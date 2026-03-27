@@ -1,6 +1,7 @@
 """CLI for skill-audit."""
 
 import os
+import sys
 from pathlib import Path
 from typing import Optional
 
@@ -44,6 +45,7 @@ before granting them access to your systems.
 
 app = typer.Typer(help=_HELP, no_args_is_help=True)
 console = Console()
+_stderr = Console(stderr=True)  # For status messages that shouldn't pollute stdout
 
 
 def _version_callback(value: bool):
@@ -187,17 +189,17 @@ def audit(
     temp_path = None
     if is_remote(path):
         try:
-            console.print(f"  [dim]Fetching {path}...[/dim]")
+            _stderr.print(f"  [dim]Fetching {path}...[/dim]")
             target, is_temp = fetch_remote(path)
             if is_temp:
                 temp_path = target
         except ValueError as e:
-            console.print(f"[red]{e}[/red]")
+            _stderr.print(f"[red]{e}[/red]")
             raise typer.Exit(1)
     else:
         target = Path(path).expanduser().resolve()
         if not target.exists():
-            console.print(f"[red]Not found: {target}[/red]")
+            _stderr.print(f"[red]Not found: {target}[/red]")
             raise typer.Exit(1)
 
     # Load ignore configuration
@@ -207,7 +209,7 @@ def audit(
     if target.is_dir():
         cards, skipped = analyze_directory(target, format, ignore_config=ignore_config, custom_patterns=cfg.custom_patterns or None, weights=cfg.weights, include_docs=include_docs)
         if not cards:
-            console.print(f"[yellow]No skill/role files found in {target}[/yellow]")
+            _stderr.print(f"[yellow]No skill/role files found in {target}[/yellow]")
             raise typer.Exit(0)
     else:
         cards = [analyze_file(target, format, ignore_config=ignore_config, custom_patterns=cfg.custom_patterns or None, weights=cfg.weights)]
@@ -220,8 +222,8 @@ def audit(
 
         provider = llm_provider or detect_provider()
         if provider is None:
-            console.print("\n  [yellow]No LLM provider found.[/yellow]")
-            console.print("  [dim]Run `ai-skill-audit providers` to check availability.[/dim]\n")
+            _stderr.print("\n  [yellow]No LLM provider found.[/yellow]")
+            _stderr.print("  [dim]Run `ai-skill-audit providers` to check availability.[/dim]\n")
         else:
             files_to_review: list[tuple[str, str, str]] = []  # (name, content, review_type)
             for card in cards:
@@ -244,7 +246,17 @@ def audit(
     if output == "json":
         print(format_json(cards))
     elif output == "html":
-        print(format_html(cards, llm_findings=llm_results or None))
+        # Build command string for the report header
+        cmd_parts = ["ai-skill-audit", "audit", path]
+        if format:
+            cmd_parts.extend(["--format", format])
+        if llm:
+            cmd_parts.append("--llm")
+        if verbose:
+            cmd_parts.append("--verbose")
+        cmd_parts.extend(["--output", "html"])
+        audit_cmd = " ".join(cmd_parts)
+        print(format_html(cards, llm_findings=llm_results or None, audit_source=path, audit_command=audit_cmd))
     elif output == "markdown":
         for card in cards:
             print(format_markdown(card))
@@ -257,7 +269,7 @@ def audit(
             format_summary_table(cards)
 
     if skipped > 0:
-        console.print(f"  [dim]Skipped {skipped} documentation file(s) (README, CONTRIBUTING, etc.). Use --include-docs to scan them.[/dim]\n")
+        _stderr.print(f"  [dim]Skipped {skipped} documentation file(s) (README, CONTRIBUTING, etc.). Use --include-docs to scan them.[/dim]\n")
 
     # Print LLM findings to terminal (for non-HTML output)
     if llm_results and output not in ("html", "json"):
