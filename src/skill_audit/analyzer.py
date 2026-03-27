@@ -64,29 +64,51 @@ def analyze_artifact(
     return card
 
 
+_DOC_FILES = {
+    # Standard repo docs
+    "readme.md", "changelog.md", "license.md", "licence.md",
+    # Contribution / governance docs
+    "contributing.md", "contributors.md", "code_of_conduct.md",
+    "security.md", "governance.md",
+    # Project management docs
+    "installation.md", "setup.md", "getting-started.md",
+    "architecture.md", "design.md", "roadmap.md",
+    # Claude/AI config files (not skills)
+    "claude.md", "gemini.md", "conventions.md",
+    # Audit / pipeline docs
+    "audit_report.md", "skill_pipeline.md", "store.md",
+}
+
+
 def analyze_directory(
     dir_path: Path,
     force_format: str | None = None,
     ignore_config: IgnoreConfig | None = None,
     custom_patterns: list[tuple[str, str, str]] | None = None,
     weights: WeightsConfig | None = None,
-) -> list[ScoreCard]:
+    include_docs: bool = False,
+) -> tuple[list[ScoreCard], int]:
     """Analyze all skill/role files in a directory.
 
     Scans top-level .md files and folder-based skills (dirs with main.md or
     SKILL.md). If nothing is found at the top level, checks common container
     directories (skills/, roles/, src/) one level deeper.
+
+    Returns (cards, skipped_count) where skipped_count is the number of
+    documentation files that were skipped.
     """
-    results = _scan_level(dir_path, force_format, ignore_config, custom_patterns, weights)
+    results, skipped = _scan_level(dir_path, force_format, ignore_config, custom_patterns, weights, include_docs)
 
     # If nothing found, try common container directories
     if not results:
         for subdir_name in ("skills", "roles", "src"):
             subdir = dir_path / subdir_name
             if subdir.is_dir():
-                results.extend(_scan_level(subdir, force_format, ignore_config, custom_patterns, weights))
+                sub_results, sub_skipped = _scan_level(subdir, force_format, ignore_config, custom_patterns, weights, include_docs)
+                results.extend(sub_results)
+                skipped += sub_skipped
 
-    return results
+    return results, skipped
 
 
 def _scan_level(
@@ -95,14 +117,14 @@ def _scan_level(
     ignore_config: IgnoreConfig | None = None,
     custom_patterns: list[tuple[str, str, str]] | None = None,
     weights: WeightsConfig | None = None,
-) -> list[ScoreCard]:
+    include_docs: bool = False,
+) -> tuple[list[ScoreCard], int]:
     """Scan a single directory level for skill/role files."""
     results: list[ScoreCard] = []
+    skipped = 0
 
     if not dir_path.exists():
-        return results
-
-    _SKIP_FILES = {"readme.md", "changelog.md", "license.md"}
+        return results, skipped
 
     # MCP config files at this level
     _MCP_FILES = {"mcp.json", "claude_desktop_config.json"}
@@ -114,7 +136,8 @@ def _scan_level(
 
     # .md files at this level
     for md_file in sorted(dir_path.glob("*.md")):
-        if md_file.name.lower() in _SKIP_FILES:
+        if not include_docs and md_file.name.lower() in _DOC_FILES:
+            skipped += 1
             continue
         card = analyze_file(md_file, force_format, ignore_config=ignore_config, custom_patterns=custom_patterns, weights=weights)
         results.append(card)
@@ -132,7 +155,7 @@ def _scan_level(
             card = analyze_file(skill_file, force_format, ignore_config=ignore_config, custom_patterns=custom_patterns, weights=weights)
             results.append(card)
 
-    return results
+    return results, skipped
 
 
 def analyze_mcp_config(path: Path) -> ScoreCard:

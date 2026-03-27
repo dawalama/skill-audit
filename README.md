@@ -446,6 +446,21 @@ ai-skill-audit audit examples/ --summary
 ai-skill-audit audit examples/malicious-skill.md --verbose
 ```
 
+### Remote audit examples
+
+See [examples/remote-audits.md](examples/remote-audits.md) for annotated scans of real public repos, including:
+
+- **MCP config with 30 servers** — catches 6 hardcoded API keys (GitHub, Slack, Discord, etc.)
+- **200+ skill collection** — grades 10 skills, auto-skips 12 documentation files
+
+```bash
+# Audit any public GitHub repo
+ai-skill-audit audit https://github.com/user/repo --summary
+
+# Audit a specific file from GitHub
+ai-skill-audit audit https://github.com/user/repo/blob/main/SKILL.md --verbose
+```
+
 ## Development
 
 ```bash

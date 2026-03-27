@@ -140,6 +140,7 @@ def audit(
     llm_provider: Optional[str] = typer.Option(None, "--llm-provider", help="Force LLM provider: claude, openrouter, ollama"),
     llm_model: Optional[str] = typer.Option(None, "--llm-model", help="Override LLM model (e.g. anthropic/claude-sonnet-4-5)"),
     no_cache: bool = typer.Option(False, "--no-cache", help="Skip LLM cache and force fresh review"),
+    include_docs: bool = typer.Option(False, "--include-docs", help="Include documentation files (README, CONTRIBUTING, etc.) in scan"),
 ):
     """Audit a skill or role file for quality and trust.
 
@@ -203,7 +204,7 @@ def audit(
     ignore_config = load_ignore_config(target)
 
     if target.is_dir():
-        cards = analyze_directory(target, format, ignore_config=ignore_config, custom_patterns=cfg.custom_patterns or None, weights=cfg.weights)
+        cards, skipped = analyze_directory(target, format, ignore_config=ignore_config, custom_patterns=cfg.custom_patterns or None, weights=cfg.weights, include_docs=include_docs)
         if not cards:
             console.print(f"[yellow]No skill/role files found in {target}[/yellow]")
             raise typer.Exit(0)
@@ -218,6 +219,8 @@ def audit(
                 format_table(card, verbose=verbose)
             if len(cards) > 1:
                 format_summary_table(cards)
+        if skipped > 0:
+            console.print(f"  [dim]Skipped {skipped} documentation file(s) (README, CONTRIBUTING, etc.). Use --include-docs to scan them.[/dim]\n")
     else:
         cards = [analyze_file(target, format, ignore_config=ignore_config, custom_patterns=cfg.custom_patterns or None, weights=cfg.weights)]
         if output == "json":
@@ -243,22 +246,27 @@ def audit(
             console.print("  [dim]Run `ai-skill-audit providers` to check availability.[/dim]\n")
         else:
             # Collect cleaned content for LLM review (strips <details>, noise)
-            files_to_review: list[tuple[str, str]] = []
+            files_to_review: list[tuple[str, str, str]] = []  # (name, content, review_type)
             for card in cards:
                 if card.file_path and card.file_path.exists():
-                    artifact = parse_for_llm(card.file_path)
-                    # Build clean content from parsed artifact
-                    clean = _build_llm_content(artifact)
-                    files_to_review.append((card.entity_name, clean))
+                    if card.entity_type == "mcp-config":
+                        # MCP configs: send raw JSON for security-focused review
+                        clean = card.file_path.read_text()
+                        files_to_review.append((card.entity_name, clean, "mcp"))
+                    else:
+                        artifact = parse_for_llm(card.file_path)
+                        clean = _build_llm_content(artifact)
+                        files_to_review.append((card.entity_name, clean, "skill"))
 
             if files_to_review:
                 label = f"{len(files_to_review)} file(s)" if len(files_to_review) > 1 else files_to_review[0][0]
-                console.print(f"  [bold]LLM Review[/bold] via {provider} — {label}\n")
+                review_label = "LLM Security Review" if any(r == "mcp" for _, _, r in files_to_review) else "LLM Review"
+                console.print(f"  [bold]{review_label}[/bold] via {provider} — {label}\n")
 
-                for fname, content in files_to_review:
+                for fname, content, rtype in files_to_review:
                     if len(files_to_review) > 1:
                         console.print(f"  [bold]{fname}[/bold]")
-                    review = review_skill(content, provider=provider, model=llm_model, no_cache=no_cache)
+                    review = review_skill(content, provider=provider, model=llm_model, no_cache=no_cache, review_type=rtype)
                     format_llm_findings(
                         review.findings, fname, review.model,
                         verbose=verbose, error=review.error,

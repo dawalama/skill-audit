@@ -72,6 +72,38 @@ Skill file to review:
 JSON findings:"""
 
 
+_MCP_REVIEW_PROMPT = """\
+You are an expert MCP security auditor. Analyze this MCP server configuration for real security risks. This is JSON config, NOT a skill — never flag missing instructions.
+
+Severity guide (be strict):
+- critical: Full filesystem/drive access, unrestricted shell execution, real-looking leaked tokens
+- high: Docker/container escape, plaintext passwords in args, arbitrary code execution
+- medium: Unpinned packages (npx -y), unencrypted protocols, overly broad permissions
+- low: Minor config hygiene issues
+
+Rules:
+- Maximum 8 findings. Merge related issues into one finding (e.g., all hardcoded secrets → one SECRET_EXPOSURE finding listing the key names).
+- No duplicates — if npx -y appears in multiple servers, report it once.
+- One short sentence per message. One short sentence per recommendation.
+- Severity must reflect actual blast radius: full drive root access = critical, not high.
+
+Respond ONLY with a JSON array. Each finding:
+- "category": SECRET_EXPOSURE, OVERPRIVILEGED, SUSPICIOUS_SERVER, or CONFIGURATION_RISK
+- "severity": critical, high, medium, or low
+- "message": one sentence
+- "evidence": short quote from the config
+- "recommendation": one sentence fix
+
+Empty config = []
+
+Config:
+---
+{content}
+---
+
+JSON:"""
+
+
 def detect_provider() -> str | None:
     """Detect which LLM provider is available, in priority order."""
     # 1. claude CLI
@@ -145,17 +177,19 @@ def _save_cache(key: str, review: LLMReview) -> None:
 
 def review_skill(content: str, provider: str | None = None,
                  model: str | None = None,
-                 no_cache: bool = False) -> LLMReview:
-    """Review a skill's content using an LLM.
+                 no_cache: bool = False,
+                 review_type: str = "skill") -> LLMReview:
+    """Review content using an LLM.
 
     Results are cached by content hash + provider + model. Pass no_cache=True
     to force a fresh review.
 
     Args:
-        content: The full text of the skill file
+        content: The full text of the file to review
         provider: Force a specific provider ("claude", "openrouter", "ollama")
         model: Override model (e.g. "anthropic/claude-sonnet-4-5" for OpenRouter)
         no_cache: Skip cache and force fresh LLM call
+        review_type: "skill" for skill/role files, "mcp" for MCP configs
 
     Returns: LLMReview with findings
     """
@@ -180,7 +214,8 @@ def review_skill(content: str, provider: str | None = None,
             cached.model = f"{cached.model} (cached)"
             return cached
 
-    prompt = _REVIEW_PROMPT.format(content=content[:8000])  # Cap at 8k chars
+    template = _MCP_REVIEW_PROMPT if review_type == "mcp" else _REVIEW_PROMPT
+    prompt = template.format(content=content[:8000])  # Cap at 8k chars
 
     try:
         if provider == "claude":

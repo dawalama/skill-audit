@@ -168,21 +168,40 @@ class TestAnalyzeDirectory:
     def test_analyzes_all_files(self, tmp_path):
         (tmp_path / "a.md").write_text("---\nname: A\ntrigger: /a\n---\n\nSkill A.\n\n## Steps\n\n1. Do A\n")
         (tmp_path / "b.md").write_text("---\nname: B\ntrigger: /b\n---\n\nSkill B.\n\n## Steps\n\n1. Do B\n")
-        cards = analyze_directory(tmp_path)
+        cards, skipped = analyze_directory(tmp_path)
         assert len(cards) == 2
+        assert skipped == 0
 
     def test_skips_readme(self, tmp_path):
         (tmp_path / "README.md").write_text("# Readme\n")
         (tmp_path / "skill.md").write_text("---\nname: X\ntrigger: /x\n---\n\nDo X.\n")
-        cards = analyze_directory(tmp_path)
+        cards, skipped = analyze_directory(tmp_path)
         assert len(cards) == 1
+        assert skipped == 1
+
+    def test_skips_doc_files(self, tmp_path):
+        (tmp_path / "CONTRIBUTING.md").write_text("# Contributing\n")
+        (tmp_path / "CODE_OF_CONDUCT.md").write_text("# Code of Conduct\n")
+        (tmp_path / "SECURITY.md").write_text("# Security\n")
+        (tmp_path / "skill.md").write_text("---\nname: X\ntrigger: /x\n---\n\nDo X.\n")
+        cards, skipped = analyze_directory(tmp_path)
+        assert len(cards) == 1
+        assert skipped == 3
+
+    def test_include_docs_scans_everything(self, tmp_path):
+        (tmp_path / "README.md").write_text("# Readme\n")
+        (tmp_path / "CONTRIBUTING.md").write_text("# Contributing\n")
+        (tmp_path / "skill.md").write_text("---\nname: X\ntrigger: /x\n---\n\nDo X.\n")
+        cards, skipped = analyze_directory(tmp_path, include_docs=True)
+        assert len(cards) == 3
+        assert skipped == 0
 
     def test_empty_directory(self, tmp_path):
-        cards = analyze_directory(tmp_path)
+        cards, skipped = analyze_directory(tmp_path)
         assert cards == []
 
     def test_nonexistent_directory(self, tmp_path):
-        cards = analyze_directory(tmp_path / "nope")
+        cards, skipped = analyze_directory(tmp_path / "nope")
         assert cards == []
 
 

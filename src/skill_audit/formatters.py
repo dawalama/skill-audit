@@ -60,14 +60,60 @@ def format_table(card: ScoreCard, verbose: bool = False) -> None:
                 for suggestion in dim.suggestions:
                     console.print(f"    [yellow]![/yellow] {suggestion}")
 
-    if card.summary:
+    if card.entity_type == "mcp-config":
+        _format_mcp_summary(card, console)
+    elif card.summary:
         console.print(f"\n  {card.summary}")
+
     console.print()
+
+
+def _format_mcp_summary(card: ScoreCard, console: Console) -> None:
+    """Print enhanced summary for MCP config scorecards."""
+    # Extract risk level from summary (e.g. "risk: CRITICAL")
+    import re
+    risk_match = re.search(r"risk:\s*(\w+)", card.summary)
+    risk = risk_match.group(1) if risk_match else "UNKNOWN"
+
+    risk_colors = {"CRITICAL": "red bold", "HIGH": "red", "MEDIUM": "yellow", "LOW": "green"}
+    risk_color = risk_colors.get(risk, "white")
+
+    # Find weakest dimension
+    weakest = min(card.dimensions, key=lambda d: d.score) if card.dimensions else None
+    weakest_detail = ""
+    if weakest and weakest.score < 1.0:
+        finding_count = len(weakest.suggestions)
+        weakest_detail = f" — Weakest: {weakest.name}"
+        if finding_count:
+            weakest_detail += f" ({finding_count} finding{'s' if finding_count != 1 else ''})"
+
+    # Count servers from summary
+    server_match = re.search(r"(\d+) server", card.summary)
+    servers = server_match.group(1) if server_match else "?"
+    total_findings = sum(len(d.suggestions) for d in card.dimensions)
+
+    console.print(f"\n  [bold]Overall Risk: [{risk_color}]{risk}[/{risk_color}][/bold]{weakest_detail}")
+    console.print(f"  [dim]{servers} server(s) configured, {total_findings} finding(s)[/dim]")
+
+    # Show recommendation for anything below A
+    if card.grade not in ("A",):
+        has_secrets = any(d.name == "secret_hygiene" and d.score < 1.0 for d in card.dimensions)
+        has_access = any(d.name in ("command_safety", "filesystem_scope") and d.score < 1.0 for d in card.dimensions)
+
+        rec_parts = []
+        if has_secrets:
+            rec_parts.append("move all secrets to a .env file or credential manager")
+        if has_access:
+            rec_parts.append("apply least-privilege rules for filesystem and shell access")
+        if not rec_parts:
+            rec_parts.append("review findings and address flagged issues")
+
+        console.print(f"\n  [yellow bold]Recommendation:[/yellow bold] {'; '.join(rec_parts).capitalize()}.")
 
 
 def format_llm_findings(findings: list, entity_name: str, model: str,
                         verbose: bool = False, error: str = "") -> None:
-    """Print LLM review findings with clear structure."""
+    """Print LLM review findings grouped by severity with deduplication."""
     console = Console()
 
     if error:
@@ -88,27 +134,56 @@ def format_llm_findings(findings: list, entity_name: str, model: str,
         "low": "[dim]LOW[/dim]",
     }
 
-    for i, finding in enumerate(ordered):
-        num = i + 1
-        label = severity_labels.get(finding.severity, finding.severity.upper())
+    # Top Risks summary — show critical+high as a quick glance box
+    top_risks = [f for f in ordered if f.severity in ("critical", "high")]
+    if top_risks:
+        console.print(f"    [bold]Top Risks[/bold]")
+        for f in top_risks:
+            label = severity_labels[f.severity]
+            console.print(f"      {label}  {f.message}")
+        console.print()
 
-        # Numbered finding with severity
-        console.print(f"    {num}. {label}  {finding.message}")
+    # Group findings by severity
+    groups: dict[str, list] = {}
+    for f in ordered:
+        groups.setdefault(f.severity, []).append(f)
 
-        # Recommendation (always shown if present — this is the actionable part)
-        if finding.recommendation:
-            console.print(f"       [green]Fix:[/green] {finding.recommendation}")
+    # Print each severity group with details (skip critical/high if already shown above without verbose)
+    for severity in ("critical", "high", "medium", "low"):
+        group = groups.get(severity, [])
+        if not group:
+            continue
 
-        # Evidence only in verbose
-        if verbose and finding.evidence:
-            evidence = finding.evidence.replace("\n", " ").strip()[:150]
-            console.print(f"       [dim]Evidence: {evidence}[/dim]")
+        # In non-verbose mode, critical/high details already shown in Top Risks
+        if severity in ("critical", "high") and not verbose:
+            # Just show the fixes inline under Top Risks
+            for finding in group:
+                if finding.recommendation:
+                    console.print(f"      [green]Fix:[/green] {finding.recommendation}")
+            if group:
+                console.print()
+            continue
 
-        # Space between findings
-        if i < len(ordered) - 1:
-            console.print()
+        label = severity_labels[severity]
+        header = {
+            "critical": "Immediate action recommended",
+            "high": "Should be addressed",
+            "medium": "Worth reviewing",
+            "low": "Minor concerns",
+        }[severity]
+        console.print(f"    {label} — {header}")
 
-    console.print(f"\n    [dim]{len(findings)} finding(s) via {model}[/dim]")
+        for finding in group:
+            console.print(f"      - {finding.message}")
+            if finding.recommendation:
+                console.print(f"        [green]Fix:[/green] {finding.recommendation}")
+            if verbose and finding.evidence:
+                evidence = finding.evidence.replace("\n", " ").strip()[:150]
+                console.print(f"        [dim]Evidence: {evidence}[/dim]")
+
+        console.print()
+
+    console.print(f"    [dim]{len(findings)} finding(s) via {model}[/dim]")
 
 
 def format_json(cards: list[ScoreCard]) -> str:
