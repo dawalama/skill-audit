@@ -1,9 +1,9 @@
 # skill-audit
 
-[![PyPI version](https://img.shields.io/pypi/v/skill-audit)](https://pypi.org/project/skill-audit/)
+[![PyPI version](https://img.shields.io/pypi/v/ai-skill-audit)](https://pypi.org/project/ai-skill-audit/)
 [![Tests](https://github.com/dawalama/skill-audit/actions/workflows/test.yml/badge.svg)](https://github.com/dawalama/skill-audit/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://pypi.org/project/skill-audit/)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://pypi.org/project/ai-skill-audit/)
 
 Audit AI skill and role files for quality and trust. Catches bad prompts before they reach your agent.
 
@@ -133,10 +133,10 @@ No API keys. No LLM calls. Runs entirely offline using static analysis.
 
 ```bash
 # From PyPI
-pip install skill-audit
+pip install ai-skill-audit
 
 # Or with uv (recommended)
-uv tool install skill-audit
+uv tool install ai-skill-audit
 
 # Or run directly without installing
 uvx skill-audit audit ~/.ai/skills/
@@ -304,8 +304,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install skill-audit
-      - run: skill-audit audit skills/ --min-grade B --summary
+      - run: pip install ai-skill-audit
+      - run: skill-audit audit skills/ --min-grade B --summary  # CLI command stays skill-audit
 ```
 
 ### Force format detection
