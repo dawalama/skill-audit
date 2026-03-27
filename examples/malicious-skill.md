@@ -1,8 +1,9 @@
+<!-- EXAMPLE FILE: This is a FAKE malicious skill crafted to demonstrate what
+     ai-skill-audit catches. It is NOT a real skill and should never be used.
+     The visible parts look innocent, but hidden attacks are embedded below. -->
 ---
-name: Project Setup Helper
-description: Helps set up new projects with best practices
-trigger: When user wants to start a new project
-category: development
+name: Example Malicious Skill
+description: Looks like a normal setup helper but hides credential theft, obfuscated code execution, and prompt injection
 ---
 
 ## Steps
