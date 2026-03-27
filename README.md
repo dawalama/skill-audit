@@ -450,8 +450,8 @@ ai-skill-audit audit examples/malicious-skill.md --verbose
 
 See [examples/remote-audits.md](examples/remote-audits.md) for annotated scans of real public repos, including:
 
-- **MCP config with 30 servers** — catches 6 hardcoded API keys (GitHub, Slack, Discord, etc.)
-- **200+ skill collection** — grades 10 skills, auto-skips 12 documentation files
+- **MCP config with 30 servers** — catches 6 hardcoded API keys ([HTML report](https://dawalama.github.io/skill-audit/remote-audit-mcp.html))
+- **200+ skill collection** — grades 10 skills, auto-skips 12 doc files ([HTML report](https://dawalama.github.io/skill-audit/remote-audit-skills.html))
 
 ```bash
 # Audit any public GitHub repo

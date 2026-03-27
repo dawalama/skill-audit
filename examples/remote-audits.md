@@ -88,8 +88,8 @@ ai-skill-audit audit https://github.com/alirezarezvani/claude-skills --summary -
 
 The same scans are available as self-contained HTML reports:
 
-- [remote-audit-mcp.html](remote-audit-mcp.html) — MCP config scan (angrysky56)
-- [remote-audit-skills.html](remote-audit-skills.html) — Skills collection scan (alirezarezvani)
+- [MCP config scan](https://dawalama.github.io/skill-audit/remote-audit-mcp.html) — angrysky56/100-tool-mcp-server
+- [Skills collection scan](https://dawalama.github.io/skill-audit/remote-audit-skills.html) — alirezarezvani/claude-skills
 
 Generate your own:
 
