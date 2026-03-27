@@ -52,7 +52,7 @@ def _strip_details_blocks(body: str) -> str:
 
 
 def detect_format(path: Path) -> str:
-    """Detect file format: dotai-skill, dotai-role, claude-native, or unknown."""
+    """Detect file format: dotai-skill, dotai-role, claude-native, mcp-config, or unknown."""
     if not path.exists():
         return "unknown"
 
@@ -62,6 +62,10 @@ def detect_format(path: Path) -> str:
         if (path / "main.md").exists():
             return "dotai-skill"
         return "unknown"
+
+    # MCP config files
+    if path.name in ("mcp.json", "claude_desktop_config.json"):
+        return "mcp-config"
 
     content = path.read_text()
     fm = _extract_frontmatter(content)
@@ -167,19 +171,26 @@ def _parse_skill_body(artifact: ParsedArtifact, body: str, fm: dict) -> None:
         if desc and not artifact.description:
             artifact.description = desc.split("\n\n")[0].strip()
 
-    # Steps — capture numbered items with their continuation lines (sub-bullets)
+    # Steps — try AST-based extraction first, fall back to regex
     steps_body = sections.get("steps") or sections.get("workflow") or sections.get("instructions") or ""
-    # Split on numbered items, keeping the full block for each step
-    step_blocks = re.split(r"(?=^\d+\.\s)", steps_body, flags=re.MULTILINE)
-    for block in step_blocks:
-        block = block.strip()
-        if not block:
-            continue
-        match = re.match(r"^\d+\.\s*(.+)", block, re.DOTALL)
-        if match:
-            # Join multi-line step into a single string, preserving sub-bullets
-            step_text = match.group(1).strip()
-            artifact.steps.append(step_text)
+    try:
+        ast_steps = _extract_steps_ast(steps_body)
+        if ast_steps:
+            artifact.steps.extend(ast_steps)
+        else:
+            raise ValueError("no steps from AST")
+    except Exception:
+        # Regex fallback: capture numbered items with their continuation lines (sub-bullets)
+        step_blocks = re.split(r"(?=^\d+\.\s)", steps_body, flags=re.MULTILINE)
+        for block in step_blocks:
+            block = block.strip()
+            if not block:
+                continue
+            match = re.match(r"^\d+\.\s*(.+)", block, re.DOTALL)
+            if match:
+                # Join multi-line step into a single string, preserving sub-bullets
+                step_text = match.group(1).strip()
+                artifact.steps.append(step_text)
 
     # Inputs
     inputs_body = sections.get("inputs") or sections.get("parameters") or sections.get("arguments") or sections.get("configuration") or ""
@@ -233,8 +244,50 @@ def _parse_role_body(artifact: ParsedArtifact, body: str) -> None:
         artifact.anti_patterns.append(match.group(1).strip())
 
 
-def _split_sections(body: str) -> dict[str, str]:
-    """Split markdown body into sections by ## headers."""
+def _split_sections_ast(body: str) -> dict[str, str]:
+    """Split markdown body into sections by ## headers using mistletoe AST."""
+    import mistletoe
+    from mistletoe.block_token import Heading
+
+    doc = mistletoe.Document(body)
+    sections: dict[str, str] = {}
+    lines = body.split("\n")
+
+    # Collect heading positions from the AST
+    heading_positions: list[tuple[str, int]] = []
+    for token in doc.children:
+        if isinstance(token, Heading) and token.level == 2:
+            # Extract the raw text from the heading's children
+            heading_text = _render_span_tokens(token.children).strip().lower()
+            # Find the line number — mistletoe tokens have a .line_number attribute (1-based) if available
+            # But line_number can be unreliable; find the heading line by matching
+            heading_positions.append((heading_text, getattr(token, 'line_number', None)))
+
+    if not heading_positions:
+        return sections
+
+    # Rebuild sections by finding heading lines in the source
+    # This approach ensures we capture all content between headings exactly as the regex would
+    header_line_indices: list[tuple[str, int]] = []
+    for line_idx, line in enumerate(lines):
+        header_match = re.match(r"^##\s+(.+)$", line)
+        if header_match:
+            name = header_match.group(1).strip().lower()
+            header_line_indices.append((name, line_idx))
+
+    for i, (name, start_idx) in enumerate(header_line_indices):
+        if i + 1 < len(header_line_indices):
+            end_idx = header_line_indices[i + 1][1]
+        else:
+            end_idx = len(lines)
+        content = "\n".join(lines[start_idx + 1 : end_idx]).strip()
+        sections[name] = content
+
+    return sections
+
+
+def _split_sections_regex(body: str) -> dict[str, str]:
+    """Split markdown body into sections by ## headers (regex fallback)."""
     sections: dict[str, str] = {}
     current_name = ""
     current_lines: list[str] = []
@@ -253,6 +306,126 @@ def _split_sections(body: str) -> dict[str, str]:
         sections[current_name] = "\n".join(current_lines).strip()
 
     return sections
+
+
+def _split_sections(body: str) -> dict[str, str]:
+    """Split markdown body into sections by ## headers.
+
+    Uses mistletoe AST parsing for reliable structure extraction,
+    falling back to regex if AST parsing fails.
+    """
+    try:
+        return _split_sections_ast(body)
+    except Exception:
+        return _split_sections_regex(body)
+
+
+def _render_span_tokens(children) -> str:
+    """Render inline/span tokens back to plain text."""
+    parts: list[str] = []
+    for child in children:
+        # Composite tokens (Strong, Emphasis, etc.) have children with the text
+        if hasattr(child, 'children') and child.children:
+            parts.append(_render_span_tokens(child.children))
+        elif hasattr(child, 'content') and child.content:
+            parts.append(child.content)
+    return "".join(parts)
+
+
+def _parse_body_ast(body: str) -> dict:
+    """Parse markdown body into structured components using mistletoe AST.
+
+    Returns a dict with:
+      - headings: list of (level, text) tuples
+      - code_blocks: list of (language, content) tuples
+      - lists: list of dicts with 'ordered' bool and 'items' list (supports nesting)
+      - paragraphs: list of raw text strings
+    """
+    import mistletoe
+    from mistletoe.block_token import (
+        Heading,
+        CodeFence,
+        BlockCode,
+        List as MdList,
+        Paragraph,
+    )
+
+    doc = mistletoe.Document(body)
+    result: dict = {
+        "headings": [],
+        "code_blocks": [],
+        "lists": [],
+        "paragraphs": [],
+    }
+
+    def _extract_list_items(list_token) -> list[dict]:
+        """Recursively extract list items, including nested lists."""
+        items = []
+        for item in list_token.children:
+            text_parts: list[str] = []
+            sub_items: list[dict] = []
+            for child in (item.children or []):
+                if isinstance(child, Paragraph):
+                    text_parts.append(_render_span_tokens(child.children))
+                elif isinstance(child, MdList):
+                    sub_items.extend(_extract_list_items(child))
+                elif hasattr(child, 'children') and child.children:
+                    text_parts.append(_render_span_tokens(child.children))
+            text = " ".join(text_parts).strip()
+            items.append({"text": text, "children": sub_items})
+        return items
+
+    for token in doc.children:
+        if isinstance(token, Heading):
+            text = _render_span_tokens(token.children).strip()
+            result["headings"].append((token.level, text))
+        elif isinstance(token, (CodeFence, BlockCode)):
+            lang = getattr(token, 'language', '') or ''
+            content = (getattr(token, 'content', '') or
+                       (token.children[0].content if token.children else ''))
+            result["code_blocks"].append((lang.lower().strip(), content.strip()))
+        elif isinstance(token, MdList):
+            ordered = hasattr(token, 'start_at') or getattr(token, 'start', None) is not None
+            items = _extract_list_items(token)
+            result["lists"].append({"ordered": ordered, "items": items})
+        elif isinstance(token, Paragraph):
+            text = _render_span_tokens(token.children).strip()
+            if text:
+                result["paragraphs"].append(text)
+
+    return result
+
+
+def _extract_steps_ast(steps_body: str) -> list[str]:
+    """Extract numbered list steps from a section body using mistletoe AST."""
+    import mistletoe
+    from mistletoe.block_token import List as MdList, Paragraph
+
+    doc = mistletoe.Document(steps_body)
+    steps: list[str] = []
+
+    for token in doc.children:
+        if isinstance(token, MdList):
+            for item in token.children:
+                text_parts: list[str] = []
+                for child in (item.children or []):
+                    if isinstance(child, Paragraph):
+                        text_parts.append(_render_span_tokens(child.children))
+                    elif isinstance(child, MdList):
+                        # Include sub-list text as part of the step
+                        for sub_item in child.children:
+                            for sub_child in (sub_item.children or []):
+                                if isinstance(sub_child, Paragraph):
+                                    text_parts.append(
+                                        "- " + _render_span_tokens(sub_child.children)
+                                    )
+                    elif hasattr(child, 'children') and child.children:
+                        text_parts.append(_render_span_tokens(child.children))
+                text = "\n".join(text_parts).strip()
+                if text:
+                    steps.append(text)
+
+    return steps
 
 
 def _extract_frontmatter(content: str) -> dict[str, str]:

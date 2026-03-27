@@ -3,21 +3,23 @@
 4 dimensions: persona_clarity, principles_quality, anti_patterns, scope.
 """
 
+from ..config import WeightsConfig
 from ..models import ScoreDimension
 from ..parser import ParsedArtifact
 
 
-def score_role(artifact: ParsedArtifact) -> list[ScoreDimension]:
+def score_role(artifact: ParsedArtifact, weights: WeightsConfig | None = None) -> list[ScoreDimension]:
     """Score a role across 4 dimensions. Returns list of ScoreDimension."""
+    w = weights or WeightsConfig()
     return [
-        _score_persona_clarity(artifact),
-        _score_principles_quality(artifact),
-        _score_anti_patterns(artifact),
-        _score_scope(artifact),
+        _score_persona_clarity(artifact, weight=w.persona_clarity),
+        _score_principles_quality(artifact, weight=w.principles_quality),
+        _score_anti_patterns(artifact, weight=w.anti_patterns),
+        _score_scope(artifact, weight=w.scope),
     ]
 
 
-def _score_persona_clarity(a: ParsedArtifact) -> ScoreDimension:
+def _score_persona_clarity(a: ParsedArtifact, weight: float = 0.30) -> ScoreDimension:
     """Has persona, starts with 'You are...', describes mission."""
     score = 0.0
     details: list[str] = []
@@ -53,13 +55,13 @@ def _score_persona_clarity(a: ParsedArtifact) -> ScoreDimension:
     return ScoreDimension(
         name="persona_clarity",
         score=min(score, 1.0),
-        weight=0.30,
+        weight=weight,
         details=details,
         suggestions=suggestions,
     )
 
 
-def _score_principles_quality(a: ParsedArtifact) -> ScoreDimension:
+def _score_principles_quality(a: ParsedArtifact, weight: float = 0.30) -> ScoreDimension:
     """Has 3+ principles, specific (>30 chars, concrete nouns)."""
     score = 0.0
     details: list[str] = []
@@ -74,7 +76,7 @@ def _score_principles_quality(a: ParsedArtifact) -> ScoreDimension:
         return ScoreDimension(
             name="principles_quality",
             score=0.0,
-            weight=0.30,
+            weight=weight,
             details=details,
             suggestions=suggestions,
         )
@@ -100,13 +102,13 @@ def _score_principles_quality(a: ParsedArtifact) -> ScoreDimension:
     return ScoreDimension(
         name="principles_quality",
         score=min(score, 1.0),
-        weight=0.30,
+        weight=weight,
         details=details,
         suggestions=suggestions,
     )
 
 
-def _score_anti_patterns(a: ParsedArtifact) -> ScoreDimension:
+def _score_anti_patterns(a: ParsedArtifact, weight: float = 0.20) -> ScoreDimension:
     """Present, 2+ items, specific."""
     score = 0.0
     details: list[str] = []
@@ -121,7 +123,7 @@ def _score_anti_patterns(a: ParsedArtifact) -> ScoreDimension:
         return ScoreDimension(
             name="anti_patterns",
             score=0.0,
-            weight=0.20,
+            weight=weight,
             details=details,
             suggestions=suggestions,
         )
@@ -147,13 +149,13 @@ def _score_anti_patterns(a: ParsedArtifact) -> ScoreDimension:
     return ScoreDimension(
         name="anti_patterns",
         score=min(score, 1.0),
-        weight=0.20,
+        weight=weight,
         details=details,
         suggestions=suggestions,
     )
 
 
-def _score_scope(a: ParsedArtifact) -> ScoreDimension:
+def _score_scope(a: ParsedArtifact, weight: float = 0.20) -> ScoreDimension:
     """Has description, focused (<120 chars), has tags."""
     score = 0.0
     details: list[str] = []
@@ -185,7 +187,7 @@ def _score_scope(a: ParsedArtifact) -> ScoreDimension:
     return ScoreDimension(
         name="scope",
         score=min(score, 1.0),
-        weight=0.20,
+        weight=weight,
         details=details,
         suggestions=suggestions,
     )

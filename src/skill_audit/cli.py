@@ -8,6 +8,7 @@ import typer
 from rich.console import Console
 
 from . import __version__
+from .config import load_config, format_config
 
 _HELP = """\
 Audit AI skill and role files for quality and trust.
@@ -131,7 +132,7 @@ def _build_llm_content(artifact) -> str:
 def audit(
     path: str = typer.Argument(..., help="File, directory, or URL to audit"),
     format: Optional[str] = typer.Option(None, "--format", "-f", help="Force format: dotai-skill, dotai-role, claude-native"),
-    output: str = typer.Option("table", "--output", "-o", help="Output format: table, json, markdown"),
+    output: str = typer.Option("table", "--output", "-o", help="Output format: table, json, markdown, html"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show per-dimension details and suggestions"),
     min_grade: Optional[str] = typer.Option(None, "--min-grade", help="Exit 1 if below grade (A/B/C/D) — useful for CI"),
     summary: bool = typer.Option(False, "--summary", help="Summary table only (for directories)"),
@@ -165,7 +166,21 @@ def audit(
     """
     from .analyzer import analyze_file, analyze_directory
     from .fetcher import is_remote, fetch_remote, cleanup_temp
-    from .formatters import format_table, format_json, format_markdown, format_summary_table
+    from .formatters import format_table, format_json, format_markdown, format_html, format_summary_table
+    from .ignore import load_ignore_config
+
+    # Load config and apply defaults (CLI flags override config values)
+    cfg = load_config()
+    if output == "table" and cfg.output != "table":
+        output = cfg.output
+    if min_grade is None and cfg.min_grade:
+        min_grade = cfg.min_grade
+    if not llm and cfg.llm.enabled:
+        llm = True
+    if llm_provider is None and cfg.llm.provider:
+        llm_provider = cfg.llm.provider
+    if llm_model is None and cfg.llm.model:
+        llm_model = cfg.llm.model
 
     # Handle remote URLs
     temp_path = None
@@ -184,13 +199,18 @@ def audit(
             console.print(f"[red]Not found: {target}[/red]")
             raise typer.Exit(1)
 
+    # Load ignore configuration
+    ignore_config = load_ignore_config(target)
+
     if target.is_dir():
-        cards = analyze_directory(target, format)
+        cards = analyze_directory(target, format, ignore_config=ignore_config, custom_patterns=cfg.custom_patterns or None, weights=cfg.weights)
         if not cards:
             console.print(f"[yellow]No skill/role files found in {target}[/yellow]")
             raise typer.Exit(0)
         if output == "json":
             print(format_json(cards))
+        elif output == "html":
+            print(format_html(cards))
         elif summary:
             format_summary_table(cards)
         else:
@@ -199,9 +219,11 @@ def audit(
             if len(cards) > 1:
                 format_summary_table(cards)
     else:
-        cards = [analyze_file(target, format)]
+        cards = [analyze_file(target, format, ignore_config=ignore_config, custom_patterns=cfg.custom_patterns or None, weights=cfg.weights)]
         if output == "json":
             print(format_json(cards))
+        elif output == "html":
+            print(format_html(cards))
         elif output == "markdown":
             for card in cards:
                 print(format_markdown(card))
@@ -272,12 +294,30 @@ def info(
     format, entity type, parsed name, description, and what sections were
     found.
     """
-    from .parser import parse_file
+    from .parser import parse_file, detect_format
 
     target = Path(path).expanduser().resolve()
     if not target.exists():
         console.print(f"[red]Not found: {target}[/red]")
         raise typer.Exit(1)
+
+    # Handle MCP config files specially
+    fmt = detect_format(target)
+    if fmt == "mcp-config":
+        from .mcp_scanner import scan_mcp_config
+        result = scan_mcp_config(target)
+        console.print(f"\n  [bold]File:[/bold]        {target.name}")
+        console.print(f"  [bold]Format:[/bold]      mcp-config")
+        console.print(f"  [bold]Type:[/bold]        mcp-config")
+        console.print(f"  [bold]Servers:[/bold]     {result.server_count}")
+        console.print(f"  [bold]Risk:[/bold]        {result.overall_risk}")
+        console.print(f"  [bold]Findings:[/bold]    {len(result.servers)}")
+        if result.servers:
+            for f in result.servers:
+                sev_color = {"critical": "red bold", "high": "red", "medium": "yellow", "low": "dim"}.get(f.severity, "white")
+                console.print(f"    [{sev_color}]{f.severity.upper()}[/{sev_color}] [{f.server_name}] {f.message}")
+        console.print()
+        return
 
     artifact = parse_file(target)
 
@@ -381,6 +421,40 @@ def cache(
     console.print(f"  Entries:  {len(entries)}")
     console.print(f"  Size:     {total_size / 1024:.1f} KB")
     console.print(f"\n  Run [bold]skill-audit cache --clear[/bold] to delete.\n")
+
+
+@app.command()
+def config():
+    """Show the current effective configuration.
+
+    Displays merged config from skill-audit.toml in the current directory
+    and ~/.config/skill-audit/config.toml. CWD config takes precedence
+    over home config. CLI flags always override config values.
+    """
+    from .config import _CWD_FILE, _HOME_FILE
+
+    cfg = load_config()
+
+    cwd_path = Path.cwd() / _CWD_FILE
+    home_path = _HOME_FILE
+
+    console.print("\n  [bold]Effective Configuration[/bold]\n")
+
+    sources = []
+    if cwd_path.exists():
+        sources.append(f"  [green]{cwd_path}[/green] (project)")
+    if home_path.exists():
+        sources.append(f"  [green]{home_path}[/green] (user)")
+    if not sources:
+        sources.append("  [dim](no config files found — using defaults)[/dim]")
+
+    console.print("  [bold]Sources:[/bold]")
+    for s in sources:
+        console.print(f"    {s}")
+    console.print()
+
+    console.print(format_config(cfg))
+    console.print()
 
 
 if __name__ == "__main__":

