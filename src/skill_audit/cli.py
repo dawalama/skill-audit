@@ -19,15 +19,15 @@ actionable feedback on your own skills and roles.
 
 How to use:
 
-  Audit a file:           skill-audit audit SKILL.md
-  See what's wrong:       skill-audit audit SKILL.md -v
-  Audit a directory:      skill-audit audit ~/.ai/skills/
-  Audit a GitHub repo:    skill-audit audit https://github.com/user/skills
-  Audit a GitHub file:    skill-audit audit https://github.com/user/repo/blob/main/SKILL.md
-  Add LLM deep review:   skill-audit audit SKILL.md --llm
-  Fail CI below grade B: skill-audit audit skills/ --min-grade B
-  Inspect without scoring: skill-audit info SKILL.md
-  Check LLM providers:   skill-audit providers
+  Audit a file:           ai-skill-audit audit SKILL.md
+  See what's wrong:       ai-skill-audit audit SKILL.md -v
+  Audit a directory:      ai-skill-audit audit ~/.ai/skills/
+  Audit a GitHub repo:    ai-skill-audit audit https://github.com/user/skills
+  Audit a GitHub file:    ai-skill-audit audit https://github.com/user/repo/blob/main/SKILL.md
+  Add LLM deep review:   ai-skill-audit audit SKILL.md --llm
+  Fail CI below grade B: ai-skill-audit audit skills/ --min-grade B
+  Inspect without scoring: ai-skill-audit info SKILL.md
+  Check LLM providers:   ai-skill-audit providers
 
 Skills are graded A-F across 6 dimensions: completeness, clarity,
 actionability, safety, testability, and trust. Trust scans for 7 threat
@@ -48,7 +48,7 @@ console = Console()
 
 def _version_callback(value: bool):
     if value:
-        print(f"skill-audit {__version__}")
+        print(f"ai-skill-audit {__version__}")
         raise typer.Exit()
 
 
@@ -159,10 +159,10 @@ def audit(
     OpenRouter (OPENROUTER_API_KEY), or Ollama (local). No LLM SDK required.
 
     Accepts local files/directories or remote URLs:
-      skill-audit audit SKILL.md                              Local file
-      skill-audit audit ~/.ai/skills/                         Local directory
-      skill-audit audit https://github.com/user/skills        GitHub repo
-      skill-audit audit https://github.com/user/repo/blob/main/SKILL.md
+      ai-skill-audit audit SKILL.md                           Local file
+      ai-skill-audit audit ~/.ai/skills/                      Local directory
+      ai-skill-audit audit https://github.com/user/skills     GitHub repo
+      ai-skill-audit audit https://github.com/user/repo/blob/main/SKILL.md
     """
     from .analyzer import analyze_file, analyze_directory
     from .fetcher import is_remote, fetch_remote, cleanup_temp
@@ -240,7 +240,7 @@ def audit(
         provider = llm_provider or detect_provider()
         if provider is None:
             console.print("\n  [yellow]No LLM provider found.[/yellow]")
-            console.print("  [dim]Run `skill-audit providers` to check availability.[/dim]\n")
+            console.print("  [dim]Run `ai-skill-audit providers` to check availability.[/dim]\n")
         else:
             # Collect cleaned content for LLM review (strips <details>, noise)
             files_to_review: list[tuple[str, str]] = []
@@ -420,7 +420,7 @@ def cache(
     console.print(f"  Location: {_CACHE_DIR}")
     console.print(f"  Entries:  {len(entries)}")
     console.print(f"  Size:     {total_size / 1024:.1f} KB")
-    console.print(f"\n  Run [bold]skill-audit cache --clear[/bold] to delete.\n")
+    console.print(f"\n  Run [bold]ai-skill-audit cache --clear[/bold] to delete.\n")
 
 
 @app.command()

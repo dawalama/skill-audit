@@ -129,33 +129,38 @@ False positives are possible — use `.skill-audit-ignore` to suppress known-goo
 
 ## Install
 
-No API keys. No LLM calls. Runs entirely offline using static analysis.
+The package is published on PyPI as **`ai-skill-audit`**:
 
 ```bash
-# From PyPI
+# Recommended
 pip install ai-skill-audit
 
-# Or with uv (recommended)
+# Or with uv (faster)
 uv tool install ai-skill-audit
 
-# Or run directly without installing
-uvx skill-audit audit ~/.ai/skills/
-
-# From source
-git clone https://github.com/dawalama/skill-audit.git
-cd skill-audit
-uv sync
-uv run skill-audit audit ~/.ai/skills/
+# Run directly without installing
+uvx ai-ai-skill-audit audit ~/.ai/skills/
 ```
 
-**Requirements:** Python 3.11+. No external dependencies beyond `pydantic`, `typer`, and `rich` (installed automatically).
+From source (for latest changes):
+
+```bash
+git clone https://github.com/dawalama/skill-audit.git
+cd skill-audit
+uv sync --extra dev
+uv run ai-ai-skill-audit audit ~/.ai/skills/
+```
+
+**Requirements:** Python >= 3.11. No API keys. No LLM calls. Runs entirely offline.
+
+> **Note:** Both `ai-skill-audit` and `skill-audit` work as CLI commands. The package name on PyPI is `ai-skill-audit` because `skill-audit` was already taken.
 
 ## Usage
 
 ### Audit a single file
 
 ```bash
-skill-audit audit review.md
+ai-skill-audit audit review.md
 ```
 
 ```
@@ -177,7 +182,7 @@ skill-audit audit review.md
 ### Audit with detailed findings
 
 ```bash
-skill-audit audit review.md --verbose
+ai-skill-audit audit review.md --verbose
 ```
 
 Shows per-dimension findings (what's good) and suggestions (what to improve).
@@ -185,7 +190,7 @@ Shows per-dimension findings (what's good) and suggestions (what to improve).
 ### Audit a directory
 
 ```bash
-skill-audit audit ~/.ai/skills/ --summary
+ai-skill-audit audit ~/.ai/skills/ --summary
 ```
 
 ```
@@ -207,11 +212,11 @@ skill-audit audit ~/.ai/skills/ --summary
 
 ```bash
 # Automatically detected in directories
-skill-audit audit . --summary
+ai-skill-audit audit . --summary
 
 # Or directly
-skill-audit audit mcp.json
-skill-audit audit claude_desktop_config.json
+ai-skill-audit audit mcp.json
+ai-skill-audit audit claude_desktop_config.json
 ```
 
 Scans MCP server configs for risky commands (`bash -c`), exposed secrets in env vars, overly broad filesystem access, and wildcard tool permissions.
@@ -220,19 +225,19 @@ Scans MCP server configs for risky commands (`bash -c`), exposed secrets in env 
 
 ```bash
 # GitHub repo
-skill-audit audit https://github.com/user/skills
+ai-skill-audit audit https://github.com/user/skills
 
 # Specific file
-skill-audit audit https://github.com/user/repo/blob/main/SKILL.md
+ai-skill-audit audit https://github.com/user/repo/blob/main/SKILL.md
 
 # Subdirectory
-skill-audit audit https://github.com/user/repo/tree/main/skills
+ai-skill-audit audit https://github.com/user/repo/tree/main/skills
 ```
 
 ### Inspect without scoring
 
 ```bash
-skill-audit info SKILL.md
+ai-skill-audit info SKILL.md
 ```
 
 Shows detected format, entity type, parsed name, and extracted structure.
@@ -243,14 +248,14 @@ Add `--llm` for deeper analysis that static patterns can't catch: intent mismatc
 
 ```bash
 # Uses claude CLI if installed (zero config — already authenticated)
-skill-audit audit SKILL.md --llm
+ai-skill-audit audit SKILL.md --llm
 
 # Force a specific provider
-skill-audit audit SKILL.md --llm --llm-provider openrouter
-skill-audit audit SKILL.md --llm --llm-provider ollama --llm-model llama3.2
+ai-skill-audit audit SKILL.md --llm --llm-provider openrouter
+ai-skill-audit audit SKILL.md --llm --llm-provider ollama --llm-model llama3.2
 
 # Check which providers are available
-skill-audit providers
+ai-skill-audit providers
 ```
 
 **No LLM SDK required.** Uses tools you already have:
@@ -269,23 +274,23 @@ Static analysis always runs first. LLM review is additive — it never replaces 
 
 ```bash
 # Rich table (default)
-skill-audit audit review.md
+ai-skill-audit audit review.md
 
 # JSON (for programmatic use)
-skill-audit audit review.md --output json
+ai-skill-audit audit review.md --output json
 
 # Markdown (for PRs and docs)
-skill-audit audit review.md --output markdown
+ai-skill-audit audit review.md --output markdown
 
 # HTML (self-contained report)
-skill-audit audit review.md --output html > report.html
+ai-skill-audit audit review.md --output html > report.html
 ```
 
 ### Use in CI
 
 ```bash
 # Fail if any skill scores below B
-skill-audit audit ~/.ai/skills/ --min-grade B
+ai-skill-audit audit ~/.ai/skills/ --min-grade B
 ```
 
 Exit code 1 if any file is below the threshold.
@@ -305,14 +310,14 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install ai-skill-audit
-      - run: skill-audit audit skills/ --min-grade B --summary  # CLI command stays skill-audit
+      - run: ai-skill-audit audit skills/ --min-grade B --summary  # CLI command stays skill-audit
 ```
 
 ### Force format detection
 
 ```bash
-skill-audit audit SKILL.md --format claude-native
-skill-audit audit custom.md --format dotai-skill
+ai-skill-audit audit SKILL.md --format claude-native
+ai-skill-audit audit custom.md --format dotai-skill
 ```
 
 ## Suppressing findings
@@ -395,7 +400,7 @@ entropy_threshold = 4.8
 CLI flags always override config file values. View effective config:
 
 ```bash
-skill-audit config
+ai-skill-audit config
 ```
 
 ## Supported formats
@@ -437,8 +442,8 @@ The `examples/` directory contains sample files for testing:
 
 ```bash
 # Try it yourself
-skill-audit audit examples/ --summary
-skill-audit audit examples/malicious-skill.md --verbose
+ai-skill-audit audit examples/ --summary
+ai-skill-audit audit examples/malicious-skill.md --verbose
 ```
 
 ## Development

@@ -38,6 +38,7 @@ Changelog = "https://github.com/dawalama/skill-audit/releases"
 dev = ["pytest>=8.0"]
 
 [project.scripts]
+ai-skill-audit = "skill_audit.cli:app"
 skill-audit = "skill_audit.cli:app"
 
 [tool.hatch.build.targets.wheel]
