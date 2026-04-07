@@ -62,7 +62,7 @@
 <div class="container">
 
 <h1><code>ai-skill-audit</code></h1>
-<p class="tagline">The linter for AI skills. Quality scoring + security scanning in one tool.</p>
+<p class="tagline">The linter for AI skills. Quality scoring + research-backed security scanning in one tool.</p>
 
 <h2>The problem</h2>
 <p>80,000+ community skills are circulating across Claude Code, Cursor, and MCP platforms. You copy-paste a config, install a skill, or browse a marketplace &mdash; and trust that it's safe.</p>
@@ -75,18 +75,21 @@
 <div class="stat-row">
   <div class="stat"><span class="num red">37%</span><span class="label">of skills with critical issues</span></div>
   <div class="stat"><span class="num yellow">6</span><span class="label">leaked API keys in one popular MCP config</span></div>
-  <div class="stat"><span class="num green">60+</span><span class="label">threat patterns detected</span></div>
+  <div class="stat"><span class="num green">80+</span><span class="label">threat patterns across 9 categories</span></div>
 </div>
 
 <h2>What it catches</h2>
 <div class="features">
   <div class="feature"><strong>Prompt injection</strong> &mdash; instruction overrides, hidden tags, zero-width chars</div>
   <div class="feature"><strong>Hardcoded secrets</strong> &mdash; AWS, GitHub, Slack, OpenAI keys</div>
-  <div class="feature"><strong>Data exfiltration</strong> &mdash; curl POST, credential file reads</div>
+  <div class="feature"><strong>Data exfiltration &amp; RCE</strong> &mdash; reverse shells, credential logging, curl POST</div>
   <div class="feature"><strong>Code obfuscation</strong> &mdash; base64|bash, eval, dynamic imports</div>
+  <div class="feature"><strong>Persistence backdoors</strong> &mdash; authorized_keys, systemd, shell profiles</div>
+  <div class="feature"><strong>Resource hijacking</strong> &mdash; crypto miners, mining pool connections</div>
   <div class="feature"><strong>Destructive commands</strong> &mdash; rm -rf, DROP TABLE, force push</div>
   <div class="feature"><strong>MCP config risks</strong> &mdash; exposed secrets, overprivileged servers</div>
 </div>
+<p style="color: var(--muted); font-size: 0.85rem; margin-top: 0.5rem;">Patterns informed by <a href="https://arxiv.org/abs/2604.03070">arXiv:2604.03070</a>, <a href="https://www.spaceraccoon.dev/prompt-injection-ai-agents-mcp/">ClawHavoc</a>, OWASP LLM Top 10, and ongoing security research.</p>
 
 <h2>See it in action</h2>
 <p>Real scans of public GitHub repositories, with static analysis + LLM security review:</p>
@@ -101,6 +104,12 @@
   <h3>Example Malicious Skill: looks normal, hides 13 attack vectors <span class="grade grade-c">C</span></h3>
   <p>A crafted test skill with perfect quality scores &mdash; but trust at 0%. Hides prompt injection, credential theft, obfuscated shell execution, and destructive commands.</p>
   <p class="finding">13 findings across 7 categories &mdash; exactly how real attacks work</p>
+</a>
+
+<a href="evil-deploy.md" class="report-card">
+  <h3>Evil Deploy: all 10 arXiv:2604.03070 categories <span class="grade" style="background:#b62324">F</span></h3>
+  <p>Test skill mapping to every vulnerability category from the "Credential Leakage in LLM Agent Skills" paper &mdash; reverse shells, persistence, crypto mining, credential logging.</p>
+  <p class="finding">16 findings across 6 categories &mdash; all 10 steps flagged</p>
 </a>
 
 <a href="remote-audit-gstack.html" class="report-card">

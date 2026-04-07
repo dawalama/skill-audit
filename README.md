@@ -7,6 +7,8 @@
 
 Audit AI skill and role files for quality and trust. Catches bad prompts before they reach your agent.
 
+**[Live demo and reports](https://dawalama.github.io/skill-audit/)** | **[PyPI](https://pypi.org/project/ai-skill-audit/)** | **[Examples](examples/remote-audits.md)**
+
 ## Why
 
 The AI skill ecosystem is growing fast — 80k+ community skills across Claude Code, OpenClaw, and other platforms. Some are excellent. Many are vague or incomplete. And some are actively malicious: audits have found 13-37% of marketplace skills contain critical issues including prompt injection, credential theft, and data exfiltration.
