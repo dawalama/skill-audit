@@ -510,7 +510,7 @@ See [examples/remote-audits.md](examples/remote-audits.md) for annotated scans o
 
 - **MCP config with 30 servers** — catches 6 hardcoded API keys ([HTML report](https://dawalama.github.io/skill-audit/remote-audit-mcp.html))
 - **Malicious skill** — looks normal, hides 13 attack vectors across 7 categories ([HTML report](https://dawalama.github.io/skill-audit/audit-malicious-skill.html))
-- **gstack dev toolkit** — 29 skills, context-aware scanning reduces false positives ([HTML report](https://dawalama.github.io/skill-audit/remote-audit-gstack.html))
+- **gstack dev toolkit** — 59 remote files scanned, including docs as attack surface ([HTML report](https://dawalama.github.io/skill-audit/remote-audit-gstack.html))
 - **200+ skill collection** — grades 10 skills, auto-skips 12 doc files ([HTML report](https://dawalama.github.io/skill-audit/remote-audit-skills.html))
 
 ```bash

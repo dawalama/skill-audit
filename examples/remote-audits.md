@@ -194,7 +194,7 @@ ai-skill-audit audit https://github.com/user/repo --verbose
 
 **Why this matters:** A malicious skill author could previously embed `<!-- skill-audit: ignore INJECTION -->` or ship a `.skill-audit-ignore` file to hide their own findings. Now, remote content has zero influence on its audit score.
 
-## 6. Garry Tan's gstack (29 Dev Skills)
+## 6. Garry Tan's gstack (59 Remote Files)
 
 A full-stack development toolkit with deploy, review, QA, canary, benchmark, and more.
 
@@ -203,19 +203,20 @@ ai-skill-audit audit https://github.com/garrytan/gstack --summary
 ```
 
 Key findings:
-- **29 skills scanned**, 10 doc files auto-skipped (AGENTS.md, ETHOS.md, etc.)
-- Average score 57% — mostly quality issues (missing examples, gotchas, testability)
-- **Context-aware scanning in action**: the `careful` skill describes `DROP TABLE`, `git reset --hard`, and `rm -rf` in its description (it *warns* about these). Previous version flagged these as threats; now correctly recognized as documentation.
-- The `eval "$(helper-script)"` pattern (used throughout for env var loading) no longer triggers false positives.
+- **59 files scanned** under remote-audit defaults, including docs such as AGENTS.md, README.md, and architecture notes because they are part of the agent instruction surface.
+- Average score 50% — mostly quality/profile mismatch issues plus trust findings from broad bootstrap and shell patterns.
+- The scan highlights an important next product need: trusted-provider and skill-profile interpretation should downgrade expected capability risks only after preserving the raw finding evidence.
+- A TOON report is also generated for agent context: `examples/remote-audit-gstack.toon`.
 
-## HTML Reports
+## Reports
 
-All scans with full LLM security review included:
+Generated reports:
 
 - [Malicious skill scan](https://dawalama.github.io/skill-audit/audit-malicious-skill.html) — multi-vector attack caught
 - [MCP config scan](https://dawalama.github.io/skill-audit/remote-audit-mcp.html) — angrysky56/100-tool-mcp-server
-- [gstack dev toolkit](https://dawalama.github.io/skill-audit/remote-audit-gstack.html) — garrytan/gstack (29 skills)
+- [gstack dev toolkit](https://dawalama.github.io/skill-audit/remote-audit-gstack.html) — garrytan/gstack (59 remote files)
 - [Skills collection scan](https://dawalama.github.io/skill-audit/remote-audit-skills.html) — alirezarezvani/claude-skills
+- Agent-facing TOON examples: `audit-clean-skill.toon`, `audit-malicious-skill.toon`, and `remote-audit-gstack.toon`
 
 Generate your own:
 
