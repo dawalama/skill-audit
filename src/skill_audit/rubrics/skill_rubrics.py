@@ -698,6 +698,8 @@ def _scan_companion_scripts(file_path) -> list[tuple[str, str]]:
         return []
     from pathlib import Path
     path = Path(file_path)
+    if path.name not in {"SKILL.md", "main.md"}:
+        return []
     # Check for scripts/ sibling (folder-based skill) or parent scripts/
     scripts_dirs = [
         path.parent / "scripts",         # SKILL.md or main.md in skill dir
@@ -1017,10 +1019,13 @@ def _build_finding(
     )
 
 
-def _evidence_window(text: str, start: int, end: int, *, radius: int = 80) -> str:
+def _evidence_window(text: str, start: int, end: int, *, radius: int = 60, max_len: int = 220) -> str:
     """Return a compact single-line evidence snippet around a regex match."""
     snippet = text[max(0, start - radius):min(len(text), end + radius)]
-    return re.sub(r"\s+", " ", snippet).strip()
+    compact = re.sub(r"\s+", " ", snippet).strip()
+    if len(compact) <= max_len:
+        return compact
+    return f"{compact[:max_len - 3]}..."
 
 
 def _finding_source(

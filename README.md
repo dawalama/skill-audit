@@ -9,6 +9,8 @@ Audit AI skill and role files for quality and trust. Catches bad prompts before 
 
 **[Live demo and reports](https://dawalama.github.io/skill-audit/)** | **[PyPI](https://pypi.org/project/ai-skill-audit/)** | **[Examples](examples/remote-audits.md)**
 
+Agents and LLM workflows should start with [AGENT_USAGE.md](AGENT_USAGE.md).
+
 ## Why
 
 The AI skill ecosystem is growing fast — 80k+ community skills across Claude Code, OpenClaw, and other platforms. Some are excellent. Many are vague or incomplete. And some are actively malicious: audits have found 13-37% of marketplace skills contain critical issues including prompt injection, credential theft, and data exfiltration.
@@ -510,6 +512,7 @@ See [examples/remote-audits.md](examples/remote-audits.md) for annotated scans o
 
 - **MCP config with 30 servers** — catches 6 hardcoded API keys ([HTML report](https://dawalama.github.io/skill-audit/remote-audit-mcp.html))
 - **Malicious skill** — looks normal, hides 13 attack vectors across 7 categories ([HTML report](https://dawalama.github.io/skill-audit/audit-malicious-skill.html))
+- **LLM review examples** — optional semantic review for malicious skills and MCP configs (`audit-malicious-skill-llm.html`, `audit-mcp-llm.html`)
 - **gstack dev toolkit** — 59 remote files scanned, including docs as attack surface ([HTML report](https://dawalama.github.io/skill-audit/remote-audit-gstack.html))
 - **200+ skill collection** — grades 10 skills, auto-skips 12 doc files ([HTML report](https://dawalama.github.io/skill-audit/remote-audit-skills.html))
 

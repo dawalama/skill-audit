@@ -102,10 +102,22 @@
   <p class="finding">Overall risk: CRITICAL &mdash; secret_hygiene scored 0%</p>
 </a>
 
+<a href="audit-mcp-llm.html" class="report-card">
+  <h3>MCP Config + LLM Review <span class="grade grade-b">B</span></h3>
+  <p>Optional semantic MCP review on top of static config checks.</p>
+  <p class="finding">Shows how --llm complements deterministic scanning</p>
+</a>
+
 <a href="audit-malicious-skill.html" class="report-card">
   <h3>Example Malicious Skill: looks normal, hides 13 attack vectors <span class="grade grade-c">C</span></h3>
   <p>A crafted test skill with perfect quality scores &mdash; but trust at 0%. Hides prompt injection, credential theft, obfuscated shell execution, and destructive commands.</p>
   <p class="finding">13 findings across 7 categories &mdash; exactly how real attacks work</p>
+</a>
+
+<a href="audit-malicious-skill-llm.html" class="report-card">
+  <h3>Malicious Skill + LLM Review <span class="grade grade-c">C</span></h3>
+  <p>Same static scan with optional LLM review added to show semantic findings such as intent mismatch and hidden behavior.</p>
+  <p class="finding">Use --llm for small, public inputs where semantic review is worth the extra cost</p>
 </a>
 
 <a href="audit-evil-deploy.html" class="report-card">

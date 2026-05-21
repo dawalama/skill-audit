@@ -213,7 +213,9 @@ Key findings:
 Generated reports:
 
 - [Malicious skill scan](https://dawalama.github.io/skill-audit/audit-malicious-skill.html) — multi-vector attack caught
+- [Malicious skill + LLM review](https://dawalama.github.io/skill-audit/audit-malicious-skill-llm.html) — static scan plus semantic review
 - [MCP config scan](https://dawalama.github.io/skill-audit/remote-audit-mcp.html) — angrysky56/100-tool-mcp-server
+- [MCP config + LLM review](https://dawalama.github.io/skill-audit/audit-mcp-llm.html) — optional semantic MCP security review
 - [gstack dev toolkit](https://dawalama.github.io/skill-audit/remote-audit-gstack.html) — garrytan/gstack (59 remote files)
 - [Skills collection scan](https://dawalama.github.io/skill-audit/remote-audit-skills.html) — alirezarezvani/claude-skills
 - Agent-facing TOON examples: `audit-clean-skill.toon`, `audit-malicious-skill.toon`, and `remote-audit-gstack.toon`
@@ -222,6 +224,9 @@ Generate your own:
 
 ```bash
 ai-skill-audit audit https://github.com/user/repo --output html > report.html
+
+# Add optional semantic review for small/public inputs
+ai-skill-audit audit examples/malicious-skill.md --llm --verbose --output html > report-llm.html
 ```
 
 ## Try it yourself

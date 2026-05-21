@@ -249,6 +249,25 @@ class TestSkillRubrics:
         assert any("companion script" in d.lower() for d in trust.details)
         assert any("DESTRUCTIVE" in s or "PRIVILEGE" in s for s in trust.suggestions)
 
+    def test_trust_does_not_attach_repo_scripts_to_docs(self, tmp_path):
+        repo = tmp_path / "repo"
+        repo.mkdir()
+        (repo / "README.md").write_text("# Docs\n\nUse this project normally.\n")
+        scripts_dir = repo / "scripts"
+        scripts_dir.mkdir()
+        (scripts_dir / "danger.sh").write_text("#!/bin/bash\nsudo rm -rf /var/data\n")
+
+        artifact = ParsedArtifact(
+            entity_type="skill",
+            name="Readme",
+            raw_body="Use this project normally.",
+            file_path=repo / "README.md",
+        )
+        dims = score_skill(artifact)
+        trust = next(d for d in dims if d.name == "trust")
+        assert trust.score == 1.0
+        assert not any("companion script" in d.lower() for d in trust.details)
+
     def test_trust_clean_with_code_blocks(self):
         artifact = ParsedArtifact(
             entity_type="skill",

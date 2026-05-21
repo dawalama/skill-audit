@@ -215,6 +215,7 @@ def _card_to_agent_dict(card: ScoreCard) -> dict:
                 "evidence": finding.evidence,
             })
 
+    risk_summary = _risk_summary(card, findings)
     dimensions = [
         {
             "name": dim.name,
@@ -233,8 +234,46 @@ def _card_to_agent_dict(card: ScoreCard) -> dict:
         "overall_score": round(card.overall_score, 3),
         "file_path": card.file_path.name if card.file_path else None,
         "summary": card.summary,
+        "risk": risk_summary,
         "dimensions": dimensions,
         "findings": findings,
+    }
+
+
+def _risk_summary(card: ScoreCard, findings: list[dict]) -> dict:
+    """Summarize active findings into an agent decision hint."""
+    active = [f for f in findings if f["disposition"] == "active"]
+    severity_order = {"critical": 4, "high": 3, "medium": 2, "low": 1}
+    counts = {"critical": 0, "high": 0, "medium": 0, "low": 0}
+    for finding in active:
+        severity = finding["severity"]
+        if severity in counts:
+            counts[severity] += 1
+    max_severity = "none"
+    for severity, _ in sorted(severity_order.items(), key=lambda item: item[1], reverse=True):
+        if counts[severity]:
+            max_severity = severity
+            break
+
+    if counts["critical"]:
+        action = "block"
+    elif counts["high"]:
+        action = "human_review"
+    elif counts["medium"] or counts["low"]:
+        action = "warn"
+    elif card.grade in {"A", "B"}:
+        action = "allow"
+    else:
+        action = "warn"
+
+    return {
+        "active_findings": len(active),
+        "critical": counts["critical"],
+        "high": counts["high"],
+        "medium": counts["medium"],
+        "low": counts["low"],
+        "max_severity": max_severity,
+        "recommended_action": action,
     }
 
 
@@ -275,7 +314,7 @@ def _to_toon(value, indent: int = 0, key: str | None = None) -> str:
                 item_lines = _to_toon(item, indent + 4).splitlines()
                 if item_lines:
                     lines.append(f"{item_prefix}- {item_lines[0].lstrip()}")
-                    lines.extend(" " * (indent + 4) + line.lstrip() for line in item_lines[1:])
+                    lines.extend(item_lines[1:])
                 else:
                     lines.append(f"{item_prefix}-")
             else:

@@ -150,149 +150,110 @@
     <a href="https://pypi.org/project/ai-skill-audit/">PyPI</a>
   </nav>
   <h1>Skill Audit Report</h1>
-  <div class="audit-meta"><code>ai-skill-audit audit examples/evil-deploy.md --verbose --output html</code></div>
-  <p class="audit-source">Source: <code>examples/evil-deploy.md</code></p>
+  <div class="audit-meta"><code>ai-skill-audit audit examples/mcp.json --llm --verbose --output html</code></div>
+  <p class="audit-source">Source: <code>examples/mcp.json</code></p>
 
-<div class="card" id="evil-deploy">
+<div class="card" id="mcp-json">
   <div class="card-header">
     <div class="card-title">
-      <h2>Evil Deploy</h2>
-      <span class="badge" style="background:#dc2626">F</span>
+      <h2>mcp.json</h2>
+      <span class="badge" style="background:#eab308">C</span>
     </div>
     <div class="card-meta">
-      <span class="tag">skill</span>
-      <span class="tag">dotai-skill</span>
-      <span class="score-label">Score: 28%</span>
+      <span class="tag">mcp-config</span>
+      <span class="tag">mcp-config</span>
+      <span class="score-label">Score: 68%</span>
     </div>
   </div>
   <div class="dimensions">
     <div class="dim-row">
       <div class="dim-info">
-        <span class="dim-name">completeness</span>
-        <span class="dim-score" style="color:#eab308">50%</span>
+        <span class="dim-name">command_safety</span>
+        <span class="dim-score" style="color:#ef4444">20%</span>
+        <span class="dim-weight">weight 30%</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:20.0%;background:#ef4444"></div>
+      </div>
+    </div>
+    <div class="dim-row">
+      <div class="dim-info">
+        <span class="dim-name">filesystem_scope</span>
+        <span class="dim-score" style="color:#22c55e">100%</span>
+        <span class="dim-weight">weight 25%</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:100.0%;background:#22c55e"></div>
+      </div>
+    </div>
+    <div class="dim-row">
+      <div class="dim-info">
+        <span class="dim-name">secret_hygiene</span>
+        <span class="dim-score" style="color:#3b82f6">60%</span>
         <span class="dim-weight">weight 20%</span>
       </div>
       <div class="bar-track">
-        <div class="bar-fill" style="width:50.0%;background:#eab308"></div>
+        <div class="bar-fill" style="width:60.0%;background:#3b82f6"></div>
       </div>
     </div>
     <div class="dim-row">
       <div class="dim-info">
-        <span class="dim-name">clarity</span>
-        <span class="dim-score" style="color:#22c55e">80%</span>
-        <span class="dim-weight">weight 15%</span>
+        <span class="dim-name">network_trust</span>
+        <span class="dim-score" style="color:#22c55e">100%</span>
+        <span class="dim-weight">weight 25%</span>
       </div>
       <div class="bar-track">
-        <div class="bar-fill" style="width:80.0%;background:#22c55e"></div>
-      </div>
-    </div>
-    <div class="dim-row">
-      <div class="dim-info">
-        <span class="dim-name">actionability</span>
-        <span class="dim-score" style="color:#ef4444">25%</span>
-        <span class="dim-weight">weight 20%</span>
-      </div>
-      <div class="bar-track">
-        <div class="bar-fill" style="width:25.0%;background:#ef4444"></div>
-      </div>
-    </div>
-    <div class="dim-row">
-      <div class="dim-info">
-        <span class="dim-name">safety</span>
-        <span class="dim-score" style="color:#ef4444">5%</span>
-        <span class="dim-weight">weight 15%</span>
-      </div>
-      <div class="bar-track">
-        <div class="bar-fill" style="width:5.0%;background:#ef4444"></div>
-      </div>
-    </div>
-    <div class="dim-row">
-      <div class="dim-info">
-        <span class="dim-name">testability</span>
-        <span class="dim-score" style="color:#ef4444">0%</span>
-        <span class="dim-weight">weight 10%</span>
-      </div>
-      <div class="bar-track">
-        <div class="bar-fill" style="width:0.0%;background:#ef4444"></div>
-      </div>
-    </div>
-    <div class="dim-row">
-      <div class="dim-info">
-        <span class="dim-name">trust</span>
-        <span class="dim-score" style="color:#ef4444">0%</span>
-        <span class="dim-weight">weight 20%</span>
-      </div>
-      <div class="bar-track">
-        <div class="bar-fill" style="width:0.0%;background:#ef4444"></div>
+        <div class="bar-fill" style="width:100.0%;background:#22c55e"></div>
       </div>
     </div>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
-    <h4>completeness (50%)</h4>
+    <h4>command_safety (20%)</h4>
+    <ul class="suggestion-list">
+      <li>[risky-server] Shell interpreter allows arbitrary command execution</li>
+      <li>[risky-server] Inline code execution flag in args</li>
+    </ul>
+    <h4>filesystem_scope (100%)</h4>
     <ul class="detail-list">
-      <li>Has description</li>
-      <li>Has 10 steps</li>
+      <li>No overly broad filesystem access detected</li>
     </ul>
+    <h4>secret_hygiene (60%)</h4>
     <ul class="suggestion-list">
-      <li>Add usage examples showing how to invoke this skill</li>
-      <li>Add gotchas/caveats to warn about common failure points</li>
-      <li>Define input parameters if the skill accepts any</li>
+      <li>[risky-server] Secret/token in environment: API_SECRET has hardcoded value</li>
     </ul>
-    <h4>clarity (80%)</h4>
+    <h4>network_trust (100%)</h4>
     <ul class="detail-list">
-      <li>Step count (10) is ideal</li>
-      <li>Language is concrete and specific</li>
-    </ul>
-    <ul class="suggestion-list">
-      <li>Description is very long — consider trimming to under 200 characters</li>
-    </ul>
-    <h4>actionability (25%)</h4>
-    <ul class="detail-list">
-      <li>No inputs defined (not always needed)</li>
-    </ul>
-    <ul class="suggestion-list">
-      <li>Start each step with an action verb (Run, Check, Verify, etc.)</li>
-      <li>Reference specific tools or commands in steps (e.g. `git diff`, Grep)</li>
-    </ul>
-    <h4>safety (5%)</h4>
-    <ul class="suggestion-list">
-      <li>Add gotchas/caveats to warn about common failure points</li>
-      <li>Add specific gotchas (describe what can go wrong and why)</li>
-      <li>Address what happens when things go wrong (errors, failures, retries)</li>
-    </ul>
-    <h4>testability (0%)</h4>
-    <ul class="suggestion-list">
-      <li>Add examples showing how to use this skill</li>
-      <li>Add examples with concrete parameter values</li>
-      <li>Add examples that describe expected outcomes</li>
-    </ul>
-    <h4>trust (0%)</h4>
-    <ul class="detail-list">
-      <li>CRITICAL: 19 suspicious pattern(s) found — review carefully before use</li>
-    </ul>
-    <ul class="suggestion-list">
-      <li>[EXFILTRATION] Posts data to external URL</li>
-      <li>[EXFILTRATION] May leak secrets</li>
-      <li>[EXFILTRATION] May leak secrets (credential in output)</li>
-      <li>[EXFILTRATION] May exfiltrate environment variables</li>
-      <li>[EXFILTRATION] Encoded data exfiltration</li>
-      <li>[EXFILTRATION] Accesses SSH keys</li>
-      <li>[EXFILTRATION] Accesses AWS credentials</li>
-      <li>[EXFILTRATION] Reads secret/key files</li>
-      <li>[EXFILTRATION] References crypto wallet/keys</li>
-      <li>[EXFILTRATION] Reverse shell via bash /dev/tcp</li>
-      <li>[EXFILTRATION] Printing credentials (credential logging)</li>
-      <li>[EXFILTRATION] Credentials in curl -u argument (visible in process list)</li>
-      <li>[OBFUSCATION] Decodes and executes hidden commands</li>
-      <li>[SECRET] Possible hardcoded API key or token</li>
-      <li>[SUSPICIOUS_URL] Pipe from URL to shell (remote code execution)</li>
-      <li>[SUSPICIOUS_URL] Direct IP address (no DNS = suspicious)</li>
-      <li>[PERSISTENCE] Appending to authorized_keys — backdoor installation</li>
-      <li>[HIJACKING] Cryptocurrency miner (xmrig)</li>
-      <li>[HIJACKING] Mining pool connection (stratum protocol)</li>
+      <li>No network exposure or suspicious URL issues</li>
     </ul>
   </details>
-  <p class="summary">Poor skill with 31 suggestions for improvement (weakest: testability)</p>
+  <div class="llm-section">
+    <h3>LLM Security Review</h3>
+    <div class="llm-group"><span class="llm-sev" style="color:#dc2626">CRITICAL</span>
+    <ul>
+      <li>The risky-server pipes a remote shell script directly into bash, granting full arbitrary code execution from an untrusted URL.
+        <br><span class="llm-fix">Fix: Remove this server and replace with a vetted, pinned MCP package installed locally.</span>
+      </li>
+      <li>A live-looking API secret is hardcoded in plaintext inside the env block.
+        <br><span class="llm-fix">Fix: Rotate the key immediately and load it from a secret manager or environment variable reference.</span>
+      </li>
+    </ul></div>
+    <div class="llm-group"><span class="llm-sev" style="color:#ef4444">HIGH</span>
+    <ul>
+      <li>The filesystem server is granted access to the entire ~/projects directory, exposing all project source and any embedded secrets.
+        <br><span class="llm-fix">Fix: Scope the filesystem server to the specific subdirectory required for the current task.</span>
+      </li>
+    </ul></div>
+    <div class="llm-group"><span class="llm-sev" style="color:#ca8a04">MEDIUM</span>
+    <ul>
+      <li>npx -y auto-installs the latest unpinned package version, enabling silent supply-chain swaps.
+        <br><span class="llm-fix">Fix: Pin to a specific version (e.g., @modelcontextprotocol/server-filesystem@x.y.z) or install locally.</span>
+      </li>
+      <li>The remote install script is fetched over a non-integrity-checked URL with no checksum verification.
+        <br><span class="llm-fix">Fix: Avoid curl-to-bash; download, inspect, and verify a pinned hash before execution.</span>
+      </li>
+    </ul></div>
+  </div>
+  <p class="summary">Some concerns MCP config (2 server(s), 3 finding(s), risk: CRITICAL) (weakest: command_safety)</p>
 </div>
   <footer>Generated by ai-skill-audit v0.5.0</footer>
 </div>
