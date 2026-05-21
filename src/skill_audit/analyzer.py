@@ -10,6 +10,7 @@ from .models import ScoreCard, ScoreDimension
 from .parser import ParsedArtifact, parse_file, detect_format
 from .rubrics.skill_rubrics import score_skill
 from .rubrics.role_rubrics import score_role
+from .verdict import interpret_card
 
 
 def analyze_file(
@@ -69,6 +70,7 @@ def analyze_artifact(
 
     card.compute_overall()
     card.summary = _generate_summary(card)
+    card.verdict = interpret_card(card)
     return card
 
 
@@ -268,6 +270,7 @@ def analyze_mcp_config(path: Path) -> ScoreCard:
     )
     card.compute_overall()
     card.summary = _generate_mcp_summary(card, result)
+    card.verdict = interpret_card(card)
     return card
 
 

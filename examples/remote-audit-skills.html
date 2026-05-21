@@ -71,6 +71,15 @@
   .suggestion-list { margin: 0.25rem 0; padding-left: 1.25rem; }
   .suggestion-list li { font-size: 0.82rem; color: #ca8a04; margin-bottom: 0.15rem; }
   .summary { font-size: 0.85rem; color: #475569; margin-top: 0.75rem; }
+  .verdict {
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;
+    padding: 0.75rem; margin: 1rem 0; font-size: 0.85rem; color: #334155;
+  }
+  .verdict strong { display: block; margin-bottom: 0.35rem; color: #0f172a; }
+  .verdict span {
+    display: inline-block; margin-right: 0.75rem; color: #475569;
+  }
+  .verdict p { margin: 0.35rem 0 0; color: #64748b; }
   .llm-section {
     margin-top: 1rem; border-top: 1px solid #e2e8f0; padding-top: 0.75rem;
   }
@@ -322,6 +331,13 @@
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: human_review</strong>
+    <span>Profile: documentation</span>
+    <span>Malice: medium</span>
+    <span>Capability: low</span>
+    <p>human_review: profile=documentation, malice=medium, capability=low, categories=EXFILTRATION</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (55%)</h4>
     <ul class="detail-list">
@@ -455,6 +471,13 @@ cp engineering-team/skills/senior-fullstack/profiles/saas-startup.json \
         <div class="bar-fill" style="width:65.0%;background:#3b82f6"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: human_review</strong>
+    <span>Profile: documentation</span>
+    <span>Malice: medium</span>
+    <span>Capability: low</span>
+    <p>human_review: profile=documentation, malice=medium, capability=low, categories=EXFILTRATION</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (55%)</h4>
@@ -591,6 +614,13 @@ git pull origin dev
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: warn</strong>
+    <span>Profile: documentation</span>
+    <span>Malice: low</span>
+    <span>Capability: low</span>
+    <p>warn: no active security findings; profile=documentation</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (43%)</h4>
     <ul class="detail-list">
@@ -714,6 +744,13 @@ git pull origin dev
         <div class="bar-fill" style="width:100.0%;background:#22c55e"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: warn</strong>
+    <span>Profile: documentation</span>
+    <span>Malice: low</span>
+    <span>Capability: low</span>
+    <p>warn: no active security findings; profile=documentation</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (55%)</h4>
@@ -858,6 +895,13 @@ python3 engineering/skill-tester/scripts/skill_valid...</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: warn</strong>
+    <span>Profile: documentation</span>
+    <span>Malice: low</span>
+    <span>Capability: low</span>
+    <p>warn: no active security findings; profile=documentation</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (55%)</h4>
     <ul class="detail-list">
@@ -989,6 +1033,13 @@ python3 engineering/skill-tester/scripts/skill_valid...</li>
         <div class="bar-fill" style="width:100.0%;background:#22c55e"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: warn</strong>
+    <span>Profile: documentation</span>
+    <span>Malice: low</span>
+    <span>Capability: low</span>
+    <p>warn: no active security findings; profile=documentation</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (55%)</h4>
@@ -1122,6 +1173,13 @@ python3 marketing-skill/content-production/scripts/seo_checker.py article.t...</
         <div class="bar-fill" style="width:60.0%;background:#3b82f6"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: warn</strong>
+    <span>Profile: documentation</span>
+    <span>Malice: low</span>
+    <span>Capability: medium</span>
+    <p>warn: profile=documentation, malice=low, capability=medium, categories=DESTRUCTIVE, PRIVILEGE</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (55%)</h4>
@@ -1501,6 +1559,13 @@ ls ~...</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: warn</strong>
+    <span>Profile: documentation</span>
+    <span>Malice: low</span>
+    <span>Capability: low</span>
+    <p>warn: no active security findings; profile=documentation</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (55%)</h4>
     <ul class="detail-list">
@@ -1667,6 +1732,13 @@ python3 finance/saas-metrics-coach/scripts/metrics_calc...</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: warn</strong>
+    <span>Profile: security-research</span>
+    <span>Malice: low</span>
+    <span>Capability: low</span>
+    <p>warn: no active security findings; profile=security-research</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (55%)</h4>
     <ul class="detail-list">
@@ -1818,6 +1890,13 @@ safety check
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: warn</strong>
+    <span>Profile: documentation</span>
+    <span>Malice: low</span>
+    <span>Capability: low</span>
+    <p>warn: no active security findings; profile=documentation</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (55%)</h4>
     <ul class="detail-list">
@@ -1943,6 +2022,13 @@ safety check
         <div class="bar-fill" style="width:100.0%;background:#22c55e"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: warn</strong>
+    <span>Profile: documentation</span>
+    <span>Malice: low</span>
+    <span>Capability: low</span>
+    <p>warn: no active security findings; profile=documentation</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (63%)</h4>
@@ -2110,6 +2196,13 @@ cd ~/workspace/projects/claude-skills
         <div class="bar-fill" style="width:100.0%;background:#22c55e"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: warn</strong>
+    <span>Profile: documentation</span>
+    <span>Malice: low</span>
+    <span>Capability: low</span>
+    <p>warn: no active security findings; profile=documentation</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (33%)</h4>

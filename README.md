@@ -225,6 +225,8 @@ ai-skill-audit audit review.md --output toon
 
 Emits a compact, structured report for agent context. JSON remains the canonical machine interchange format; TOON is optimized for token-efficient agent prompts.
 
+Agent-facing outputs include a context-aware `verdict` with profile, recommendation, capability risk, malice indicators, and reasons. Raw findings are still preserved; the verdict explains how to interpret them.
+
 ### Audit a directory
 
 ```bash

@@ -30,6 +30,18 @@ class ScoreDimension(BaseModel):
     findings: list[Finding] = Field(default_factory=list)
 
 
+class AuditVerdict(BaseModel):
+    """Context-aware interpretation of a scorecard."""
+
+    profile: str = "general"
+    recommendation: str = "warn"
+    capability_risk: str = "low"
+    malice_indicators: str = "low"
+    quality: str = "unknown"
+    summary: str = ""
+    reasons: list[str] = Field(default_factory=list)
+
+
 class ScoreCard(BaseModel):
     """Complete scoring result for a skill or role."""
 
@@ -41,6 +53,7 @@ class ScoreCard(BaseModel):
     grade: str = "F"
     summary: str = ""
     file_path: Path | None = None
+    verdict: AuditVerdict | None = None
 
     def compute_overall(self) -> None:
         """Compute weighted overall score and grade from dimensions."""
@@ -67,6 +80,7 @@ class ScoreCard(BaseModel):
             "grade": self.grade,
             "summary": self.summary,
             "file_path": str(self.file_path) if self.file_path else None,
+            "verdict": self.verdict.model_dump() if self.verdict else None,
             "dimensions": [
                 {
                     "name": d.name,

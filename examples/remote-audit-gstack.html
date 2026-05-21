@@ -71,6 +71,15 @@
   .suggestion-list { margin: 0.25rem 0; padding-left: 1.25rem; }
   .suggestion-list li { font-size: 0.82rem; color: #ca8a04; margin-bottom: 0.15rem; }
   .summary { font-size: 0.85rem; color: #475569; margin-top: 0.75rem; }
+  .verdict {
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;
+    padding: 0.75rem; margin: 1rem 0; font-size: 0.85rem; color: #334155;
+  }
+  .verdict strong { display: block; margin-bottom: 0.35rem; color: #0f172a; }
+  .verdict span {
+    display: inline-block; margin-right: 0.75rem; color: #475569;
+  }
+  .verdict p { margin: 0.35rem 0 0; color: #64748b; }
   .llm-section {
     margin-top: 1rem; border-top: 1px solid #e2e8f0; padding-top: 0.75rem;
   }
@@ -651,6 +660,13 @@
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: warn</strong>
+    <span>Profile: documentation</span>
+    <span>Malice: low</span>
+    <span>Capability: medium</span>
+    <p>warn: profile=documentation, malice=low, capability=medium, categories=DESTRUCTIVE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (55%)</h4>
     <ul class="detail-list">
@@ -784,6 +800,13 @@ bun test                 # ...</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: human_review</strong>
+    <span>Profile: documentation</span>
+    <span>Malice: medium</span>
+    <span>Capability: medium</span>
+    <p>human_review: profile=documentation, malice=medium, capability=medium, categories=EXFILTRATION, SUSPICIOUS_URL</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (55%)</h4>
     <ul class="detail-list">
@@ -916,6 +939,13 @@ jq &#x27;.tests[] | select(.exit_reason == &quot;timeout&quot;) | .last_tool_cal
         <div class="bar-fill" style="width:10.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: human_review</strong>
+    <span>Profile: browser-automation</span>
+    <span>Malice: medium</span>
+    <span>Capability: medium</span>
+    <p>human_review: profile=browser-automation, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, SUSPICIOUS_URL</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (55%)</h4>
@@ -1131,6 +1161,13 @@ cp browse/dist/browse ~/.claude/skills/gstack/browse/dist/browse</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: documentation</span>
+    <span>Malice: high</span>
+    <span>Capability: high</span>
+    <p>block: profile=documentation, malice=high, capability=high, categories=DESTRUCTIVE, ENTROPY, EXFILTRATION, INJECTION, PERSISTENCE, PRIVILEGE, SUSPICIOUS_URL</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (55%)</h4>
     <ul class="detail-list">
@@ -1309,6 +1346,13 @@ gbrain sources list --json | jq &#x27;.sources[] | {id, page_count, federated}&#
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: human_review</strong>
+    <span>Profile: documentation</span>
+    <span>Malice: high</span>
+    <span>Capability: medium</span>
+    <p>human_review: profile=documentation, malice=high, capability=medium, categories=DESTRUCTIVE, PERSISTENCE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (55%)</h4>
     <ul class="detail-list">
@@ -1465,6 +1509,13 @@ clawhub publish openclaw/skills/gstack-openclaw-office-hours \
         <div class="bar-fill" style="width:100.0%;background:#22c55e"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: warn</strong>
+    <span>Profile: documentation</span>
+    <span>Malice: low</span>
+    <span>Capability: low</span>
+    <p>warn: no active security findings; profile=documentation</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (55%)</h4>
@@ -1673,6 +1724,13 @@ bu...</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: warn</strong>
+    <span>Profile: documentation</span>
+    <span>Malice: low</span>
+    <span>Capability: low</span>
+    <p>warn: no active security findings; profile=documentation</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (43%)</h4>
     <ul class="detail-list">
@@ -1799,6 +1857,13 @@ bu...</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: warn</strong>
+    <span>Profile: documentation</span>
+    <span>Malice: low</span>
+    <span>Capability: low</span>
+    <p>warn: no active security findings; profile=documentation</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (43%)</h4>
     <ul class="detail-list">
@@ -1923,6 +1988,13 @@ bu...</li>
         <div class="bar-fill" style="width:0.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: documentation</span>
+    <span>Malice: high</span>
+    <span>Capability: high</span>
+    <p>block: profile=documentation, malice=high, capability=high, categories=DESTRUCTIVE, INJECTION, SECRET</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (55%)</h4>
@@ -2075,6 +2147,13 @@ gstack-brain-init</li>
         <div class="bar-fill" style="width:15.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: human_review</strong>
+    <span>Profile: developer-toolkit</span>
+    <span>Malice: medium</span>
+    <span>Capability: medium</span>
+    <p>human_review: profile=developer-toolkit, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
@@ -2315,6 +2394,13 @@ $B html @e2        ...</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: human_review</strong>
+    <span>Profile: documentation</span>
+    <span>Malice: medium</span>
+    <span>Capability: low</span>
+    <p>human_review: profile=documentation, malice=medium, capability=low, categories=EXFILTRATION</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (43%)</h4>
     <ul class="detail-list">
@@ -2440,6 +2526,13 @@ $B html @e2        ...</li>
         <div class="bar-fill" style="width:0.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: human_review</strong>
+    <span>Profile: developer-toolkit</span>
+    <span>Malice: high</span>
+    <span>Capability: medium</span>
+    <p>human_review: profile=developer-toolkit, malice=high, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PERSISTENCE</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (55%)</h4>
@@ -2607,6 +2700,13 @@ rm -rf ~/.gstack/.setup-gbrain.lock.d</li>
         <div class="bar-fill" style="width:15.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: medium</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
@@ -2843,6 +2943,13 @@ TIMESTAMP=$(date -u +%Y-%m...</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: human_review</strong>
+    <span>Profile: developer-toolkit</span>
+    <span>Malice: medium</span>
+    <span>Capability: medium</span>
+    <p>human_review: profile=developer-toolkit, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -3048,6 +3155,13 @@ $B eval &quot;(() =&gt; { const r = performance.getEntriesByType(&#x27;resource&
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: human_review</strong>
+    <span>Profile: developer-toolkit</span>
+    <span>Malice: medium</span>
+    <span>Capability: medium</span>
+    <p>human_review: profile=developer-toolkit, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -3231,6 +3345,13 @@ BIN=&quot;$HOME/.claude/skills/gstack/bin/gstack-model-benchmark&quot;
         <div class="bar-fill" style="width:100.0%;background:#22c55e"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: warn</strong>
+    <span>Profile: general</span>
+    <span>Malice: low</span>
+    <span>Capability: low</span>
+    <p>warn: no active security findings; profile=general</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
@@ -3481,6 +3602,13 @@ $B c...</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: human_review</strong>
+    <span>Profile: deployment</span>
+    <span>Malice: medium</span>
+    <span>Capability: medium</span>
+    <p>human_review: profile=deployment, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -3704,6 +3832,13 @@ mkdir -p ~/.g...</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: medium</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -3856,6 +3991,13 @@ echo &#x27;{&quot;skill&quot;:&quot;careful&quot;,&quot;ts&quot;:&quot;&#x27;$(d
         <div class="bar-fill" style="width:10.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: human_review</strong>
+    <span>Profile: developer-toolkit</span>
+    <span>Malice: medium</span>
+    <span>Capability: medium</span>
+    <p>human_review: profile=developer-toolkit, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
@@ -4102,6 +4244,13 @@ mkdir -p .context</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: human_review</strong>
+    <span>Profile: browser-automation</span>
+    <span>Malice: medium</span>
+    <span>Capability: medium</span>
+    <p>human_review: profile=browser-automation, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -4321,6 +4470,13 @@ $B snapshot -i</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: medium</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -4504,6 +4660,13 @@ eval &quot;$(~/.claude/skills/gstack/bin/gstack-slug 2&gt;/dev/null)&quot; &amp;
         <div class="bar-fill" style="width:15.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: medium</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
@@ -4704,6 +4867,13 @@ eval &quot;$(~/.claude/skills/gstack/bin/gstack-slug 2&gt;/dev/null)&quot; &amp;
         <div class="bar-fill" style="width:0.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: high</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=high, capability=high, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE, SUSPICIOUS_URL</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
@@ -4929,6 +5099,13 @@ mkdir -p .gstack/security-reports</li>
         <div class="bar-fill" style="width:0.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: high</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=high, capability=high, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE, SUSPICIOUS_URL</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
@@ -5198,6 +5375,13 @@ open &quot;$PREVIEW_FILE&quot;</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: medium</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -5445,6 +5629,13 @@ $B screenshot /tmp/gstack-verify-...</li>
         <div class="bar-fill" style="width:0.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: developer-toolkit</span>
+    <span>Malice: high</span>
+    <span>Capability: medium</span>
+    <p>block: profile=developer-toolkit, malice=high, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE, SECRET</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
@@ -5728,6 +5919,13 @@ $B screenshot &quot;$REPORT_DIR/screenshots/finding-NNN-a...</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: medium</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE, SUSPICIOUS_URL</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -5964,6 +6162,13 @@ echo &#x27;{&quot;approved_variant&quot;:&quot;&lt;V&gt;&quot;,&quot;feedback&qu
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: human_review</strong>
+    <span>Profile: developer-toolkit</span>
+    <span>Malice: medium</span>
+    <span>Capability: medium</span>
+    <p>human_review: profile=developer-toolkit, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -6177,6 +6382,13 @@ eval &quot;$(~/.claude/skills/gstack/bin/gstack-slug 2&gt;/dev/null)&quot;
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: medium</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -6194,7 +6406,7 @@ eval &quot;$(~/.claude/skills/gstack/bin/gstack-slug 2&gt;/dev/null)&quot;
     <ul class="suggestion-list">
       <li>Description is too short — expand to 20-200 characters</li>
       <li>Consider adding more steps (3-10 is ideal)</li>
-      <li>Replace vague words: maybe, things</li>
+      <li>Replace vague words: things, maybe</li>
     </ul>
     <h4>actionability (25%)</h4>
     <ul class="detail-list">
@@ -6378,6 +6590,13 @@ git push</li>
         <div class="bar-fill" style="width:15.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: human_review</strong>
+    <span>Profile: deployment</span>
+    <span>Malice: medium</span>
+    <span>Capability: medium</span>
+    <p>human_review: profile=deployment, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
@@ -6625,6 +6844,13 @@ glab mr update -t &quot;$NEW_TITLE&quot;</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: medium</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (85%)</h4>
     <ul class="detail-list">
@@ -6769,6 +6995,13 @@ eval &quot;$(~/.claude/skills/gstack/bin/gstack-pa...</li>
         <div class="bar-fill" style="width:15.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: human_review</strong>
+    <span>Profile: developer-toolkit</span>
+    <span>Malice: medium</span>
+    <span>Capability: medium</span>
+    <p>human_review: profile=developer-toolkit, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
@@ -6972,6 +7205,13 @@ LOC...</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: medium</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -7116,6 +7356,13 @@ eval &quot;$(~/.claude/skills/gstack/bin/gstack-pa...</li>
         <div class="bar-fill" style="width:15.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: medium</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
@@ -7315,6 +7562,13 @@ eval &quot;$(~/.claude/skills/gstack/bin/gstack-slug 2&gt;/dev/null)&quot; &amp;
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: high</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=high, capability=high, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -7334,7 +7588,7 @@ eval &quot;$(~/.claude/skills/gstack/bin/gstack-slug 2&gt;/dev/null)&quot; &amp;
     </ul>
     <ul class="suggestion-list">
       <li>Description is too short — expand to 20-200 characters</li>
-      <li>Replace vague words: maybe, things</li>
+      <li>Replace vague words: things, maybe</li>
     </ul>
     <h4>actionability (75%)</h4>
     <ul class="detail-list">
@@ -7518,6 +7772,13 @@ STATE_DIR=&quot;$GSTACK_STATE...</li>
         <div class="bar-fill" style="width:0.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: deployment</span>
+    <span>Malice: high</span>
+    <span>Capability: medium</span>
+    <p>block: profile=deployment, malice=high, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
@@ -7857,6 +8118,13 @@ mkdir -p ~/.g...</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: medium</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -8050,6 +8318,13 @@ for LEVEL in micro patch minor major; do
         <div class="bar-fill" style="width:15.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: medium</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
@@ -8255,6 +8530,13 @@ eval &quot;$(~/.cl...</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: medium</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -8448,6 +8730,13 @@ $P generate --no-confidential memo.md memo.pdf</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: high</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=high, capability=high, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -8467,7 +8756,7 @@ $P generate --no-confidential memo.md memo.pdf</li>
     </ul>
     <ul class="suggestion-list">
       <li>Description is too short — expand to 20-200 characters</li>
-      <li>Replace vague words: maybe, things</li>
+      <li>Replace vague words: things, maybe</li>
     </ul>
     <h4>actionability (75%)</h4>
     <ul class="detail-list">
@@ -8742,6 +9031,13 @@ echo &#x27;{&quot;skill&quot;:&quot;office-hours&quot;,&quot;event&quot;:&quot;r
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: human_review</strong>
+    <span>Profile: browser-automation</span>
+    <span>Malice: medium</span>
+    <span>Capability: medium</span>
+    <p>human_review: profile=browser-automation, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -8960,6 +9256,13 @@ $B snapshot -i</li>
         <div class="bar-fill" style="width:15.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: medium</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
@@ -9185,6 +9488,13 @@ $B tunnel rotate</li>
         <div class="bar-fill" style="width:0.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: developer-toolkit</span>
+    <span>Malice: high</span>
+    <span>Capability: medium</span>
+    <p>block: profile=developer-toolkit, malice=high, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
@@ -9431,6 +9741,13 @@ eval &quot;$(~/.claude/skill...</li>
         <div class="bar-fill" style="width:0.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: developer-toolkit</span>
+    <span>Malice: high</span>
+    <span>Capability: medium</span>
+    <p>block: profile=developer-toolkit, malice=high, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE, SUSPICIOUS_URL</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
@@ -9688,6 +10005,13 @@ TASKS_DIR=&quot;${...</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: developer-toolkit</span>
+    <span>Malice: high</span>
+    <span>Capability: medium</span>
+    <p>block: profile=developer-toolkit, malice=high, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -9922,6 +10246,13 @@ TASKS_DIR=&quot;${...</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: developer-toolkit</span>
+    <span>Malice: high</span>
+    <span>Capability: medium</span>
+    <p>block: profile=developer-toolkit, malice=high, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -10148,6 +10479,13 @@ TASKS_DIR=&quot;${...</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: medium</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -10359,6 +10697,13 @@ eval &quot;$(~/.c...</li>
         <div class="bar-fill" style="width:0.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: developer-toolkit</span>
+    <span>Malice: high</span>
+    <span>Capability: medium</span>
+    <p>block: profile=developer-toolkit, malice=high, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
@@ -10652,6 +10997,13 @@ eval &quot;$(~/.claude/skills/gstack/bin/gstack-slug 2&gt;/dev/null)&quot; &amp;
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: developer-toolkit</span>
+    <span>Malice: high</span>
+    <span>Capability: medium</span>
+    <p>block: profile=developer-toolkit, malice=high, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -10898,6 +11250,13 @@ eval &quot;$(~/.claude/skills/gstack/bin/gstack-slug 2&gt;/dev/null)&quot; &amp;
         <div class="bar-fill" style="width:0.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: high</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=high, capability=high, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
@@ -11151,6 +11510,13 @@ today=$(date +%Y-%m-%d)...</li>
         <div class="bar-fill" style="width:0.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: developer-toolkit</span>
+    <span>Malice: high</span>
+    <span>Capability: medium</span>
+    <p>block: profile=developer-toolkit, malice=high, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
@@ -11415,6 +11781,13 @@ _REPO_ROOT=$(git rev-parse --sh...</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: human_review</strong>
+    <span>Profile: browser-automation</span>
+    <span>Malice: medium</span>
+    <span>Capability: medium</span>
+    <p>human_review: profile=browser-automation, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -11607,6 +11980,13 @@ $B skill run &lt;name&gt; [--arg key=value ...]</li>
         <div class="bar-fill" style="width:15.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: human_review</strong>
+    <span>Profile: browser-automation</span>
+    <span>Malice: medium</span>
+    <span>Capability: medium</span>
+    <p>human_review: profile=browser-automation, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (85%)</h4>
@@ -11801,6 +12181,13 @@ $B cookies</li>
         <div class="bar-fill" style="width:15.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: human_review</strong>
+    <span>Profile: deployment</span>
+    <span>Malice: medium</span>
+    <span>Capability: medium</span>
+    <p>human_review: profile=deployment, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
@@ -11997,6 +12384,13 @@ curl -sf &quot;{health-check-url}&quot; -o /dev/null -w &quot;%{http_code}&quot;
         <div class="bar-fill" style="width:5.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: medium</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
@@ -12287,6 +12681,13 @@ curl -s -X DELETE -H &quot;Authorization: Bearer $SUPABASE_ACCESS_TOKEN&quot; \
         <div class="bar-fill" style="width:0.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: deployment</span>
+    <span>Malice: high</span>
+    <span>Capability: medium</span>
+    <p>block: profile=deployment, malice=high, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
@@ -12701,6 +13102,13 @@ echo &#x27;{&quot;skill&quot;:&quot;ship&quot;,&quot;timestamp&quot;:&quot;&#x27
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: medium</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -12902,6 +13310,13 @@ $B skill run &lt;name&gt;    # should match the JSON ...</li>
       </div>
     </div>
   </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: medium</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
+  </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (80%)</h4>
     <ul class="detail-list">
@@ -13097,6 +13512,13 @@ if [ -f ~/.gbrain/config.json ] &amp;&amp; \
         <div class="bar-fill" style="width:15.0%;background:#ef4444"></div>
       </div>
     </div>
+  </div>
+  <div class="verdict">
+    <strong>Verdict: block</strong>
+    <span>Profile: general</span>
+    <span>Malice: medium</span>
+    <span>Capability: high</span>
+    <p>block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE</p>
   </div>
   <details class="detail-section"><summary>Details &amp; Suggestions</summary>
     <h4>completeness (63%)</h4>

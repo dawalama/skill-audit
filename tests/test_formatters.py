@@ -36,7 +36,7 @@ def test_format_toon_includes_agent_summary_and_findings():
 
     assert "audits[1]:" in output
     assert "entity_name: Leaky" in output
-    assert "risk:" in output
+    assert "verdict:" in output
     assert "recommended_action: human_review" in output
     assert "dimensions[1\t]{name\tscore\tweight\tfindings}:" in output
     assert "findings[1\t]{id\tcategory\tseverity\tsource\tconfidence\tdisposition\tmessage\tevidence}:" in output

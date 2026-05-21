@@ -68,6 +68,14 @@ Use table output for interactive terminal review.
 
 Security findings matter more than the overall grade.
 
+Prefer the `verdict` field in JSON/TOON output for first-pass decisions. It separates raw findings from interpretation:
+
+- `profile`: what kind of artifact this appears to be
+- `recommendation`: `allow`, `warn`, `human_review`, or `block`
+- `capability_risk`: how broad the requested powers are
+- `malice_indicators`: whether findings look like malicious intent
+- `reasons`: why the recommendation was made
+
 - `INJECTION`, `SECRET`, `EXFILTRATION`, `PERSISTENCE`, `HIJACKING`: block or require explicit human approval.
 - `OBFUSCATION`: require human review unless the reason is clearly documented and expected.
 - `SUSPICIOUS_URL`, `DESTRUCTIVE`, `PRIVILEGE`, `ENTROPY`: warn and review in context.

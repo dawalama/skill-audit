@@ -6,14 +6,15 @@ audits[1]:
     overall_score: 0.973
     file_path: clean-skill.md
     summary: Excellent skill with 1 suggestions for improvement
-    risk:
-      active_findings: 0
-      critical: 0
-      high: 0
-      medium: 0
-      low: 0
-      max_severity: none
-      recommended_action: allow
+    verdict:
+      profile: developer-toolkit
+      recommendation: allow
+      capability_risk: low
+      malice_indicators: low
+      quality: A
+      summary: "allow: no active security findings; profile=developer-toolkit"
+      reasons[1]:
+        - Interpreted as developer-toolkit; expected capabilities are reviewed in that context
     dimensions[6	]{name	score	weight	findings}:
       completeness	1.0	0.2	0
       clarity	1.0	0.15	0

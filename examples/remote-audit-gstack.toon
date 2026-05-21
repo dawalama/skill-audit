@@ -6,14 +6,18 @@ audits[59]:
     overall_score: 0.545
     file_path: AGENTS.md
     summary: "Needs work skill with 9 suggestions for improvement (weakest: safety)"
-    risk:
-      active_findings: 1
-      critical: 0
-      high: 0
-      medium: 1
-      low: 0
-      max_severity: medium
-      recommended_action: warn
+    verdict:
+      profile: documentation
+      recommendation: warn
+      capability_risk: medium
+      malice_indicators: low
+      quality: D
+      summary: "warn: profile=documentation, malice=low, capability=medium, categories=DESTRUCTIVE"
+      reasons[4]:
+        - "Active finding categories: DESTRUCTIVE"
+        - Interpreted as documentation; expected capabilities are reviewed in that context
+        - Capability risk is medium
+        - Quality grade is D
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.55	0.2	0
       clarity	0.65	0.15	0
@@ -30,14 +34,20 @@ audits[59]:
     overall_score: 0.492
     file_path: ARCHITECTURE.md
     summary: "Poor skill with 10 suggestions for improvement (weakest: safety)"
-    risk:
-      active_findings: 3
-      critical: 0
-      high: 2
-      medium: 1
-      low: 0
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: documentation
+      recommendation: human_review
+      capability_risk: medium
+      malice_indicators: medium
+      quality: F
+      summary: "human_review: profile=documentation, malice=medium, capability=medium, categories=EXFILTRATION, SUSPICIOUS_URL"
+      reasons[6]:
+        - "Active finding categories: EXFILTRATION, SUSPICIOUS_URL"
+        - Interpreted as documentation; expected capabilities are reviewed in that context
+        - Malice indicators are medium
+        - Capability risk is medium
+        - Quality grade is F
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.55	0.2	0
       clarity	0.45	0.15	0
@@ -56,14 +66,20 @@ audits[59]:
     overall_score: 0.453
     file_path: BROWSER.md
     summary: "Poor skill with 10 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 3
-      critical: 0
-      high: 1
-      medium: 2
-      low: 0
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: browser-automation
+      recommendation: human_review
+      capability_risk: medium
+      malice_indicators: medium
+      quality: F
+      summary: "human_review: profile=browser-automation, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, SUSPICIOUS_URL"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, SUSPICIOUS_URL"
+        - Interpreted as browser-automation; expected capabilities are reviewed in that context
+        - Malice indicators are medium
+        - Capability risk is medium
+        - Quality grade is F
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.55	0.2	0
       clarity	0.45	0.15	0
@@ -82,14 +98,20 @@ audits[59]:
     overall_score: 0.432
     file_path: CHANGELOG.md
     summary: "Poor skill with 23 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 16
-      critical: 4
-      high: 4
-      medium: 7
-      low: 1
-      max_severity: critical
-      recommended_action: block
+    verdict:
+      profile: documentation
+      recommendation: block
+      capability_risk: high
+      malice_indicators: high
+      quality: F
+      summary: "block: profile=documentation, malice=high, capability=high, categories=DESTRUCTIVE, ENTROPY, EXFILTRATION, INJECTION, PERSISTENCE, PRIVILEGE, SUSPICIOUS_URL"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, ENTROPY, EXFILTRATION, INJECTION, PERSISTENCE, PRIVILEGE, SUSPICIOUS_URL"
+        - Interpreted as documentation; expected capabilities are reviewed in that context
+        - Malice indicators are high
+        - Capability risk is high
+        - Quality grade is F
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.55	0.2	0
       clarity	0.45	0.15	0
@@ -121,14 +143,20 @@ audits[59]:
     overall_score: 0.522
     file_path: CLAUDE.md
     summary: "Needs work skill with 8 suggestions for improvement (weakest: safety)"
-    risk:
-      active_findings: 2
-      critical: 1
-      high: 0
-      medium: 1
-      low: 0
-      max_severity: critical
-      recommended_action: block
+    verdict:
+      profile: documentation
+      recommendation: human_review
+      capability_risk: medium
+      malice_indicators: high
+      quality: D
+      summary: "human_review: profile=documentation, malice=high, capability=medium, categories=DESTRUCTIVE, PERSISTENCE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, PERSISTENCE"
+        - Interpreted as documentation; expected capabilities are reviewed in that context
+        - Malice indicators are high
+        - Capability risk is medium
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.55	0.2	0
       clarity	0.65	0.15	0
@@ -146,14 +174,16 @@ audits[59]:
     overall_score: 0.633
     file_path: CONTRIBUTING.md
     summary: "Needs work skill with 7 suggestions for improvement (weakest: safety)"
-    risk:
-      active_findings: 0
-      critical: 0
-      high: 0
-      medium: 0
-      low: 0
-      max_severity: none
-      recommended_action: warn
+    verdict:
+      profile: documentation
+      recommendation: warn
+      capability_risk: low
+      malice_indicators: low
+      quality: D
+      summary: "warn: no active security findings; profile=documentation"
+      reasons[2]:
+        - Interpreted as documentation; expected capabilities are reviewed in that context
+        - Quality grade is D
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.55	0.2	0
       clarity	0.45	0.15	0
@@ -169,14 +199,16 @@ audits[59]:
     overall_score: 0.564
     file_path: DESIGN.md
     summary: "Needs work skill with 9 suggestions for improvement (weakest: testability)"
-    risk:
-      active_findings: 0
-      critical: 0
-      high: 0
-      medium: 0
-      low: 0
-      max_severity: none
-      recommended_action: warn
+    verdict:
+      profile: documentation
+      recommendation: warn
+      capability_risk: low
+      malice_indicators: low
+      quality: D
+      summary: "warn: no active security findings; profile=documentation"
+      reasons[2]:
+        - Interpreted as documentation; expected capabilities are reviewed in that context
+        - Quality grade is D
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.43	0.2	0
       clarity	0.65	0.15	0
@@ -192,14 +224,16 @@ audits[59]:
     overall_score: 0.533
     file_path: ETHOS.md
     summary: "Needs work skill with 10 suggestions for improvement (weakest: testability)"
-    risk:
-      active_findings: 0
-      critical: 0
-      high: 0
-      medium: 0
-      low: 0
-      max_severity: none
-      recommended_action: warn
+    verdict:
+      profile: documentation
+      recommendation: warn
+      capability_risk: low
+      malice_indicators: low
+      quality: D
+      summary: "warn: no active security findings; profile=documentation"
+      reasons[2]:
+        - Interpreted as documentation; expected capabilities are reviewed in that context
+        - Quality grade is D
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.43	0.2	0
       clarity	0.45	0.15	0
@@ -215,14 +249,20 @@ audits[59]:
     overall_score: 0.463
     file_path: README.md
     summary: "Poor skill with 11 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 1
-      high: 1
-      medium: 3
-      low: 0
-      max_severity: critical
-      recommended_action: block
+    verdict:
+      profile: documentation
+      recommendation: block
+      capability_risk: high
+      malice_indicators: high
+      quality: F
+      summary: "block: profile=documentation, malice=high, capability=high, categories=DESTRUCTIVE, INJECTION, SECRET"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, INJECTION, SECRET"
+        - Interpreted as documentation; expected capabilities are reviewed in that context
+        - Malice indicators are high
+        - Capability risk is high
+        - Quality grade is F
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.55	0.2	0
       clarity	0.65	0.15	0
@@ -243,14 +283,20 @@ audits[59]:
     overall_score: 0.535
     file_path: SKILL.md
     summary: "Needs work skill with 11 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: developer-toolkit
+      recommendation: human_review
+      capability_risk: medium
+      malice_indicators: medium
+      quality: D
+      summary: "human_review: profile=developer-toolkit, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Interpreted as developer-toolkit; expected capabilities are reviewed in that context
+        - Malice indicators are medium
+        - Capability risk is medium
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -271,14 +317,19 @@ audits[59]:
     overall_score: 0.553
     file_path: TODOS.md
     summary: "Needs work skill with 8 suggestions for improvement (weakest: safety)"
-    risk:
-      active_findings: 1
-      critical: 0
-      high: 1
-      medium: 0
-      low: 0
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: documentation
+      recommendation: human_review
+      capability_risk: low
+      malice_indicators: medium
+      quality: D
+      summary: "human_review: profile=documentation, malice=medium, capability=low, categories=EXFILTRATION"
+      reasons[5]:
+        - "Active finding categories: EXFILTRATION"
+        - Interpreted as documentation; expected capabilities are reviewed in that context
+        - Malice indicators are medium
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.43	0.2	0
       clarity	0.65	0.15	0
@@ -295,14 +346,20 @@ audits[59]:
     overall_score: 0.463
     file_path: USING_GBRAIN_WITH_GSTACK.md
     summary: "Poor skill with 9 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 3
-      critical: 1
-      high: 1
-      medium: 1
-      low: 0
-      max_severity: critical
-      recommended_action: block
+    verdict:
+      profile: developer-toolkit
+      recommendation: human_review
+      capability_risk: medium
+      malice_indicators: high
+      quality: F
+      summary: "human_review: profile=developer-toolkit, malice=high, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PERSISTENCE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PERSISTENCE"
+        - Interpreted as developer-toolkit; expected capabilities are reviewed in that context
+        - Malice indicators are high
+        - Capability risk is medium
+        - Quality grade is F
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.55	0.2	0
       clarity	0.65	0.15	0
@@ -321,14 +378,19 @@ audits[59]:
     overall_score: 0.565
     file_path: SKILL.md
     summary: "Needs work skill with 10 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: medium
+      quality: D
+      summary: "block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Malice indicators are medium
+        - Capability risk is high
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.8	0.15	0
@@ -349,14 +411,20 @@ audits[59]:
     overall_score: 0.435
     file_path: SKILL.md
     summary: "Poor skill with 13 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: developer-toolkit
+      recommendation: human_review
+      capability_risk: medium
+      malice_indicators: medium
+      quality: F
+      summary: "human_review: profile=developer-toolkit, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Interpreted as developer-toolkit; expected capabilities are reviewed in that context
+        - Malice indicators are medium
+        - Capability risk is medium
+        - Quality grade is F
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -377,14 +445,20 @@ audits[59]:
     overall_score: 0.565
     file_path: SKILL.md
     summary: "Needs work skill with 10 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: developer-toolkit
+      recommendation: human_review
+      capability_risk: medium
+      malice_indicators: medium
+      quality: D
+      summary: "human_review: profile=developer-toolkit, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Interpreted as developer-toolkit; expected capabilities are reviewed in that context
+        - Malice indicators are medium
+        - Capability risk is medium
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.8	0.15	0
@@ -405,14 +479,15 @@ audits[59]:
     overall_score: 0.735
     file_path: SKILL.md
     summary: "Acceptable skill with 5 suggestions for improvement (weakest: safety)"
-    risk:
-      active_findings: 0
-      critical: 0
-      high: 0
-      medium: 0
-      low: 0
-      max_severity: none
-      recommended_action: warn
+    verdict:
+      profile: general
+      recommendation: warn
+      capability_risk: low
+      malice_indicators: low
+      quality: C
+      summary: "warn: no active security findings; profile=general"
+      reasons[1]:
+        - Quality grade is C
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.8	0.15	0
@@ -428,14 +503,20 @@ audits[59]:
     overall_score: 0.435
     file_path: SKILL.md
     summary: "Poor skill with 13 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: deployment
+      recommendation: human_review
+      capability_risk: medium
+      malice_indicators: medium
+      quality: F
+      summary: "human_review: profile=deployment, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Interpreted as deployment; expected capabilities are reviewed in that context
+        - Malice indicators are medium
+        - Capability risk is medium
+        - Quality grade is F
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -456,14 +537,19 @@ audits[59]:
     overall_score: 0.432
     file_path: SKILL.md
     summary: "Poor skill with 15 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 8
-      critical: 0
-      high: 2
-      medium: 5
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: medium
+      quality: F
+      summary: "block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Malice indicators are medium
+        - Capability risk is high
+        - Quality grade is F
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.7	0.15	0
@@ -487,14 +573,20 @@ audits[59]:
     overall_score: 0.525
     file_path: SKILL.md
     summary: "Needs work skill with 12 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 6
-      critical: 0
-      high: 3
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: developer-toolkit
+      recommendation: human_review
+      capability_risk: medium
+      malice_indicators: medium
+      quality: D
+      summary: "human_review: profile=developer-toolkit, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Interpreted as developer-toolkit; expected capabilities are reviewed in that context
+        - Malice indicators are medium
+        - Capability risk is medium
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -516,14 +608,20 @@ audits[59]:
     overall_score: 0.525
     file_path: SKILL.md
     summary: "Needs work skill with 12 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 6
-      critical: 0
-      high: 2
-      medium: 3
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: browser-automation
+      recommendation: human_review
+      capability_risk: medium
+      malice_indicators: medium
+      quality: D
+      summary: "human_review: profile=browser-automation, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Interpreted as browser-automation; expected capabilities are reviewed in that context
+        - Malice indicators are medium
+        - Capability risk is medium
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -545,14 +643,19 @@ audits[59]:
     overall_score: 0.565
     file_path: SKILL.md
     summary: "Needs work skill with 10 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: medium
+      quality: D
+      summary: "block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Malice indicators are medium
+        - Capability risk is high
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.8	0.15	0
@@ -573,14 +676,19 @@ audits[59]:
     overall_score: 0.535
     file_path: SKILL.md
     summary: "Needs work skill with 11 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: medium
+      quality: D
+      summary: "block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Malice indicators are medium
+        - Capability risk is high
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -601,14 +709,19 @@ audits[59]:
     overall_score: 0.477
     file_path: SKILL.md
     summary: "Poor skill with 14 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 7
-      critical: 1
-      high: 2
-      medium: 3
-      low: 1
-      max_severity: critical
-      recommended_action: block
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: high
+      quality: F
+      summary: "block: profile=general, malice=high, capability=high, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE, SUSPICIOUS_URL"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE, SUSPICIOUS_URL"
+        - Malice indicators are high
+        - Capability risk is high
+        - Quality grade is F
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -631,14 +744,19 @@ audits[59]:
     overall_score: 0.505
     file_path: SKILL.md
     summary: "Needs work skill with 14 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 8
-      critical: 1
-      high: 3
-      medium: 3
-      low: 1
-      max_severity: critical
-      recommended_action: block
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: high
+      quality: D
+      summary: "block: profile=general, malice=high, capability=high, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE, SUSPICIOUS_URL"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE, SUSPICIOUS_URL"
+        - Malice indicators are high
+        - Capability risk is high
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -662,14 +780,19 @@ audits[59]:
     overall_score: 0.535
     file_path: SKILL.md
     summary: "Needs work skill with 11 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: medium
+      quality: D
+      summary: "block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Malice indicators are medium
+        - Capability risk is high
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -690,14 +813,20 @@ audits[59]:
     overall_score: 0.505
     file_path: SKILL.md
     summary: "Needs work skill with 13 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 7
-      critical: 1
-      high: 3
-      medium: 2
-      low: 1
-      max_severity: critical
-      recommended_action: block
+    verdict:
+      profile: developer-toolkit
+      recommendation: block
+      capability_risk: medium
+      malice_indicators: high
+      quality: D
+      summary: "block: profile=developer-toolkit, malice=high, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE, SECRET"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE, SECRET"
+        - Interpreted as developer-toolkit; expected capabilities are reviewed in that context
+        - Malice indicators are high
+        - Capability risk is medium
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -720,14 +849,19 @@ audits[59]:
     overall_score: 0.505
     file_path: SKILL.md
     summary: "Needs work skill with 13 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 7
-      critical: 0
-      high: 3
-      medium: 3
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: medium
+      quality: D
+      summary: "block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE, SUSPICIOUS_URL"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE, SUSPICIOUS_URL"
+        - Malice indicators are medium
+        - Capability risk is high
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -750,14 +884,20 @@ audits[59]:
     overall_score: 0.535
     file_path: SKILL.md
     summary: "Needs work skill with 11 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: developer-toolkit
+      recommendation: human_review
+      capability_risk: medium
+      malice_indicators: medium
+      quality: D
+      summary: "human_review: profile=developer-toolkit, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Interpreted as developer-toolkit; expected capabilities are reviewed in that context
+        - Malice indicators are medium
+        - Capability risk is medium
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -778,14 +918,19 @@ audits[59]:
     overall_score: 0.405
     file_path: SKILL.md
     summary: "Poor skill with 14 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: medium
+      quality: F
+      summary: "block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Malice indicators are medium
+        - Capability risk is high
+        - Quality grade is F
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.4	0.15	0
@@ -806,14 +951,20 @@ audits[59]:
     overall_score: 0.535
     file_path: SKILL.md
     summary: "Needs work skill with 11 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: deployment
+      recommendation: human_review
+      capability_risk: medium
+      malice_indicators: medium
+      quality: D
+      summary: "human_review: profile=deployment, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Interpreted as deployment; expected capabilities are reviewed in that context
+        - Malice indicators are medium
+        - Capability risk is medium
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -834,14 +985,19 @@ audits[59]:
     overall_score: 0.593
     file_path: SKILL.md
     summary: "Needs work skill with 10 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: medium
+      quality: D
+      summary: "block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Malice indicators are medium
+        - Capability risk is high
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.85	0.2	0
       clarity	0.6	0.15	0
@@ -862,14 +1018,20 @@ audits[59]:
     overall_score: 0.535
     file_path: SKILL.md
     summary: "Needs work skill with 11 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: developer-toolkit
+      recommendation: human_review
+      capability_risk: medium
+      malice_indicators: medium
+      quality: D
+      summary: "human_review: profile=developer-toolkit, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Interpreted as developer-toolkit; expected capabilities are reviewed in that context
+        - Malice indicators are medium
+        - Capability risk is medium
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -890,14 +1052,19 @@ audits[59]:
     overall_score: 0.482
     file_path: SKILL.md
     summary: "Poor skill with 12 suggestions for improvement (weakest: safety)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: medium
+      quality: F
+      summary: "block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Malice indicators are medium
+        - Capability risk is high
+        - Quality grade is F
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.7	0.15	0
@@ -918,14 +1085,19 @@ audits[59]:
     overall_score: 0.565
     file_path: SKILL.md
     summary: "Needs work skill with 10 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: medium
+      quality: D
+      summary: "block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Malice indicators are medium
+        - Capability risk is high
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.8	0.15	0
@@ -946,14 +1118,19 @@ audits[59]:
     overall_score: 0.505
     file_path: SKILL.md
     summary: "Needs work skill with 12 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 6
-      critical: 1
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: critical
-      recommended_action: block
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: high
+      quality: D
+      summary: "block: profile=general, malice=high, capability=high, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE"
+        - Malice indicators are high
+        - Capability risk is high
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -975,14 +1152,20 @@ audits[59]:
     overall_score: 0.505
     file_path: SKILL.md
     summary: "Needs work skill with 12 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 6
-      critical: 1
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: critical
-      recommended_action: block
+    verdict:
+      profile: deployment
+      recommendation: block
+      capability_risk: medium
+      malice_indicators: high
+      quality: D
+      summary: "block: profile=deployment, malice=high, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE"
+        - Interpreted as deployment; expected capabilities are reviewed in that context
+        - Malice indicators are high
+        - Capability risk is medium
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -1004,14 +1187,19 @@ audits[59]:
     overall_score: 0.565
     file_path: SKILL.md
     summary: "Needs work skill with 10 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: medium
+      quality: D
+      summary: "block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Malice indicators are medium
+        - Capability risk is high
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.8	0.15	0
@@ -1032,14 +1220,19 @@ audits[59]:
     overall_score: 0.565
     file_path: SKILL.md
     summary: "Needs work skill with 10 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: medium
+      quality: D
+      summary: "block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Malice indicators are medium
+        - Capability risk is high
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.8	0.15	0
@@ -1060,14 +1253,19 @@ audits[59]:
     overall_score: 0.565
     file_path: SKILL.md
     summary: "Needs work skill with 10 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: medium
+      quality: D
+      summary: "block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Malice indicators are medium
+        - Capability risk is high
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.8	0.15	0
@@ -1088,14 +1286,19 @@ audits[59]:
     overall_score: 0.505
     file_path: SKILL.md
     summary: "Needs work skill with 13 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 7
-      critical: 1
-      high: 3
-      medium: 2
-      low: 1
-      max_severity: critical
-      recommended_action: block
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: high
+      quality: D
+      summary: "block: profile=general, malice=high, capability=high, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE"
+        - Malice indicators are high
+        - Capability risk is high
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -1118,14 +1321,20 @@ audits[59]:
     overall_score: 0.525
     file_path: SKILL.md
     summary: "Needs work skill with 12 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 6
-      critical: 0
-      high: 2
-      medium: 3
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: browser-automation
+      recommendation: human_review
+      capability_risk: medium
+      malice_indicators: medium
+      quality: D
+      summary: "human_review: profile=browser-automation, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Interpreted as browser-automation; expected capabilities are reviewed in that context
+        - Malice indicators are medium
+        - Capability risk is medium
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -1147,14 +1356,19 @@ audits[59]:
     overall_score: 0.565
     file_path: SKILL.md
     summary: "Needs work skill with 10 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: medium
+      quality: D
+      summary: "block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Malice indicators are medium
+        - Capability risk is high
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.8	0.15	0
@@ -1175,14 +1389,20 @@ audits[59]:
     overall_score: 0.505
     file_path: SKILL.md
     summary: "Needs work skill with 12 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 6
-      critical: 1
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: critical
-      recommended_action: block
+    verdict:
+      profile: developer-toolkit
+      recommendation: block
+      capability_risk: medium
+      malice_indicators: high
+      quality: D
+      summary: "block: profile=developer-toolkit, malice=high, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE"
+        - Interpreted as developer-toolkit; expected capabilities are reviewed in that context
+        - Malice indicators are high
+        - Capability risk is medium
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -1204,14 +1424,20 @@ audits[59]:
     overall_score: 0.505
     file_path: SKILL.md
     summary: "Needs work skill with 14 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 8
-      critical: 1
-      high: 3
-      medium: 3
-      low: 1
-      max_severity: critical
-      recommended_action: block
+    verdict:
+      profile: developer-toolkit
+      recommendation: block
+      capability_risk: medium
+      malice_indicators: high
+      quality: D
+      summary: "block: profile=developer-toolkit, malice=high, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE, SUSPICIOUS_URL"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE, SUSPICIOUS_URL"
+        - Interpreted as developer-toolkit; expected capabilities are reviewed in that context
+        - Malice indicators are high
+        - Capability risk is medium
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -1235,14 +1461,20 @@ audits[59]:
     overall_score: 0.505
     file_path: SKILL.md
     summary: "Needs work skill with 12 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 6
-      critical: 1
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: critical
-      recommended_action: block
+    verdict:
+      profile: developer-toolkit
+      recommendation: block
+      capability_risk: medium
+      malice_indicators: high
+      quality: D
+      summary: "block: profile=developer-toolkit, malice=high, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE"
+        - Interpreted as developer-toolkit; expected capabilities are reviewed in that context
+        - Malice indicators are high
+        - Capability risk is medium
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -1264,14 +1496,20 @@ audits[59]:
     overall_score: 0.505
     file_path: SKILL.md
     summary: "Needs work skill with 12 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 6
-      critical: 1
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: critical
-      recommended_action: block
+    verdict:
+      profile: developer-toolkit
+      recommendation: block
+      capability_risk: medium
+      malice_indicators: high
+      quality: D
+      summary: "block: profile=developer-toolkit, malice=high, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE"
+        - Interpreted as developer-toolkit; expected capabilities are reviewed in that context
+        - Malice indicators are high
+        - Capability risk is medium
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -1293,14 +1531,19 @@ audits[59]:
     overall_score: 0.535
     file_path: SKILL.md
     summary: "Needs work skill with 11 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: medium
+      quality: D
+      summary: "block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Malice indicators are medium
+        - Capability risk is high
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -1321,14 +1564,20 @@ audits[59]:
     overall_score: 0.4
     file_path: SKILL.md
     summary: "Poor skill with 15 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 6
-      critical: 1
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: critical
-      recommended_action: block
+    verdict:
+      profile: developer-toolkit
+      recommendation: block
+      capability_risk: medium
+      malice_indicators: high
+      quality: F
+      summary: "block: profile=developer-toolkit, malice=high, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE"
+        - Interpreted as developer-toolkit; expected capabilities are reviewed in that context
+        - Malice indicators are high
+        - Capability risk is medium
+        - Quality grade is F
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.4	0.15	0
@@ -1350,14 +1599,20 @@ audits[59]:
     overall_score: 0.4
     file_path: SKILL.md
     summary: "Poor skill with 15 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 6
-      critical: 1
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: critical
-      recommended_action: block
+    verdict:
+      profile: developer-toolkit
+      recommendation: block
+      capability_risk: medium
+      malice_indicators: high
+      quality: F
+      summary: "block: profile=developer-toolkit, malice=high, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE"
+        - Interpreted as developer-toolkit; expected capabilities are reviewed in that context
+        - Malice indicators are high
+        - Capability risk is medium
+        - Quality grade is F
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.4	0.15	0
@@ -1379,14 +1634,19 @@ audits[59]:
     overall_score: 0.505
     file_path: SKILL.md
     summary: "Needs work skill with 12 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 6
-      critical: 1
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: critical
-      recommended_action: block
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: high
+      quality: D
+      summary: "block: profile=general, malice=high, capability=high, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE"
+        - Malice indicators are high
+        - Capability risk is high
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -1408,14 +1668,20 @@ audits[59]:
     overall_score: 0.505
     file_path: SKILL.md
     summary: "Needs work skill with 12 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 6
-      critical: 1
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: critical
-      recommended_action: block
+    verdict:
+      profile: developer-toolkit
+      recommendation: block
+      capability_risk: medium
+      malice_indicators: high
+      quality: D
+      summary: "block: profile=developer-toolkit, malice=high, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE"
+        - Interpreted as developer-toolkit; expected capabilities are reviewed in that context
+        - Malice indicators are high
+        - Capability risk is medium
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -1437,14 +1703,20 @@ audits[59]:
     overall_score: 0.535
     file_path: SKILL.md
     summary: "Needs work skill with 11 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: browser-automation
+      recommendation: human_review
+      capability_risk: medium
+      malice_indicators: medium
+      quality: D
+      summary: "human_review: profile=browser-automation, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Interpreted as browser-automation; expected capabilities are reviewed in that context
+        - Malice indicators are medium
+        - Capability risk is medium
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -1465,14 +1737,20 @@ audits[59]:
     overall_score: 0.637
     file_path: SKILL.md
     summary: "Needs work skill with 9 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: browser-automation
+      recommendation: human_review
+      capability_risk: medium
+      malice_indicators: medium
+      quality: D
+      summary: "human_review: profile=browser-automation, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Interpreted as browser-automation; expected capabilities are reviewed in that context
+        - Malice indicators are medium
+        - Capability risk is medium
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.85	0.2	0
       clarity	0.6	0.15	0
@@ -1493,14 +1771,20 @@ audits[59]:
     overall_score: 0.499
     file_path: SKILL.md
     summary: "Poor skill with 12 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: deployment
+      recommendation: human_review
+      capability_risk: medium
+      malice_indicators: medium
+      quality: F
+      summary: "human_review: profile=deployment, malice=medium, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Interpreted as deployment; expected capabilities are reviewed in that context
+        - Malice indicators are medium
+        - Capability risk is medium
+        - Quality grade is F
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -1521,14 +1805,19 @@ audits[59]:
     overall_score: 0.515
     file_path: SKILL.md
     summary: "Needs work skill with 13 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 7
-      critical: 0
-      high: 3
-      medium: 3
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: medium
+      quality: D
+      summary: "block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Malice indicators are medium
+        - Capability risk is high
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -1551,14 +1840,20 @@ audits[59]:
     overall_score: 0.505
     file_path: SKILL.md
     summary: "Needs work skill with 12 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 6
-      critical: 1
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: critical
-      recommended_action: block
+    verdict:
+      profile: deployment
+      recommendation: block
+      capability_risk: medium
+      malice_indicators: high
+      quality: D
+      summary: "block: profile=deployment, malice=high, capability=medium, categories=DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE"
+      reasons[6]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, INJECTION, PRIVILEGE"
+        - Interpreted as deployment; expected capabilities are reviewed in that context
+        - Malice indicators are high
+        - Capability risk is medium
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -1580,14 +1875,19 @@ audits[59]:
     overall_score: 0.535
     file_path: SKILL.md
     summary: "Needs work skill with 11 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: medium
+      quality: D
+      summary: "block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Malice indicators are medium
+        - Capability risk is high
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -1608,14 +1908,19 @@ audits[59]:
     overall_score: 0.535
     file_path: SKILL.md
     summary: "Needs work skill with 11 suggestions for improvement (weakest: trust)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: medium
+      quality: D
+      summary: "block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Malice indicators are medium
+        - Capability risk is high
+        - Quality grade is D
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.8	0.2	0
       clarity	0.6	0.15	0
@@ -1636,14 +1941,19 @@ audits[59]:
     overall_score: 0.394
     file_path: SKILL.md
     summary: "Poor skill with 15 suggestions for improvement (weakest: safety)"
-    risk:
-      active_findings: 5
-      critical: 0
-      high: 2
-      medium: 2
-      low: 1
-      max_severity: high
-      recommended_action: human_review
+    verdict:
+      profile: general
+      recommendation: block
+      capability_risk: high
+      malice_indicators: medium
+      quality: F
+      summary: "block: profile=general, malice=medium, capability=high, categories=DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+      reasons[5]:
+        - "Active finding categories: DESTRUCTIVE, EXFILTRATION, PRIVILEGE"
+        - Malice indicators are medium
+        - Capability risk is high
+        - Quality grade is F
+        - Raw findings are preserved; reputation/profile should not suppress evidence
     dimensions[6	]{name	score	weight	findings}:
       completeness	0.63	0.2	0
       clarity	0.57	0.15	0

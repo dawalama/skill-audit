@@ -39,6 +39,15 @@ def format_table(card: ScoreCard, verbose: bool = False) -> None:
 
     console.print(table)
 
+    if card.verdict:
+        console.print()
+        console.print(f"  [bold]Verdict:[/bold] {card.verdict.recommendation} "
+                      f"[dim](profile: {card.verdict.profile}, "
+                      f"malice: {card.verdict.malice_indicators}, "
+                      f"capability: {card.verdict.capability_risk})[/dim]")
+        for reason in card.verdict.reasons[:3]:
+            console.print(f"    [dim]- {reason}[/dim]")
+
     if verbose:
         # In verbose mode, show suggestions (what to fix) prominently,
         # and details (what's good) only for imperfect dimensions
@@ -215,7 +224,7 @@ def _card_to_agent_dict(card: ScoreCard) -> dict:
                 "evidence": finding.evidence,
             })
 
-    risk_summary = _risk_summary(card, findings)
+    verdict = card.verdict.model_dump() if card.verdict else _risk_summary(card, findings)
     dimensions = [
         {
             "name": dim.name,
@@ -234,7 +243,7 @@ def _card_to_agent_dict(card: ScoreCard) -> dict:
         "overall_score": round(card.overall_score, 3),
         "file_path": card.file_path.name if card.file_path else None,
         "summary": card.summary,
-        "risk": risk_summary,
+        "verdict": verdict,
         "dimensions": dimensions,
         "findings": findings,
     }
@@ -513,6 +522,17 @@ def format_html(cards: list[ScoreCard], llm_findings: dict[str, list] | None = N
     </div>''')
         sections.append('  </div>')
 
+        # Context-aware verdict
+        if card.verdict:
+            v = card.verdict
+            sections.append(f'''  <div class="verdict">
+    <strong>Verdict: {_esc(v.recommendation)}</strong>
+    <span>Profile: {_esc(v.profile)}</span>
+    <span>Malice: {_esc(v.malice_indicators)}</span>
+    <span>Capability: {_esc(v.capability_risk)}</span>
+    <p>{_esc(v.summary)}</p>
+  </div>''')
+
         # Details / suggestions (collapsible)
         has_details = any(dim.details or dim.suggestions for dim in card.dimensions)
         if has_details:
@@ -673,6 +693,15 @@ def format_html(cards: list[ScoreCard], llm_findings: dict[str, list] | None = N
   .suggestion-list {{ margin: 0.25rem 0; padding-left: 1.25rem; }}
   .suggestion-list li {{ font-size: 0.82rem; color: #ca8a04; margin-bottom: 0.15rem; }}
   .summary {{ font-size: 0.85rem; color: #475569; margin-top: 0.75rem; }}
+  .verdict {{
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;
+    padding: 0.75rem; margin: 1rem 0; font-size: 0.85rem; color: #334155;
+  }}
+  .verdict strong {{ display: block; margin-bottom: 0.35rem; color: #0f172a; }}
+  .verdict span {{
+    display: inline-block; margin-right: 0.75rem; color: #475569;
+  }}
+  .verdict p {{ margin: 0.35rem 0 0; color: #64748b; }}
   .llm-section {{
     margin-top: 1rem; border-top: 1px solid #e2e8f0; padding-top: 0.75rem;
   }}
