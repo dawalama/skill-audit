@@ -5,6 +5,19 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 
 
+class Finding(BaseModel):
+    """A structured audit finding for machine consumers."""
+
+    id: str
+    category: str
+    severity: str
+    message: str
+    evidence: str = ""
+    source: str = "content"
+    confidence: float = Field(default=0.8, ge=0.0, le=1.0)
+    disposition: str = "active"
+
+
 class ScoreDimension(BaseModel):
     """A single scoring dimension with score and feedback."""
 
@@ -14,6 +27,7 @@ class ScoreDimension(BaseModel):
     weight: float = 0.2
     details: list[str] = Field(default_factory=list)
     suggestions: list[str] = Field(default_factory=list)
+    findings: list[Finding] = Field(default_factory=list)
 
 
 class ScoreCard(BaseModel):
@@ -60,6 +74,7 @@ class ScoreCard(BaseModel):
                     "weight": d.weight,
                     "details": d.details,
                     "suggestions": d.suggestions,
+                    "findings": [f.model_dump() for f in d.findings],
                 }
                 for d in self.dimensions
             ],

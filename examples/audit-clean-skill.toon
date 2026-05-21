@@ -1,0 +1,16 @@
+audits[1]:
+  - entity_type: skill
+    entity_name: Code Review
+    format: dotai-skill
+    grade: A
+    overall_score: 0.973
+    file_path: clean-skill.md
+    summary: Excellent skill with 1 suggestions for improvement
+    dimensions[6	]{name	score	weight	findings}:
+    completeness	1.0	0.2	0
+    clarity	1.0	0.15	0
+    actionability	0.867	0.2	0
+    safety	1.0	0.15	0
+    testability	1.0	0.1	0
+    trust	1.0	0.2	0
+    findings: []

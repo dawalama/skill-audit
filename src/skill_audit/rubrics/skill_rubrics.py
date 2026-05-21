@@ -6,7 +6,7 @@
 import re
 
 from ..config import WeightsConfig
-from ..models import ScoreDimension
+from ..models import Finding, ScoreDimension
 from ..parser import ParsedArtifact
 
 # Action verbs that indicate actionable steps
@@ -742,6 +742,7 @@ def _score_trust(
     score = 1.0  # Start at full trust, deduct for findings
     details: list[str] = []
     suggestions: list[str] = []
+    structured_findings: list[Finding] = []
     _ignored = {c.upper() for c in (ignore_categories or set())}
 
     # Pre-process: strip lines covered by ignore-next-line directives,
@@ -820,7 +821,7 @@ def _score_trust(
     # that warn about dangers should not flag if the pattern isn't in executable code
     _DOC_AWARE_CATEGORIES = {"DESTRUCTIVE"}
 
-    findings: list[tuple[str, str]] = []  # (category, description)
+    findings: list[dict[str, str]] = []
 
     # Scan all pattern categories
     _ALL_PATTERN_GROUPS = [
@@ -838,7 +839,8 @@ def _score_trust(
     for patterns, category, case_insensitive in _ALL_PATTERN_GROUPS:
         text_to_scan = full_scan_lower if case_insensitive else full_scan
         for pattern, desc in patterns:
-            if re.search(pattern, text_to_scan):
+            match = re.search(pattern, text_to_scan)
+            if match:
                 # Context-aware filtering: for DESTRUCTIVE patterns, check if the
                 # match is ONLY in documentation (description/gotchas) and not in
                 # any actionable context (code blocks, scripts, steps, commands).
@@ -849,19 +851,39 @@ def _score_trust(
                     if not re.search(pattern, action_text):
                         # Pattern only in docs/description — skip it
                         continue
-                findings.append((category, desc))
+                evidence = _evidence_window(full_scan, match.start(), match.end())
+                findings.append({
+                    "category": category,
+                    "description": desc,
+                    "evidence": evidence,
+                    "source": _finding_source(evidence, exec_blocks=exec_blocks, scripts=scripts, inline_cmds=inline_cmds),
+                })
 
     # Custom patterns from config file
     if custom_patterns:
         for pat, desc, category in custom_patterns:
             try:
-                if re.search(pat, full_scan, re.IGNORECASE):
-                    findings.append((category, desc))
+                match = re.search(pat, full_scan, re.IGNORECASE)
+                if match:
+                    findings.append({
+                        "category": category.upper(),
+                        "description": desc,
+                        "evidence": _evidence_window(full_scan, match.start(), match.end()),
+                        "source": "custom-pattern",
+                    })
             except re.error:
                 pass  # Skip invalid regex patterns
 
     # Entropy analysis: flag high-entropy strings (encoded payloads)
-    entropy_findings = _check_entropy(full_scan, threshold=entropy_threshold)
+    entropy_findings = [
+        {
+            "category": category,
+            "description": desc,
+            "evidence": desc,
+            "source": "entropy",
+        }
+        for category, desc in _check_entropy(full_scan, threshold=entropy_threshold)
+    ]
     findings.extend(entropy_findings)
 
     if not findings:
@@ -875,6 +897,7 @@ def _score_trust(
             weight=weight,
             details=details,
             suggestions=suggestions,
+            findings=structured_findings,
         )
 
     # Deduct based on severity
@@ -895,12 +918,30 @@ def _score_trust(
     seen_categories: set[str] = set()
     suppressed_categories: set[str] = set()
 
-    for category, desc in findings:
+    for idx, finding in enumerate(findings, 1):
+        category = finding["category"].upper()
+        desc = finding["description"]
         if category in _ignored:
             suppressed_categories.add(category)
             suggestions.append(f"[{category}] (ignored) {desc}")
+            structured_findings.append(_build_finding(
+                index=idx,
+                category=category,
+                message=desc,
+                evidence=finding.get("evidence", ""),
+                source=finding.get("source", "content"),
+                disposition="suppressed",
+            ))
             continue
         suggestions.append(f"[{category}] {desc}")
+        structured_findings.append(_build_finding(
+            index=idx,
+            category=category,
+            message=desc,
+            evidence=finding.get("evidence", ""),
+            source=finding.get("source", "content"),
+            disposition="active",
+        ))
         if category not in seen_categories:
             total_deduction += severity_weights.get(category, 0.2)
             seen_categories.add(category)
@@ -914,7 +955,7 @@ def _score_trust(
     score = max(0.0, 1.0 - total_deduction)
 
     # Count only non-ignored findings for severity reporting
-    active_findings = [(c, d) for c, d in findings if c not in _ignored]
+    active_findings = [f for f in findings if f["category"].upper() not in _ignored]
 
     if not active_findings and findings:
         details.append(f"All {len(findings)} finding(s) suppressed by ignore rules")
@@ -931,7 +972,81 @@ def _score_trust(
         weight=weight,
         details=details,
         suggestions=suggestions,
+        findings=structured_findings,
     )
+
+
+_CATEGORY_SEVERITY = {
+    "INJECTION": "critical",
+    "PERSISTENCE": "critical",
+    "HIJACKING": "critical",
+    "OBFUSCATION": "high",
+    "SECRET": "high",
+    "EXFILTRATION": "high",
+    "SUSPICIOUS_URL": "medium",
+    "DESTRUCTIVE": "medium",
+    "ENTROPY": "medium",
+    "PRIVILEGE": "low",
+}
+
+
+def _build_finding(
+    *,
+    index: int,
+    category: str,
+    message: str,
+    evidence: str,
+    source: str,
+    disposition: str,
+) -> Finding:
+    """Create a stable structured finding from a trust match."""
+    category_slug = category.lower().replace("_", "-")
+    severity = _CATEGORY_SEVERITY.get(category, "medium")
+    confidence = 0.9 if source in {"code", "script", "inline-command"} else 0.75
+    if disposition == "suppressed":
+        confidence = min(confidence, 0.7)
+    return Finding(
+        id=f"trust-{category_slug}-{index}",
+        category=category,
+        severity=severity,
+        message=message,
+        evidence=evidence,
+        source=source,
+        confidence=confidence,
+        disposition=disposition,
+    )
+
+
+def _evidence_window(text: str, start: int, end: int, *, radius: int = 80) -> str:
+    """Return a compact single-line evidence snippet around a regex match."""
+    snippet = text[max(0, start - radius):min(len(text), end + radius)]
+    return re.sub(r"\s+", " ", snippet).strip()
+
+
+def _finding_source(
+    evidence: str,
+    *,
+    exec_blocks: list[tuple[str, str]],
+    scripts: list[tuple[str, str]],
+    inline_cmds: list[str],
+) -> str:
+    """Infer a coarse source label for existing pattern matches."""
+    needle = evidence.lower()
+    if any(_overlaps(code, needle) for _, code in exec_blocks):
+        return "code"
+    if any(_overlaps(content, needle) for _, content in scripts):
+        return "script"
+    if inline_cmds and any(_overlaps(cmd, needle) for cmd in inline_cmds):
+        return "inline-command"
+    return "content"
+
+
+def _overlaps(source_text: str, evidence: str) -> bool:
+    """Check whether a compact evidence snippet plausibly came from source_text."""
+    source = re.sub(r"\s+", " ", source_text).strip().lower()
+    if not source or not evidence:
+        return False
+    return source in evidence or evidence in source
 
 
 def _check_entropy(text: str, threshold: float = 4.8) -> list[tuple[str, str]]:

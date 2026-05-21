@@ -162,6 +162,7 @@ class TestAnalyzeFile:
         assert "grade" in d
         assert "dimensions" in d
         assert isinstance(d["dimensions"], list)
+        assert "findings" in d["dimensions"][0]
 
 
 class TestAnalyzeDirectory:

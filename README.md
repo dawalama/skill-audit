@@ -215,6 +215,14 @@ ai-skill-audit audit review.md --verbose
 
 Shows per-dimension findings (what's good) and suggestions (what to improve).
 
+### Agent-friendly TOON output
+
+```bash
+ai-skill-audit audit review.md --output toon
+```
+
+Emits a compact, structured report for agent context. JSON remains the canonical machine interchange format; TOON is optimized for token-efficient agent prompts.
+
 ### Audit a directory
 
 ```bash

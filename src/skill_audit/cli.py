@@ -25,6 +25,7 @@ How to use:
   Audit a directory:      ai-skill-audit audit ~/.ai/skills/
   Audit a GitHub repo:    ai-skill-audit audit https://github.com/user/skills
   Audit a GitHub file:    ai-skill-audit audit https://github.com/user/repo/blob/main/SKILL.md
+  Agent-friendly output: ai-skill-audit audit SKILL.md --output toon
   Add LLM deep review:   ai-skill-audit audit SKILL.md --llm
   Fail CI below grade B: ai-skill-audit audit skills/ --min-grade B
   Inspect without scoring: ai-skill-audit info SKILL.md
@@ -134,7 +135,7 @@ def _build_llm_content(artifact) -> str:
 def audit(
     path: str = typer.Argument(..., help="File, directory, or URL to audit"),
     format: Optional[str] = typer.Option(None, "--format", "-f", help="Force format: dotai-skill, dotai-role, claude-native"),
-    output: str = typer.Option("table", "--output", "-o", help="Output format: table, json, markdown, html"),
+    output: str = typer.Option("table", "--output", "-o", help="Output format: table, json, toon, markdown, html"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show per-dimension details and suggestions"),
     min_grade: Optional[str] = typer.Option(None, "--min-grade", help="Exit 1 if below grade (A/B/C/D) — useful for CI"),
     summary: bool = typer.Option(False, "--summary", help="Summary table only (for directories)"),
@@ -172,7 +173,7 @@ def audit(
     """
     from .analyzer import analyze_file, analyze_directory
     from .fetcher import is_remote, fetch_remote, cleanup_temp
-    from .formatters import format_table, format_json, format_markdown, format_html, format_summary_table
+    from .formatters import format_table, format_json, format_toon, format_markdown, format_html, format_summary_table
     from .ignore import load_ignore_config
 
     # Load config and apply defaults (CLI flags override config values)
@@ -257,6 +258,8 @@ def audit(
     # Output
     if output == "json":
         print(format_json(cards))
+    elif output == "toon":
+        print(format_toon(cards))
     elif output == "html":
         # Build command string for the report header
         cmd_parts = ["ai-skill-audit", "audit", path]

@@ -191,6 +191,149 @@ def format_json(cards: list[ScoreCard]) -> str:
     return json.dumps([c.to_dict() for c in cards], indent=2)
 
 
+def format_toon(cards: list[ScoreCard]) -> str:
+    """Format scorecards as compact TOON for agent context."""
+    payload = {
+        "audits": [_card_to_agent_dict(card) for card in cards],
+    }
+    return _to_toon(payload)
+
+
+def _card_to_agent_dict(card: ScoreCard) -> dict:
+    """Return the agent-oriented subset of a scorecard."""
+    findings = []
+    for dim in card.dimensions:
+        for finding in dim.findings:
+            findings.append({
+                "id": finding.id,
+                "category": finding.category,
+                "severity": finding.severity,
+                "source": finding.source,
+                "confidence": round(finding.confidence, 2),
+                "disposition": finding.disposition,
+                "message": finding.message,
+                "evidence": finding.evidence,
+            })
+
+    dimensions = [
+        {
+            "name": dim.name,
+            "score": round(dim.score, 3),
+            "weight": round(dim.weight, 3),
+            "findings": len(dim.findings),
+        }
+        for dim in card.dimensions
+    ]
+
+    return {
+        "entity_type": card.entity_type,
+        "entity_name": card.entity_name,
+        "format": card.format,
+        "grade": card.grade,
+        "overall_score": round(card.overall_score, 3),
+        "file_path": card.file_path.name if card.file_path else None,
+        "summary": card.summary,
+        "dimensions": dimensions,
+        "findings": findings,
+    }
+
+
+def _to_toon(value, indent: int = 0, key: str | None = None) -> str:
+    """Encode JSON-like data as a conservative TOON subset."""
+    prefix = " " * indent
+    if isinstance(value, dict):
+        lines = []
+        if key is not None:
+            lines.append(f"{prefix}{_toon_key(key)}:")
+            child_indent = indent + 2
+        else:
+            child_indent = indent
+        for child_key, child_value in value.items():
+            encoded = _to_toon(child_value, child_indent, child_key)
+            if encoded:
+                lines.append(encoded)
+        return "\n".join(lines)
+
+    if isinstance(value, list):
+        header = f"{prefix}{_toon_key(key)}[{len(value)}]:" if key is not None else f"{prefix}[{len(value)}]:"
+        if not value:
+            return f"{prefix}{_toon_key(key)}: []" if key is not None else f"{prefix}[]"
+        if _is_tabular(value):
+            keys = list(value[0].keys())
+            delimiter = "\t"
+            fields = delimiter.join(_toon_key(k) for k in keys)
+            rows = [
+                " " * (indent + 2) + delimiter.join(_toon_scalar(item[k], delimiter=delimiter) for k in keys)
+                for item in value
+            ]
+            tab_header = f"{prefix}{_toon_key(key)}[{len(value)}\t]{{{fields}}}:" if key is not None else f"{prefix}[{len(value)}\t]{{{fields}}}:"
+            return "\n".join([tab_header, *rows])
+        lines = [header]
+        for item in value:
+            item_prefix = " " * (indent + 2)
+            if isinstance(item, dict):
+                item_lines = _to_toon(item, indent + 4).splitlines()
+                if item_lines:
+                    lines.append(f"{item_prefix}- {item_lines[0].lstrip()}")
+                    lines.extend(" " * (indent + 4) + line.lstrip() for line in item_lines[1:])
+                else:
+                    lines.append(f"{item_prefix}-")
+            else:
+                lines.append(f"{item_prefix}- {_toon_scalar(item)}")
+        return "\n".join(lines)
+
+    if key is None:
+        return f"{prefix}{_toon_scalar(value)}"
+    return f"{prefix}{_toon_key(key)}: {_toon_scalar(value)}"
+
+
+def _is_tabular(value: list) -> bool:
+    """Return True if a list can be encoded as a TOON tabular array."""
+    if not value or not all(isinstance(item, dict) for item in value):
+        return False
+    keys = list(value[0].keys())
+    if not keys:
+        return False
+    for item in value:
+        if list(item.keys()) != keys:
+            return False
+        if any(isinstance(v, (dict, list)) for v in item.values()):
+            return False
+    return True
+
+
+def _toon_key(value: str) -> str:
+    """Encode an object key."""
+    if value.replace("_", "").replace("-", "").isalnum() and value[:1].isalpha():
+        return value
+    return json.dumps(value)
+
+
+def _toon_scalar(value, delimiter: str = ",") -> str:
+    """Encode a primitive scalar for TOON."""
+    if value is None:
+        return "null"
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, (int, float)):
+        return str(value)
+    text = str(value)
+    needs_quotes = (
+        text == ""
+        or text != text.strip()
+        or text in {"true", "false", "null", "-"}
+        or text.startswith("-")
+        or any(ch in text for ch in (":", '"', "\\", "[", "]", "{", "}", "\n", "\r", "\t", delimiter))
+    )
+    if not needs_quotes:
+        try:
+            float(text)
+            needs_quotes = True
+        except ValueError:
+            pass
+    return json.dumps(text) if needs_quotes else text
+
+
 def format_markdown(card: ScoreCard) -> str:
     """Format a scorecard as markdown."""
     lines = [

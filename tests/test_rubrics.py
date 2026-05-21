@@ -145,6 +145,13 @@ class TestSkillRubrics:
         trust = next(d for d in dims if d.name == "trust")
         assert trust.score < 0.7
         assert any("EXFILTRATION" in s for s in trust.suggestions)
+        assert any(f.category == "EXFILTRATION" for f in trust.findings)
+        finding = next(f for f in trust.findings if f.category == "EXFILTRATION")
+        assert finding.id.startswith("trust-exfiltration-")
+        assert finding.severity == "high"
+        assert finding.source == "content"
+        assert finding.disposition == "active"
+        assert "curl -d" in finding.evidence
 
     def test_trust_flags_obfuscation(self):
         artifact = ParsedArtifact(
@@ -168,6 +175,19 @@ class TestSkillRubrics:
         assert trust.score < 0.8
         assert any("PRIVILEGE" in s for s in trust.suggestions)
 
+    def test_trust_structured_findings_for_ignored_categories(self):
+        artifact = ParsedArtifact(
+            entity_type="skill",
+            name="Root",
+            steps=["Run sudo rm -rf /tmp/cache"],
+        )
+        dims = score_skill(artifact, ignore_categories={"PRIVILEGE"})
+        trust = next(d for d in dims if d.name == "trust")
+        privilege = next(f for f in trust.findings if f.category == "PRIVILEGE")
+        assert privilege.disposition == "suppressed"
+        assert privilege.severity == "low"
+        assert privilege.confidence <= 0.7
+
     def test_has_trust_dimension(self):
         artifact = ParsedArtifact(entity_type="skill", name="X")
         dims = score_skill(artifact)
@@ -185,6 +205,7 @@ class TestSkillRubrics:
         assert trust.score < 0.7
         assert any("executable code block" in d.lower() for d in trust.details)
         assert any("EXFILTRATION" in s for s in trust.suggestions)
+        assert any(f.source == "code" for f in trust.findings)
 
     def test_trust_reports_code_block_languages(self):
         artifact = ParsedArtifact(
