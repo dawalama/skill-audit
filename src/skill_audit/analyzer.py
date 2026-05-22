@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from .config import WeightsConfig
@@ -22,6 +23,8 @@ def analyze_file(
     trust_inline: bool = True,
 ) -> ScoreCard:
     """Analyze a single skill or role file and return a ScoreCard."""
+    if path.is_file() and _is_script_file(path):
+        return analyze_script_file(path, ignore_config=ignore_config, custom_patterns=custom_patterns, weights=weights, trust_inline=trust_inline)
     fmt = force_format or detect_format(path)
     if fmt == "mcp-config":
         return analyze_mcp_config(path)
@@ -92,6 +95,25 @@ _DOC_FILES = {
     "todos.md", "vision.md", "philosophy.md",
 }
 
+_MCP_FILES = {"mcp.json", "claude_desktop_config.json"}
+
+_SCRIPT_EXTENSIONS = {
+    ".bash", ".cjs", ".fish", ".js", ".jsx", ".mjs", ".ps1", ".py",
+    ".rb", ".sh", ".ts", ".tsx", ".zsh",
+}
+
+_SCRIPT_NAMES = {
+    "bash", "sh", "zsh", "fish", "python", "python3", "node", "ruby",
+}
+
+_SKIP_DIRS = {
+    ".git", ".hg", ".svn",
+    ".mypy_cache", ".pytest_cache", ".ruff_cache", ".tox",
+    ".venv", "venv", "env",
+    "__pycache__", "node_modules",
+    "build", "dist", "site-packages",
+}
+
 
 def analyze_directory(
     dir_path: Path,
@@ -104,73 +126,112 @@ def analyze_directory(
 ) -> tuple[list[ScoreCard], int]:
     """Analyze all skill/role files in a directory.
 
-    Scans top-level .md files and folder-based skills (dirs with main.md or
-    SKILL.md). If nothing is found at the top level, checks common container
-    directories (skills/, roles/, src/) one level deeper.
+    Recursively scans markdown skills/roles, MCP configs, and executable script
+    files. Documentation files such as README.md are skipped by default without
+    stopping recursion into deeper skill directories.
 
     Returns (cards, skipped_count) where skipped_count is the number of
     documentation files that were skipped.
     """
-    results, skipped = _scan_level(dir_path, force_format, ignore_config, custom_patterns, weights, include_docs, trust_inline)
+    results: list[ScoreCard] = []
+    candidates, skipped = _collect_audit_candidates(dir_path, include_docs=include_docs)
 
-    # If nothing found, try common container directories
-    if not results:
-        for subdir_name in ("skills", "roles", "src"):
-            subdir = dir_path / subdir_name
-            if subdir.is_dir():
-                sub_results, sub_skipped = _scan_level(subdir, force_format, ignore_config, custom_patterns, weights, include_docs, trust_inline)
-                results.extend(sub_results)
-                skipped += sub_skipped
+    for candidate in candidates:
+        card = analyze_file(
+            candidate,
+            force_format,
+            ignore_config=ignore_config,
+            custom_patterns=custom_patterns,
+            weights=weights,
+            trust_inline=trust_inline,
+        )
+        results.append(card)
 
     return results, skipped
 
 
-def _scan_level(
+def _collect_audit_candidates(
     dir_path: Path,
-    force_format: str | None = None,
-    ignore_config: IgnoreConfig | None = None,
-    custom_patterns: list[tuple[str, str, str]] | None = None,
-    weights: WeightsConfig | None = None,
     include_docs: bool = False,
-    trust_inline: bool = True,
-) -> tuple[list[ScoreCard], int]:
-    """Scan a single directory level for skill/role files."""
-    results: list[ScoreCard] = []
+) -> tuple[list[Path], int]:
+    """Return auditable files under a directory in stable order."""
+    candidates: list[Path] = []
     skipped = 0
 
     if not dir_path.exists():
-        return results, skipped
+        return candidates, skipped
 
-    # MCP config files at this level
-    _MCP_FILES = {"mcp.json", "claude_desktop_config.json"}
-    for mcp_name in sorted(_MCP_FILES):
-        mcp_file = dir_path / mcp_name
-        if mcp_file.exists():
-            card = analyze_mcp_config(mcp_file)
-            results.append(card)
+    for root, dirs, files in os.walk(dir_path):
+        dirs[:] = sorted(d for d in dirs if d not in _SKIP_DIRS and not d.startswith("."))
+        root_path = Path(root)
+        for filename in sorted(files):
+            path = root_path / filename
+            if path.name in _MCP_FILES:
+                candidates.append(path)
+            elif path.suffix.lower() == ".md":
+                if not include_docs and path.name.lower() in _DOC_FILES:
+                    skipped += 1
+                    continue
+                candidates.append(path)
+            elif _is_script_file(path):
+                candidates.append(path)
 
-    # .md files at this level
-    for md_file in sorted(dir_path.glob("*.md")):
-        if not include_docs and md_file.name.lower() in _DOC_FILES:
-            skipped += 1
-            continue
-        card = analyze_file(md_file, force_format, ignore_config=ignore_config, custom_patterns=custom_patterns, weights=weights, trust_inline=trust_inline)
-        results.append(card)
+    return candidates, skipped
 
-    # Folder-based skills (dirs with main.md or SKILL.md)
-    for item in sorted(dir_path.iterdir()):
-        if not item.is_dir():
-            continue
-        skill_file = None
-        if (item / "main.md").exists():
-            skill_file = item / "main.md"
-        elif (item / "SKILL.md").exists():
-            skill_file = item / "SKILL.md"
-        if skill_file:
-            card = analyze_file(skill_file, force_format, ignore_config=ignore_config, custom_patterns=custom_patterns, weights=weights, trust_inline=trust_inline)
-            results.append(card)
 
-    return results, skipped
+def _is_script_file(path: Path) -> bool:
+    """Return True for source/script files worth trust scanning directly."""
+    return path.suffix.lower() in _SCRIPT_EXTENSIONS or path.name in _SCRIPT_NAMES
+
+
+def analyze_script_file(
+    path: Path,
+    ignore_config: IgnoreConfig | None = None,
+    custom_patterns: list[tuple[str, str, str]] | None = None,
+    weights: WeightsConfig | None = None,
+    trust_inline: bool = True,
+) -> ScoreCard:
+    """Analyze an executable script file with the trust scanner."""
+    from .rubrics.skill_rubrics import _score_trust
+
+    try:
+        content = path.read_text()
+    except (OSError, UnicodeDecodeError):
+        content = ""
+
+    ignore_categories: set[str] = set()
+    if ignore_config is not None:
+        ignore_categories |= ignore_config.ignored_categories(path)
+    if trust_inline and content:
+        ignore_categories |= IgnoreConfig.parse_inline_ignores(content)
+
+    w = weights or WeightsConfig()
+    artifact = ParsedArtifact(
+        name=path.name,
+        entity_type="script",
+        format="script",
+        raw_body=content,
+        file_path=path,
+    )
+    trust = _score_trust(
+        artifact,
+        ignore_categories=ignore_categories,
+        custom_patterns=custom_patterns,
+        weight=1.0,
+        entropy_threshold=w.entropy_threshold,
+        trust_inline=trust_inline,
+    )
+    card = ScoreCard(
+        entity_type="script",
+        entity_name=path.name,
+        format="script",
+        dimensions=[trust],
+        file_path=path,
+    )
+    card.compute_overall()
+    card.summary = _generate_summary(card)
+    card.verdict = interpret_card(card)
+    return card
 
 
 def analyze_mcp_config(path: Path) -> ScoreCard:

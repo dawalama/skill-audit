@@ -780,10 +780,14 @@ def _score_trust(
             first_line = code.split("\n")[0].strip()[:80]
             details.append(f"  [{lang}] {first_line}")
 
-    # Layer 3: Scan companion scripts
-    scripts = _scan_companion_scripts(a.file_path)
+    # Layer 3: Scan direct script files or companion scripts.
+    if a.format == "script":
+        scripts = [(a.file_path.name if a.file_path else "script", clean_body)]
+    else:
+        scripts = _scan_companion_scripts(a.file_path)
     if scripts:
-        details.append(f"Includes {len(scripts)} companion script(s): {', '.join(name for name, _ in scripts)}")
+        label = "script file" if a.format == "script" else "companion script"
+        details.append(f"Includes {len(scripts)} {label}(s): {', '.join(name for name, _ in scripts)}")
 
     # Layer 2b: Extract inline commands (deduplicated for display)
     inline_cmds = _extract_inline_commands(all_text)
