@@ -45,12 +45,21 @@ def analyze_text(
     security_only: bool = False,
 ) -> ScoreCard:
     """Analyze raw skill or role text without writing it to disk."""
-    artifact = parse_text(
-        content,
-        force_format=force_format,
-        name=name,
-        filename=filename,
-    )
+    if _is_script_file(Path(filename)):
+        artifact = ParsedArtifact(
+            name=name if name != "inline" else filename,
+            entity_type="script",
+            format="script",
+            raw_body=content,
+            file_path=Path(filename),
+        )
+    else:
+        artifact = parse_text(
+            content,
+            force_format=force_format,
+            name=name,
+            filename=filename,
+        )
     return analyze_artifact(
         artifact,
         ignore_config=ignore_config,

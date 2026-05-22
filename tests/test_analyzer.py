@@ -182,6 +182,34 @@ class TestAnalyzeFile:
         assert text_card.overall_score == file_card.overall_score
         assert [d.name for d in text_card.dimensions] == [d.name for d in file_card.dimensions]
 
+    def test_python_comment_does_not_trigger_credential_file_access(self):
+        content = (
+            "paths = ['notes.md']\n"
+            "# by extension, but credentials.md / secrets.txt / ~/.aws/credentials would\n"
+            "# slip through the natural-language filter\n"
+        )
+
+        card = analyze_text(content, filename="filter.py", security_only=True)
+        trust = next(dim for dim in card.dimensions if dim.name == "trust")
+
+        assert not any(f.category == "EXFILTRATION" for f in trust.findings)
+
+    def test_python_literal_log_message_does_not_trigger_config_dump(self):
+        content = 'print("Skipping: file is not natural language (code/config)")\n'
+
+        card = analyze_text(content, filename="filter.py", security_only=True)
+        trust = next(dim for dim in card.dimensions if dim.name == "trust")
+
+        assert not any(f.message == "Printing config object (may contain credentials)" for f in trust.findings)
+
+    def test_python_config_object_print_still_flags(self):
+        content = "print(config)\n"
+
+        card = analyze_text(content, filename="filter.py", security_only=True)
+        trust = next(dim for dim in card.dimensions if dim.name == "trust")
+
+        assert any(f.message == "Printing config object (may contain credentials)" for f in trust.findings)
+
 
 class TestAnalyzeDirectory:
     def test_analyzes_all_files(self, tmp_path):

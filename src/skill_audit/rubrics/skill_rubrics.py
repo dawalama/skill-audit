@@ -5,6 +5,7 @@
 
 import re
 
+from ..code_projection import executable_text, project_code
 from ..config import WeightsConfig
 from ..models import Finding, ScoreDimension
 from ..parser import ParsedArtifact
@@ -761,12 +762,16 @@ def _score_trust(
     else:
         clean_body = a.raw_body or ""
 
-    # Layer 1: All prose text
-    all_text = f"{' '.join(a.steps)} {clean_body} {' '.join(a.gotchas)} {' '.join(a.examples)}"
+    # Layer 1: All prose text. Direct scripts are scanned as code below, not as
+    # prose, so comments/string literals do not become agent-instruction text.
+    if a.format == "script":
+        all_text = ""
+    else:
+        all_text = f"{' '.join(a.steps)} {clean_body} {' '.join(a.gotchas)} {' '.join(a.examples)}"
 
     # Documentation-only text: description + gotchas (used for context-aware filtering)
     # Patterns found ONLY here and nowhere else are likely documenting dangers, not executing them
-    doc_only_text = f"{a.description} {' '.join(a.gotchas)}"
+    doc_only_text = "" if a.format == "script" else f"{a.description} {' '.join(a.gotchas)}"
 
     # Layer 2: Extract executable code blocks
     code_blocks = _extract_code_blocks(all_text)
@@ -799,11 +804,22 @@ def _score_trust(
             truncated = cmd[:80] + "..." if len(cmd) > 80 else cmd
             details.append(f"  $ {truncated}")
 
-    # Build full scan text: prose + code blocks + scripts + inline commands
+    # Build full scan text: prose + executable projections + inline commands.
+    # Markdown prose remains part of the agent instruction surface, but direct
+    # script/code scanning should avoid comments and inert string literals where
+    # possible.
     scan_texts = [all_text]
-    for _, code in exec_blocks:
+    prepared_exec_blocks = [
+        (lang, executable_text(project_code(code, language=lang)))
+        for lang, code in exec_blocks
+    ]
+    prepared_scripts = [
+        (name, executable_text(project_code(content, filename=name)))
+        for name, content in scripts
+    ]
+    for _, code in prepared_exec_blocks:
         scan_texts.append(code)
-    for _, content in scripts:
+    for _, content in prepared_scripts:
         scan_texts.append(content)
     for cmd in inline_cmds:
         scan_texts.append(cmd)
@@ -815,9 +831,9 @@ def _score_trust(
     # Description often documents what the skill *warns about* (e.g., "warns before rm -rf")
     # which is not the same as executing it
     actionable_texts = [' '.join(a.steps), clean_body, ' '.join(a.gotchas), ' '.join(a.examples)]
-    for _, code in exec_blocks:
+    for _, code in prepared_exec_blocks:
         actionable_texts.append(code)
-    for _, content in scripts:
+    for _, content in prepared_scripts:
         actionable_texts.append(content)
     for cmd in inline_cmds:
         actionable_texts.append(cmd)
