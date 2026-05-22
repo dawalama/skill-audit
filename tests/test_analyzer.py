@@ -164,6 +164,15 @@ class TestAnalyzeFile:
         assert isinstance(d["dimensions"], list)
         assert "findings" in d["dimensions"][0]
 
+    def test_to_audit_payload(self, high_quality_skill):
+        card = analyze_file(high_quality_skill, security_only=True)
+        payload = card.to_audit_payload()
+        assert payload["summary"]["mode"] == "security"
+        assert payload["summary"]["risk"] in {"low", "medium", "high", "critical"}
+        assert "verdict" in payload
+        assert "dimensions" in payload
+        assert "findings" in payload
+
 
 class TestAnalyzeDirectory:
     def test_analyzes_all_files(self, tmp_path):
@@ -172,6 +181,25 @@ class TestAnalyzeDirectory:
         cards, skipped = analyze_directory(tmp_path)
         assert len(cards) == 2
         assert skipped == 0
+
+    def test_security_only_skips_quality_dimensions(self, tmp_path):
+        path = tmp_path / "skill.md"
+        path.write_text("---\nname: X\ntrigger: /x\n---\n\nDo X.\n")
+
+        card = analyze_file(path, security_only=True)
+
+        assert [dim.name for dim in card.dimensions] == ["trust"]
+        assert card.to_audit_payload()["summary"]["mode"] == "security"
+
+    def test_directory_security_only_skips_quality_dimensions(self, tmp_path):
+        (tmp_path / "a.md").write_text("---\nname: A\ntrigger: /a\n---\n\nSkill A.\n")
+        (tmp_path / "b.md").write_text("---\nname: B\ntrigger: /b\n---\n\nSkill B.\n")
+
+        cards, skipped = analyze_directory(tmp_path, security_only=True)
+
+        assert skipped == 0
+        assert len(cards) == 2
+        assert all([dim.name for dim in card.dimensions] == ["trust"] for card in cards)
 
     def test_skips_readme(self, tmp_path):
         (tmp_path / "README.md").write_text("# Readme\n")

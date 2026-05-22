@@ -21,6 +21,7 @@ def analyze_file(
     custom_patterns: list[tuple[str, str, str]] | None = None,
     weights: WeightsConfig | None = None,
     trust_inline: bool = True,
+    security_only: bool = False,
 ) -> ScoreCard:
     """Analyze a single skill or role file and return a ScoreCard."""
     if path.is_file() and _is_script_file(path):
@@ -29,7 +30,7 @@ def analyze_file(
     if fmt == "mcp-config":
         return analyze_mcp_config(path)
     artifact = parse_file(path, force_format)
-    return analyze_artifact(artifact, ignore_config=ignore_config, custom_patterns=custom_patterns, weights=weights, trust_inline=trust_inline)
+    return analyze_artifact(artifact, ignore_config=ignore_config, custom_patterns=custom_patterns, weights=weights, trust_inline=trust_inline, security_only=security_only)
 
 
 def analyze_artifact(
@@ -38,6 +39,7 @@ def analyze_artifact(
     custom_patterns: list[tuple[str, str, str]] | None = None,
     weights: WeightsConfig | None = None,
     trust_inline: bool = True,
+    security_only: bool = False,
 ) -> ScoreCard:
     """Score a parsed artifact and return a ScoreCard.
 
@@ -58,7 +60,20 @@ def analyze_artifact(
 
     w = weights or WeightsConfig()
 
-    if artifact.entity_type == "role":
+    if security_only:
+        from .rubrics.skill_rubrics import _score_trust
+
+        dimensions = [
+            _score_trust(
+                artifact,
+                ignore_categories=ignore_categories,
+                custom_patterns=custom_patterns,
+                weight=1.0,
+                entropy_threshold=w.entropy_threshold,
+                trust_inline=trust_inline,
+            )
+        ]
+    elif artifact.entity_type == "role":
         dimensions = score_role(artifact, weights=w)
     else:
         dimensions = score_skill(artifact, ignore_categories=ignore_categories, custom_patterns=custom_patterns, weights=w, trust_inline=trust_inline)
@@ -127,6 +142,7 @@ def analyze_directory(
     weights: WeightsConfig | None = None,
     include_docs: bool = False,
     trust_inline: bool = True,
+    security_only: bool = False,
 ) -> tuple[list[ScoreCard], int]:
     """Analyze all skill/role files in a directory.
 
@@ -148,6 +164,7 @@ def analyze_directory(
             custom_patterns=custom_patterns,
             weights=weights,
             trust_inline=trust_inline,
+            security_only=security_only,
         )
         results.append(card)
 

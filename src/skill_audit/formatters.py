@@ -195,8 +195,10 @@ def format_llm_findings(findings: list, entity_name: str, model: str,
     console.print(f"    [dim]{len(findings)} finding(s) via {model}[/dim]")
 
 
-def format_json(cards: list[ScoreCard]) -> str:
+def format_json(cards: list[ScoreCard], *, audit_payload: bool = False) -> str:
     """Format scorecards as JSON."""
+    if audit_payload:
+        return json.dumps([c.to_audit_payload() for c in cards], indent=2)
     return json.dumps([c.to_dict() for c in cards], indent=2)
 
 

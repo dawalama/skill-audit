@@ -94,6 +94,46 @@ class ScoreCard(BaseModel):
             ],
         }
 
+    def to_audit_payload(self) -> dict:
+        """Serialize to a stable payload for agents and service wrappers."""
+        findings = [
+            finding.model_dump()
+            for dimension in self.dimensions
+            for finding in dimension.findings
+        ]
+        active = [finding for finding in findings if finding["disposition"] == "active"]
+        severity_counts = {
+            severity: sum(1 for finding in active if finding["severity"] == severity)
+            for severity in ("critical", "high", "medium", "low")
+        }
+        risk = _risk_from_findings(severity_counts, self.overall_score)
+
+        return {
+            "summary": {
+                "entity_type": self.entity_type,
+                "entity_name": self.entity_name,
+                "format": self.format,
+                "grade": self.grade,
+                "score": round(self.overall_score, 3),
+                "risk": risk,
+                "file_path": str(self.file_path) if self.file_path else None,
+                "mode": "security" if _is_security_only(self.dimensions) else "full",
+                "active_findings": len(active),
+                "severity_counts": severity_counts,
+            },
+            "verdict": self.verdict.model_dump() if self.verdict else None,
+            "dimensions": [
+                {
+                    "name": dimension.name,
+                    "score": round(dimension.score, 3),
+                    "weight": dimension.weight,
+                    "findings": len(dimension.findings),
+                }
+                for dimension in self.dimensions
+            ],
+            "findings": findings,
+        }
+
 
 def _score_to_grade(score: float) -> str:
     """Convert a 0-1 score to a letter grade."""
@@ -107,3 +147,17 @@ def _score_to_grade(score: float) -> str:
         return "D"
     else:
         return "F"
+
+
+def _is_security_only(dimensions: list[ScoreDimension]) -> bool:
+    return len(dimensions) == 1 and dimensions[0].name == "trust"
+
+
+def _risk_from_findings(severity_counts: dict[str, int], score: float) -> str:
+    if severity_counts["critical"]:
+        return "critical"
+    if severity_counts["high"]:
+        return "high"
+    if severity_counts["medium"] or score < 0.7:
+        return "medium"
+    return "low"

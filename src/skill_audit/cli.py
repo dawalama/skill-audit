@@ -139,6 +139,7 @@ def audit(
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show per-dimension details and suggestions"),
     min_grade: Optional[str] = typer.Option(None, "--min-grade", help="Exit 1 if below grade (A/B/C/D) — useful for CI"),
     summary: bool = typer.Option(False, "--summary", help="Summary table only (for directories)"),
+    security_only: bool = typer.Option(False, "--security-only", help="Run only trust/security checks; skip quality scoring"),
     llm: bool = typer.Option(False, "--llm", help="Enable LLM review for deeper analysis (uses claude CLI, OpenRouter, or Ollama)"),
     llm_provider: Optional[str] = typer.Option(None, "--llm-provider", help="Force LLM provider: claude, openrouter, ollama"),
     llm_model: Optional[str] = typer.Option(None, "--llm-model", help="Override LLM model (e.g. anthropic/claude-sonnet-4-5)"),
@@ -222,12 +223,12 @@ def audit(
 
     skipped = 0
     if target.is_dir():
-        cards, skipped = analyze_directory(target, format, ignore_config=ignore_config, custom_patterns=cfg.custom_patterns or None, weights=cfg.weights, include_docs=include_docs, trust_inline=_trust_inline)
+        cards, skipped = analyze_directory(target, format, ignore_config=ignore_config, custom_patterns=cfg.custom_patterns or None, weights=cfg.weights, include_docs=include_docs, trust_inline=_trust_inline, security_only=security_only)
         if not cards:
             _stderr.print(f"[yellow]No skill/role files found in {target}[/yellow]")
             raise typer.Exit(0)
     else:
-        cards = [analyze_file(target, format, ignore_config=ignore_config, custom_patterns=cfg.custom_patterns or None, weights=cfg.weights, trust_inline=_trust_inline)]
+        cards = [analyze_file(target, format, ignore_config=ignore_config, custom_patterns=cfg.custom_patterns or None, weights=cfg.weights, trust_inline=_trust_inline, security_only=security_only)]
 
     # LLM review (runs before output so HTML can include findings)
     llm_results: dict[str, list] = {}
@@ -259,7 +260,7 @@ def audit(
 
     # Output
     if output == "json":
-        print(format_json(cards))
+        print(format_json(cards, audit_payload=security_only))
     elif output == "toon":
         print(format_toon(cards))
     elif output == "html":
@@ -271,6 +272,8 @@ def audit(
             cmd_parts.append("--llm")
         if verbose:
             cmd_parts.append("--verbose")
+        if security_only:
+            cmd_parts.append("--security-only")
         cmd_parts.extend(["--output", "html"])
         audit_cmd = " ".join(cmd_parts)
         print(format_html(cards, llm_findings=llm_results or None, audit_source=path, audit_command=audit_cmd))
