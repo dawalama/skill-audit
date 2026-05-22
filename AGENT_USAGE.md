@@ -18,6 +18,12 @@ Do not treat a passing audit as proof of safety. Treat it as structured triage.
 
 ## Recommended Commands
 
+Check whether a skill is safe enough to install:
+
+```bash
+uv run ai-skill-audit audit path/to/SKILL.md --security-only --output json
+```
+
 Audit a local skill:
 
 ```bash
@@ -58,6 +64,9 @@ uv run ai-skill-audit audit path/to/skills --verbose --output html > audit-repor
 
 Use JSON when another program or API will consume the result.
 
+Use `--security-only --output json` when making an install decision. This emits
+the stable audit payload and skips quality scoring.
+
 Use TOON when the result will be pasted into an LLM or agent context. TOON is compact and keeps the schema visible.
 
 Use HTML for humans.
@@ -67,6 +76,10 @@ Use table output for interactive terminal review.
 ## How To Interpret Results
 
 Security findings matter more than the overall grade.
+
+For install decisions, prefer security-only mode. Full audit mode also judges
+whether the skill is clear, complete, and useful; that is valuable for review,
+but it should not be confused with install safety.
 
 Prefer the `verdict` field in JSON/TOON output for first-pass decisions. It separates raw findings from interpretation:
 
@@ -98,7 +111,10 @@ Example: a deployment skill from a reputable provider may legitimately run `git`
 
 ## Remote Audit Safety
 
-Remote audits include documentation files by default because docs can contain agent instructions.
+Remote audits do not trust target-controlled suppressions. Documentation files
+are skipped by default in directory scans to avoid treating ordinary project
+docs as installable skills. Use `--include-docs` when you intentionally want to
+scan documentation as agent-facing content.
 
 Agents should not:
 
@@ -116,7 +132,7 @@ Use this simple policy until a dedicated service policy engine exists:
 | Active critical finding | Block or ask for explicit approval |
 | Active high finding | Human review required |
 | Only medium/low findings | Warn and summarize |
-| No active findings and grade A/B | Allow |
-| No active findings but grade C/D/F | Warn about quality |
+| No active findings in security-only mode | Allow |
+| No active findings in full mode but grade C/D/F | Warn about quality |
 
 The service wrapper project should implement this as a structured API policy decision.

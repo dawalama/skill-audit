@@ -3,7 +3,7 @@
 import pytest
 from pathlib import Path
 
-from skill_audit.analyzer import analyze_file, analyze_artifact, analyze_directory
+from skill_audit.analyzer import analyze_file, analyze_artifact, analyze_directory, analyze_text
 from skill_audit.parser import parse_file
 
 
@@ -172,6 +172,15 @@ class TestAnalyzeFile:
         assert "verdict" in payload
         assert "dimensions" in payload
         assert "findings" in payload
+
+    def test_analyze_text_matches_file_audit(self, high_quality_skill):
+        content = high_quality_skill.read_text()
+        file_card = analyze_file(high_quality_skill, security_only=True)
+        text_card = analyze_text(content, filename=high_quality_skill.name, security_only=True)
+        assert text_card.format == file_card.format
+        assert text_card.grade == file_card.grade
+        assert text_card.overall_score == file_card.overall_score
+        assert [d.name for d in text_card.dimensions] == [d.name for d in file_card.dimensions]
 
 
 class TestAnalyzeDirectory:

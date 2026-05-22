@@ -1017,7 +1017,7 @@ def _build_finding(
         category=category,
         severity=severity,
         message=message,
-        evidence=evidence,
+        evidence=_redact_sensitive_evidence(evidence),
         source=source,
         confidence=confidence,
         disposition=disposition,
@@ -1031,6 +1031,47 @@ def _evidence_window(text: str, start: int, end: int, *, radius: int = 60, max_l
     if len(compact) <= max_len:
         return compact
     return f"{compact[:max_len - 3]}..."
+
+
+def _redact_sensitive_evidence(evidence: str) -> str:
+    """Mask credential-like values before evidence reaches output."""
+    if not evidence:
+        return evidence
+
+    patterns = [
+        r"\bAKIA[0-9A-Z]{16}\b",
+        r"\bghp_[A-Za-z0-9]{20,}\b",
+        r"\bglpat-[A-Za-z0-9_-]{20,}\b",
+        r"\bxox[bporas]-[A-Za-z0-9-]{10,}\b",
+        r"\bsk-proj-[A-Za-z0-9_-]{16,}\b",
+        r"\bsk-ant-[A-Za-z0-9_-]{16,}\b",
+        r"\bsk_live_[A-Za-z0-9]{16,}\b",
+        r"\bhf_[A-Za-z0-9]{16,}\b",
+        r"\bsk-[A-Za-z0-9]{24,}\b",
+        r"\bey[A-Za-z0-9_-]{20,}\.ey[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]*\b",
+        r"(?i)(bearer\s+)[A-Za-z0-9._~+/=-]{16,}",
+        r"(?i)((?:api[_-]?key|token|secret|password|credential|auth)\s*[=:]\s*[\"']?)[A-Za-z0-9._~+/=-]{8,}",
+    ]
+
+    redacted = evidence
+    for pattern in patterns:
+        redacted = re.sub(pattern, _mask_match, redacted)
+    return redacted
+
+
+def _mask_match(match: re.Match) -> str:
+    """Preserve enough context for debugging without exposing the secret."""
+    if match.lastindex:
+        prefix = match.group(1)
+        secret = match.group(0)[len(prefix):]
+        return prefix + _mask_secret(secret)
+    return _mask_secret(match.group(0))
+
+
+def _mask_secret(secret: str) -> str:
+    if len(secret) <= 8:
+        return "[REDACTED]"
+    return f"{secret[:4]}...[REDACTED]...{secret[-4:]}"
 
 
 def _finding_source(

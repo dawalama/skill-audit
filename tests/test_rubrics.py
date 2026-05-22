@@ -310,6 +310,19 @@ class TestSkillRubrics:
         trust = next(d for d in dims if d.name == "trust")
         assert any("SECRET" in s for s in trust.suggestions)
 
+    def test_trust_redacts_secret_evidence(self):
+        secret = "sk-proj-abc123def456ghi789jkl012mno345pqr678stu901vwx234"
+        artifact = ParsedArtifact(
+            entity_type="skill",
+            name="Leaky",
+            raw_body=f"Use this key: {secret}",
+        )
+        dims = score_skill(artifact)
+        trust = next(d for d in dims if d.name == "trust")
+        evidence = " ".join(f.evidence for f in trust.findings)
+        assert secret not in evidence
+        assert "[REDACTED]" in evidence
+
     def test_trust_flags_aws_key(self):
         artifact = ParsedArtifact(
             entity_type="skill",

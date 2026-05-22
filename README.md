@@ -169,7 +169,7 @@ pip install ai-skill-audit
 uv tool install ai-skill-audit
 
 # Run directly without installing
-uvx ai-ai-skill-audit audit ~/.ai/skills/
+uvx ai-skill-audit audit ~/.ai/skills/
 ```
 
 From source (for latest changes):
@@ -178,7 +178,7 @@ From source (for latest changes):
 git clone https://github.com/dawalama/skill-audit.git
 cd skill-audit
 uv sync --extra dev
-uv run ai-ai-skill-audit audit ~/.ai/skills/
+uv run ai-skill-audit audit ~/.ai/skills/
 ```
 
 **Requirements:** Python >= 3.11. No API keys. No LLM calls. Runs entirely offline.
@@ -226,6 +226,20 @@ ai-skill-audit audit review.md --output toon
 Emits a compact, structured report for agent context. JSON remains the canonical machine interchange format; TOON is optimized for token-efficient agent prompts.
 
 Agent-facing outputs include a context-aware `verdict` with profile, recommendation, capability risk, malice indicators, and reasons. Raw findings are still preserved; the verdict explains how to interpret them.
+
+### Security-only install checks
+
+Use `--security-only` when the question is "is this safe enough to install?"
+rather than "is this skill well-written?"
+
+```bash
+ai-skill-audit audit SKILL.md --security-only
+ai-skill-audit audit SKILL.md --security-only --output json
+```
+
+Security-only mode runs the trust/security scanner and skips quality dimensions
+such as completeness, clarity, actionability, safety, and testability. With
+`--output json`, it emits the stable audit payload from `ScoreCard.to_audit_payload()`.
 
 ### Audit a directory
 
@@ -318,6 +332,9 @@ ai-skill-audit audit review.md
 
 # JSON (for programmatic use)
 ai-skill-audit audit review.md --output json
+
+# Stable install-safety payload
+ai-skill-audit audit review.md --security-only --output json
 
 # Markdown (for PRs and docs)
 ai-skill-audit audit review.md --output markdown
@@ -453,13 +470,33 @@ ai-skill-audit config
 | `mcp-config` | MCP server configurations | `mcp.json` or `claude_desktop_config.json` filename |
 | `unknown` | Plain markdown | Fallback — still scored as a skill |
 
+## Python API
+
+```python
+from pathlib import Path
+from skill_audit.analyzer import analyze_file, analyze_text
+
+# Full quality + security audit from a file
+card = analyze_file(Path("SKILL.md"))
+
+# Security-only install check from a file
+security = analyze_file(Path("SKILL.md"), security_only=True)
+payload = security.to_audit_payload()
+
+# In-memory audit for fetched or pasted content
+inline = analyze_text(markdown_text, filename="SKILL.md", security_only=True)
+```
+
+Use `to_dict()` for the full legacy scorecard shape. Use `to_audit_payload()`
+for agent/service install-safety decisions.
+
 ## Remote audit hardening
 
 When auditing remote repos, skill-audit applies stricter defaults — the audited content cannot influence its own score:
 
 - **No self-suppression** — the repo's `.skill-audit-ignore` file is not loaded (use `--trust-target-ignore` to opt in)
 - **No inline ignores** — `<!-- skill-audit: ignore CATEGORY -->` comments in the file are ignored
-- **Docs are scanned** — `README.md`, `AGENTS.md`, `CLAUDE.md` are part of the attack surface and included by default
+- **Docs are skipped by default in directory scans** — ordinary project docs are not treated as installable skills unless you pass `--include-docs`
 - **Critical categories are never suppressible inline** — INJECTION, SECRET, EXFILTRATION, PERSISTENCE, and HIJACKING cannot be suppressed via inline comments, even for local files
 
 ## Research
@@ -535,7 +572,7 @@ uv sync --extra dev
 uv run pytest tests/ -v
 ```
 
-213 tests covering all scoring dimensions, 9 threat categories, and 38 adversarial attack patterns.
+250 tests covering parser, analyzer, scoring dimensions, 9 threat categories, and adversarial attack patterns.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add detection patterns and rubrics.
 

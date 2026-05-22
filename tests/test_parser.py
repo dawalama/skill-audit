@@ -3,7 +3,7 @@
 import pytest
 from pathlib import Path
 
-from skill_audit.parser import parse_file, detect_format, ParsedArtifact
+from skill_audit.parser import parse_file, parse_text, detect_format, detect_format_from_text, ParsedArtifact
 
 
 @pytest.fixture
@@ -141,6 +141,13 @@ class TestDetectFormat:
         (d / "main.md").write_text("---\ntrigger: /x\n---\nDo stuff.\n")
         assert detect_format(d) == "dotai-skill"
 
+    def test_detect_format_from_text(self):
+        content = "---\nname: X\ntrigger: /x\n---\n\n## Steps\n\n1. Do X\n"
+        assert detect_format_from_text(content) == "dotai-skill"
+
+    def test_detect_format_from_text_uses_filename(self):
+        assert detect_format_from_text("---\nname: X\n---\n\nDo X\n", filename="SKILL.md") == "claude-native"
+
 
 class TestParseFile:
     def test_parses_dotai_skill(self, dotai_skill):
@@ -200,3 +207,12 @@ class TestParseFile:
         result = parse_file(dotai_skill)
         assert "Read" in result.allowed_tools
         assert "Grep" in result.allowed_tools
+
+    def test_parse_text_matches_file_parse(self, dotai_skill):
+        content = dotai_skill.read_text()
+        file_result = parse_file(dotai_skill)
+        text_result = parse_text(content, name="Review", filename=dotai_skill.name)
+        assert text_result.format == file_result.format
+        assert text_result.entity_type == file_result.entity_type
+        assert text_result.name == file_result.name
+        assert text_result.steps == file_result.steps

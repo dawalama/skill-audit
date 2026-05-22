@@ -8,7 +8,7 @@ from pathlib import Path
 from .config import WeightsConfig
 from .ignore import IgnoreConfig
 from .models import ScoreCard, ScoreDimension
-from .parser import ParsedArtifact, parse_file, detect_format
+from .parser import ParsedArtifact, parse_file, parse_text, detect_format
 from .rubrics.skill_rubrics import score_skill
 from .rubrics.role_rubrics import score_role
 from .verdict import interpret_card
@@ -31,6 +31,34 @@ def analyze_file(
         return analyze_mcp_config(path)
     artifact = parse_file(path, force_format)
     return analyze_artifact(artifact, ignore_config=ignore_config, custom_patterns=custom_patterns, weights=weights, trust_inline=trust_inline, security_only=security_only)
+
+
+def analyze_text(
+    content: str,
+    force_format: str | None = None,
+    name: str = "inline",
+    filename: str = "inline.md",
+    ignore_config: IgnoreConfig | None = None,
+    custom_patterns: list[tuple[str, str, str]] | None = None,
+    weights: WeightsConfig | None = None,
+    trust_inline: bool = True,
+    security_only: bool = False,
+) -> ScoreCard:
+    """Analyze raw skill or role text without writing it to disk."""
+    artifact = parse_text(
+        content,
+        force_format=force_format,
+        name=name,
+        filename=filename,
+    )
+    return analyze_artifact(
+        artifact,
+        ignore_config=ignore_config,
+        custom_patterns=custom_patterns,
+        weights=weights,
+        trust_inline=trust_inline,
+        security_only=security_only,
+    )
 
 
 def analyze_artifact(

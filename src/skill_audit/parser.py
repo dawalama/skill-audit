@@ -68,6 +68,15 @@ def detect_format(path: Path) -> str:
         return "mcp-config"
 
     content = path.read_text()
+    return detect_format_from_text(content, filename=path.name)
+
+
+def detect_format_from_text(content: str, filename: str = "inline.md") -> str:
+    """Detect artifact format from raw text and an optional filename."""
+    # MCP config files require filename context; raw JSON can otherwise be many things.
+    if filename in ("mcp.json", "claude_desktop_config.json"):
+        return "mcp-config"
+
     fm = _extract_frontmatter(content)
     body = _extract_body(content)
 
@@ -76,7 +85,7 @@ def detect_format(path: Path) -> str:
         return "claude-native"
 
     # SKILL.md filename convention
-    if path.name == "SKILL.md":
+    if filename == "SKILL.md":
         return "claude-native"
 
     # Claude-native markers in frontmatter
@@ -124,17 +133,34 @@ def parse_file(path: Path, force_format: str | None = None) -> ParsedArtifact:
             return ParsedArtifact(file_path=path)
         return parse_file(actual_path, force_format)
 
-    fmt = force_format or detect_format(path)
     content = path.read_text()
+    return parse_text(
+        content,
+        force_format=force_format,
+        name=path.stem.replace("-", " ").replace("_", " ").title(),
+        filename=path.name,
+        file_path=path,
+    )
+
+
+def parse_text(
+    content: str,
+    force_format: str | None = None,
+    name: str = "inline",
+    filename: str = "inline.md",
+    file_path: Path | None = None,
+) -> ParsedArtifact:
+    """Parse raw skill or role text into a normalized artifact."""
+    fmt = force_format or detect_format_from_text(content, filename=filename)
     fm = _extract_frontmatter(content)
     body = _extract_body(content)
 
     artifact = ParsedArtifact(
-        file_path=path,
+        file_path=file_path,
         format=fmt,
         frontmatter=fm,
         raw_body=body,
-        name=fm.get("name", path.stem.replace("-", " ").replace("_", " ").title()),
+        name=fm.get("name", name),
         description=fm.get("description", ""),
         tags=_parse_list(fm.get("tags", "")),
     )
