@@ -488,7 +488,8 @@ _EXFILTRATION_PATTERNS = [
     (r"\bcat\b.*\.(env|pem|key)\b", "Reads secret/key files"),
     (r"~/.gnupg/", "Accesses GPG keys"),
     (r"~/\.(kube|docker)/config", "Accesses cloud/container credentials"),
-    (r"\bwallet|seed\s*phrase|mnemonic|private\s*key", "References crypto wallet/keys"),
+    (r"\b(cat|read|copy|send|curl|upload|export|print|log)\b[\s\S]{0,200}\b(wallet|seed\s*phrase|mnemonic|private\s*key)\b", "May expose crypto wallet/keys"),
+    (r"\b(wallet|seed\s*phrase|mnemonic|private\s*key)\b[\s\S]{0,200}\b(cat|read|copy|send|curl|upload|export|print|log)\b", "May expose crypto wallet/keys"),
     # Remote code execution — reverse shells (arXiv:2604.03070 Pattern B1, 52.2% of malicious skills)
     (r"bash\s+-i\s+>&\s*/dev/tcp/", "Reverse shell via bash /dev/tcp"),
     (r"\bsocat\b.*\bexec\b", "Socat reverse shell"),

@@ -114,6 +114,10 @@ _SKIP_DIRS = {
     "build", "dist", "site-packages",
 }
 
+_AUDIT_CONTAINER_DIRS = {
+    "agents", "commands", "contexts", "hooks", "roles", "rules", "skills",
+}
+
 
 def analyze_directory(
     dir_path: Path,
@@ -126,9 +130,9 @@ def analyze_directory(
 ) -> tuple[list[ScoreCard], int]:
     """Analyze all skill/role files in a directory.
 
-    Recursively scans markdown skills/roles, MCP configs, and executable script
-    files. Documentation files such as README.md are skipped by default without
-    stopping recursion into deeper skill directories.
+    Recursively scans markdown skills/roles, MCP configs, and scripts attached
+    to discovered skill surfaces. Documentation files such as README.md are
+    skipped by default without stopping recursion into deeper skill directories.
 
     Returns (cards, skipped_count) where skipped_count is the number of
     documentation files that were skipped.
@@ -155,11 +159,12 @@ def _collect_audit_candidates(
     include_docs: bool = False,
 ) -> tuple[list[Path], int]:
     """Return auditable files under a directory in stable order."""
-    candidates: list[Path] = []
+    markdown_candidates: list[Path] = []
+    mcp_candidates: list[Path] = []
     skipped = 0
 
     if not dir_path.exists():
-        return candidates, skipped
+        return [], skipped
 
     for root, dirs, files in os.walk(dir_path):
         dirs[:] = sorted(d for d in dirs if d not in _SKIP_DIRS and not d.startswith("."))
@@ -167,21 +172,85 @@ def _collect_audit_candidates(
         for filename in sorted(files):
             path = root_path / filename
             if path.name in _MCP_FILES:
-                candidates.append(path)
+                mcp_candidates.append(path)
             elif path.suffix.lower() == ".md":
-                if not include_docs and path.name.lower() in _DOC_FILES:
+                if not include_docs and not _is_audit_markdown(path, dir_path):
                     skipped += 1
                     continue
-                candidates.append(path)
-            elif _is_script_file(path):
-                candidates.append(path)
+                markdown_candidates.append(path)
 
+    script_candidates = _collect_attached_script_candidates(dir_path, markdown_candidates)
+    candidates = sorted({*mcp_candidates, *markdown_candidates, *script_candidates})
     return candidates, skipped
 
 
 def _is_script_file(path: Path) -> bool:
     """Return True for source/script files worth trust scanning directly."""
     return path.suffix.lower() in _SCRIPT_EXTENSIONS or path.name in _SCRIPT_NAMES
+
+
+def _is_audit_markdown(path: Path, base_dir: Path) -> bool:
+    """Return True for markdown files that look like installable AI surfaces."""
+    if path.name in {"SKILL.md", "main.md"}:
+        return True
+    if path.name.lower() in _DOC_FILES:
+        return False
+
+    rel_parts = [part.lower() for part in path.relative_to(base_dir).parts]
+    if any(part in _AUDIT_CONTAINER_DIRS for part in rel_parts[:-1]):
+        return True
+
+    # Allow root-level files only when they declare a known skill/role format.
+    if path.parent == base_dir:
+        return detect_format(path) != "unknown"
+
+    return False
+
+
+def _collect_attached_script_candidates(base_dir: Path, markdown_candidates: list[Path]) -> list[Path]:
+    """Collect scripts attached to skill files without scanning whole repos."""
+    scripts: list[Path] = []
+    seen_roots: set[Path] = set()
+
+    for markdown in markdown_candidates:
+        for root in _script_roots_for_markdown(base_dir, markdown):
+            if root in seen_roots or not root.is_dir():
+                continue
+            seen_roots.add(root)
+            scripts.extend(_script_files_under(root))
+
+    return scripts
+
+
+def _script_roots_for_markdown(base_dir: Path, markdown: Path) -> list[Path]:
+    """Return script roots likely owned by a markdown skill surface."""
+    if markdown.name in {"SKILL.md", "main.md"}:
+        return [markdown.parent]
+
+    roots = [markdown.parent / "scripts"]
+    same_stem_dir = markdown.parent / markdown.stem
+    if same_stem_dir.is_dir():
+        roots.append(same_stem_dir)
+
+    # For a root-level single-file skill, scan only conventional companion
+    # scripts instead of every source/test script in the repository.
+    if markdown.parent == base_dir:
+        return roots
+
+    return roots
+
+
+def _script_files_under(root: Path) -> list[Path]:
+    """Return script files under a bounded root, pruning dependencies."""
+    results: list[Path] = []
+    for walk_root, dirs, files in os.walk(root):
+        dirs[:] = sorted(d for d in dirs if d not in _SKIP_DIRS and not d.startswith("."))
+        root_path = Path(walk_root)
+        for filename in sorted(files):
+            path = root_path / filename
+            if _is_script_file(path):
+                results.append(path)
+    return results
 
 
 def analyze_script_file(

@@ -60,20 +60,35 @@ def _infer_profile(card: ScoreCard) -> str:
     if card.entity_type == "mcp-config" or card.format == "mcp-config":
         return "mcp-config"
 
+    path_parts = []
+    if card.file_path:
+        path_parts = [part.lower() for part in card.file_path.parts[-6:]]
+
     text = " ".join(
         part.lower()
         for part in [
             card.entity_name,
             card.file_path.name if card.file_path else "",
             card.file_path.parent.name if card.file_path else "",
+            " ".join(path_parts),
         ]
     )
 
-    if any(term in text for term in ("deploy", "ship", "release", "canary", "cloud", "kubernetes")):
+    if any(term in text for term in (
+        "deploy", "ship", "release", "canary", "cloud", "kubernetes",
+        "homelab", "wireguard", "pihole", "dns", "ssh", "service",
+    )):
         return "deployment"
     if any(term in text for term in ("browser", "scrape", "cookie", "chrome")):
         return "browser-automation"
-    if any(term in text for term in ("gstack", "devtool", "developer", "review", "qa", "benchmark", "codex")):
+    if any(term in text for term in (
+        "gstack", "devtool", "developer", "review", "qa", "benchmark",
+        "codex", "git", "workflow", "django", "swiftui", "vite",
+        "pytorch", "mysql", "jira", "verification", "patterns",
+        "testing", "e2e", "netmiko",
+    )):
+        return "developer-toolkit"
+    if any(term in text for term in ("payment", "x402", "evm", "token", "wallet", "blockchain", "crypto")):
         return "developer-toolkit"
     if any(term in text for term in ("security", "threat", "audit", "malicious", "injection")):
         return "security-research"

@@ -1,3 +1,3 @@
 """skill-audit: Audit AI skill and role files for quality and trust."""
 
-__version__ = "0.5.2"
+__version__ = "0.6.0"

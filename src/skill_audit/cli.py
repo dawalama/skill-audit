@@ -143,7 +143,7 @@ def audit(
     llm_provider: Optional[str] = typer.Option(None, "--llm-provider", help="Force LLM provider: claude, openrouter, ollama"),
     llm_model: Optional[str] = typer.Option(None, "--llm-model", help="Override LLM model (e.g. anthropic/claude-sonnet-4-5)"),
     no_cache: bool = typer.Option(False, "--no-cache", help="Skip LLM cache and force fresh review"),
-    include_docs: Optional[bool] = typer.Option(None, "--include-docs", help="Include documentation files (README, CONTRIBUTING, etc.) in scan — defaults to True for remote targets"),
+    include_docs: Optional[bool] = typer.Option(None, "--include-docs", help="Include documentation files (README, CONTRIBUTING, etc.) in directory scans"),
     trust_target_ignore: bool = typer.Option(False, "--trust-target-ignore", help="Honor .skill-audit-ignore files inside remote repos (off by default for safety)"),
 ):
     """Audit a skill or role file for quality and trust.
@@ -207,11 +207,13 @@ def audit(
             _stderr.print(f"[red]Not found: {target}[/red]")
             raise typer.Exit(1)
 
-    # For remote targets: default to including docs (they're part of the attack
-    # surface), skip the repo's .skill-audit-ignore (attacker-controlled),
-    # and ignore inline suppression comments (the file shouldn't influence its own audit)
+    # For remote targets: skip the repo's .skill-audit-ignore
+    # (attacker-controlled) and ignore inline suppression comments (the file
+    # shouldn't influence its own audit). Documentation files are skipped by
+    # default for both local and remote directory scans to avoid scoring repo
+    # docs as installable skills; pass --include-docs to include them.
     if include_docs is None:
-        include_docs = _is_remote  # True for remote, False for local
+        include_docs = False
     _trust_ignore = trust_target_ignore if _is_remote else True
     _trust_inline = not _is_remote  # Local files trusted, remote files not
 
