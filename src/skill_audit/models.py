@@ -42,6 +42,10 @@ class AuditVerdict(BaseModel):
     recommendation: str = "warn"
     capability_risk: str = "low"
     malice_indicators: str = "low"
+    # True when a system-level capability has no connection to the skill's stated
+    # purpose (e.g. a "text summarizer" that runs a shell). Adds scrutiny; a match
+    # never removes it.
+    intent_mismatch: bool = False
     quality: str = "unknown"
     summary: str = ""
     reasons: list[str] = Field(default_factory=list)
@@ -53,6 +57,7 @@ class ScoreCard(BaseModel):
     entity_type: str  # "skill" or "role"
     entity_name: str
     format: str  # "dotai-skill", "dotai-role", "claude-native", "unknown"
+    description: str = ""
     dimensions: list[ScoreDimension] = Field(default_factory=list)
     overall_score: float = 0.0
     grade: str = "F"

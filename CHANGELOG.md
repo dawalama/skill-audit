@@ -24,6 +24,20 @@ semantic versioning.
   `tests/test_transparency.py` (incl. the "reputable-but-compromised must still block"
   case) and adversarial encode-then-exec / wrapped-payload probes.
 
+### Added — intent–capability coherence (issue #2, layer 2)
+- The verdict gains an **`intent_mismatch`** signal: a system-level capability
+  (shell/privilege/persistence/destructive) in a *purely textual* skill
+  (summarize/translate/proofread/…) is flagged as not matching the stated purpose
+  and escalated to `human_review` — even when declared.
+- Coherence only ADDS scrutiny. A capability that *matches* the claimed purpose is
+  never treated as evidence of safety (a malicious author can claim any purpose;
+  hidden behaviour is judged separately). Deliberately tight scope (network is
+  excluded, vague purposes aren't guessed) keeps false positives near zero —
+  verified by adversarial probes (code-reviewer+linter, translator+API,
+  summarizer+LLM-API all correctly NOT flagged).
+- `ScoreCard` now carries `description`; the verdict surfaces `intent_mismatch` in
+  the table and HTML outputs.
+
 ## [0.9.0] - 2026-06-10
 
 ### Fixed

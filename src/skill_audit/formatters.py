@@ -41,10 +41,11 @@ def format_table(card: ScoreCard, verbose: bool = False) -> None:
 
     if card.verdict:
         console.print()
+        mismatch = " [yellow]intent-mismatch[/yellow]" if card.verdict.intent_mismatch else ""
         console.print(f"  [bold]Verdict:[/bold] {card.verdict.recommendation} "
                       f"[dim](profile: {card.verdict.profile}, "
                       f"malice: {card.verdict.malice_indicators}, "
-                      f"capability: {card.verdict.capability_risk})[/dim]")
+                      f"capability: {card.verdict.capability_risk})[/dim]{mismatch}")
         for reason in card.verdict.reasons[:3]:
             console.print(f"    [dim]- {reason}[/dim]")
 
@@ -527,11 +528,14 @@ def format_html(cards: list[ScoreCard], llm_findings: dict[str, list] | None = N
         # Context-aware verdict
         if card.verdict:
             v = card.verdict
+            mismatch_span = (
+                '\n    <span>Intent: mismatch</span>' if v.intent_mismatch else ""
+            )
             sections.append(f'''  <div class="verdict">
     <strong>Verdict: {_esc(v.recommendation)}</strong>
     <span>Profile: {_esc(v.profile)}</span>
     <span>Malice: {_esc(v.malice_indicators)}</span>
-    <span>Capability: {_esc(v.capability_risk)}</span>
+    <span>Capability: {_esc(v.capability_risk)}</span>{mismatch_span}
     <p>{_esc(v.summary)}</p>
   </div>''')
 

@@ -28,6 +28,34 @@ def _is_malice_finding(finding: Finding) -> bool:
     return finding.category in MALICE_CATEGORIES or finding.transparency == "hidden"
 
 
+# Purely textual purposes: text-in, text-out operations that genuinely never need
+# shell/privilege/persistence/destructive capability. Kept deliberately tight so
+# the mismatch signal almost never fires a false positive. (Network is excluded —
+# a text skill may legitimately call a translation/LLM API.)
+_PURELY_TEXTUAL_PURPOSE = (
+    "summari", "paraphras", "proofread", "rephrase", "spellcheck", "spell check",
+    "word count", "rewrite", "grammar", "glossary", "translate", "translation",
+)
+
+# System-level capability that a purely textual skill has no reason to hold.
+_SYSTEM_CAPABILITY = {"CAPABILITY", "PRIVILEGE", "PERSISTENCE", "HIJACKING", "DESTRUCTIVE"}
+
+
+def _intent_mismatch(card: ScoreCard, findings: list[Finding]) -> bool:
+    """True when a purely textual purpose is paired with system capability.
+
+    Mismatch only ADDS scrutiny — a capability that *matches* the stated purpose
+    is never treated as evidence of safety (a malicious author can claim any
+    purpose; hidden behaviour is judged separately).
+    """
+    # The description is the strongest purpose signal; the name backs it up.
+    purpose = f"{card.entity_name} {card.description}".lower()
+    purely_textual = any(term in purpose for term in _PURELY_TEXTUAL_PURPOSE)
+    if not purely_textual:
+        return False
+    return any(f.category in _SYSTEM_CAPABILITY for f in findings)
+
+
 def interpret_card(card: ScoreCard) -> AuditVerdict:
     """Return a context-aware verdict for a scorecard."""
     findings = _active_findings(card)
@@ -35,8 +63,13 @@ def interpret_card(card: ScoreCard) -> AuditVerdict:
     profile = _infer_profile(card)
     malice = _malice_level(findings)
     capability = _capability_level(findings, profile)
-    recommendation = _recommendation(card, findings, profile, malice, capability)
-    reasons = _reasons(card, findings, profile, malice, capability, recommendation)
+    intent_mismatch = _intent_mismatch(card, findings)
+    recommendation = _recommendation(
+        card, findings, profile, malice, capability, intent_mismatch
+    )
+    reasons = _reasons(
+        card, findings, profile, malice, capability, recommendation, intent_mismatch
+    )
 
     summary = _summary(
         recommendation=recommendation,
@@ -51,6 +84,7 @@ def interpret_card(card: ScoreCard) -> AuditVerdict:
         recommendation=recommendation,
         capability_risk=capability,
         malice_indicators=malice,
+        intent_mismatch=intent_mismatch,
         quality=card.grade,
         summary=summary,
         reasons=reasons,
@@ -139,6 +173,7 @@ def _recommendation(
     profile: str,
     malice: str,
     capability: str,
+    intent_mismatch: bool = False,
 ) -> str:
     categories = {f.category for f in findings}
     hidden_malice = any(_is_malice_finding(f) and f.transparency == "hidden" for f in findings)
@@ -157,6 +192,10 @@ def _recommendation(
         return "human_review"
     if malice == "high":
         return "human_review"
+    # A capability that doesn't match the stated purpose is suspicious even when
+    # declared — surface it for a human.
+    if intent_mismatch:
+        return "human_review"
     if capability == "high":
         return "human_review"
     if capability == "medium":
@@ -173,6 +212,7 @@ def _reasons(
     malice: str,
     capability: str,
     recommendation: str,
+    intent_mismatch: bool = False,
 ) -> list[str]:
     categories = sorted({f.category for f in findings})
     reasons: list[str] = []
@@ -180,6 +220,8 @@ def _reasons(
         reasons.append(f"Active finding categories: {', '.join(categories)}")
     if profile != "general":
         reasons.append(f"Interpreted as {profile}; expected capabilities are reviewed in that context")
+    if intent_mismatch:
+        reasons.append("Capability does not match the stated purpose (system access in a text-only skill)")
     if malice != "low":
         reasons.append(f"Malice indicators are {malice}")
     if capability != "low":
