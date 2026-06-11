@@ -38,6 +38,13 @@ semantic versioning.
 - `ScoreCard` now carries `description`; the verdict surfaces `intent_mismatch` in
   the table and HTML outputs.
 
+### Changed — lead with the verdict
+- Outputs now present the letter grade explicitly as a **quality** grade and the
+  **trust verdict** as a separate axis (table header `Quality: C  ·  Trust: block`,
+  HTML/markdown likewise). A low quality grade can no longer be misread as a malice
+  verdict, and a powerful-but-legitimate toolkit reads as `Trust: human_review`
+  rather than a scary `F`.
+
 ## [0.9.0] - 2026-06-10
 
 ### Fixed

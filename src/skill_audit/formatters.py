@@ -16,10 +16,15 @@ def format_table(card: ScoreCard, verbose: bool = False) -> None:
     console = Console()
 
     grade_color = _grade_color(card.grade)
-    title = f"[bold]{card.entity_name}[/bold] ({card.entity_type}) — Grade: [{grade_color}]{card.grade}[/{grade_color}] ({card.overall_score:.0%})"
+    # The letter grade is a QUALITY grade; trust is the verdict's recommendation.
+    # Keep the two axes distinct so a low grade can't be misread as "malicious".
+    title = f"[bold]{card.entity_name}[/bold] ({card.entity_type}) — Quality: [{grade_color}]{card.grade}[/{grade_color}] ({card.overall_score:.0%})"
+    subtitle = f"Format: {card.format}"
+    if card.verdict:
+        subtitle += f"  ·  Trust: {card.verdict.recommendation}"
 
     console.print()
-    console.print(Panel(title, subtitle=f"Format: {card.format}"))
+    console.print(Panel(title, subtitle=subtitle))
 
     table = Table(show_header=True)
     table.add_column("Dimension", style="bold")
@@ -390,7 +395,15 @@ def format_markdown(card: ScoreCard) -> str:
     lines = [
         f"# {card.entity_name} ({card.entity_type})",
         "",
-        f"**Grade:** {card.grade} ({card.overall_score:.0%})  ",
+        f"**Quality grade:** {card.grade} ({card.overall_score:.0%})  ",
+    ]
+    if card.verdict:
+        lines.append(
+            f"**Trust verdict:** {card.verdict.recommendation} "
+            f"(malice: {card.verdict.malice_indicators}, "
+            f"capability: {card.verdict.capability_risk})  "
+        )
+    lines += [
         f"**Format:** {card.format}  ",
         "",
         "## Dimensions",
@@ -454,6 +467,14 @@ def format_summary_table(cards: list[ScoreCard]) -> None:
     console.print()
 
 
+def _trust_label(card: ScoreCard) -> str:
+    """A compact ' · Trust: <recommendation>' tag — the trust axis, distinct from
+    the quality grade."""
+    if not card.verdict:
+        return ""
+    return f"  ·  Trust: {card.verdict.recommendation}"
+
+
 def format_html(cards: list[ScoreCard], llm_findings: dict[str, list] | None = None, audit_source: str = "", audit_command: str = "") -> str:
     """Generate a self-contained HTML report for scorecards.
 
@@ -499,12 +520,12 @@ def format_html(cards: list[ScoreCard], llm_findings: dict[str, list] | None = N
   <div class="card-header">
     <div class="card-title">
       <h2>{_esc(card.entity_name)}</h2>
-      <span class="badge" style="background:{gc}">{_esc(card.grade)}</span>
+      <span class="badge" style="background:{gc}" title="Quality grade">{_esc(card.grade)}</span>
     </div>
     <div class="card-meta">
       <span class="tag">{_esc(card.entity_type)}</span>
       <span class="tag">{_esc(card.format)}</span>
-      <span class="score-label">Score: {card.overall_score:.0%}</span>
+      <span class="score-label">Quality: {card.overall_score:.0%}{_trust_label(card)}</span>
     </div>
   </div>''')
 
