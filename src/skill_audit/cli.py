@@ -256,6 +256,14 @@ def audit(
                     if review.findings:
                         llm_results[fname] = review.findings
 
+                # Fold the semantic findings into each verdict (escalate-only) so
+                # the LLM review affects the decision, not just the display.
+                from .verdict import fold_llm_findings
+                for card in cards:
+                    card_llm = llm_results.get(card.entity_name)
+                    if card_llm:
+                        card.verdict = fold_llm_findings(card.verdict, card_llm)
+
     # Output
     if output == "json":
         print(format_json(cards, audit_payload=security_only))

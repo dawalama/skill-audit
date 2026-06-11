@@ -6,7 +6,68 @@ installation/use decisions without hiding raw evidence.
 
 from __future__ import annotations
 
+import re
+
 from .models import AuditVerdict, Finding, ScoreCard
+
+_REC_ORDER = ["allow", "warn", "human_review", "block"]
+_MALICE_ORDER = ["low", "medium", "high"]
+
+
+def _escalate(current: str, target: str, order: list[str]) -> str:
+    """Return whichever of current/target is more severe — never downgrade."""
+    if current not in order:
+        return target
+    return target if order.index(target) > order.index(current) else current
+
+
+def fold_llm_findings(verdict: AuditVerdict | None, llm_findings: list) -> AuditVerdict | None:
+    """Fold an optional LLM review's findings into the verdict.
+
+    The semantic layer can only ADD scrutiny: it escalates the recommendation and
+    malice and may set intent_mismatch, but never downgrades them. A clean LLM pass
+    is not evidence of safety — same principle as never trusting provenance. Only
+    high/critical security findings count; QUALITY findings never touch trust.
+    """
+    if verdict is None or not llm_findings:
+        return verdict
+
+    strong = {
+        f.category.upper()
+        for f in llm_findings
+        if getattr(f, "severity", "low") in {"high", "critical"}
+    }
+    if not strong & {"INJECTION", "HIDDEN_BEHAVIOR", "INTENT_MISMATCH"}:
+        return verdict
+
+    rec = verdict.recommendation
+    malice = verdict.malice_indicators
+    mismatch = verdict.intent_mismatch
+    reasons = list(verdict.reasons)
+
+    if "INJECTION" in strong:
+        rec = _escalate(rec, "block", _REC_ORDER)
+        malice = _escalate(malice, "high", _MALICE_ORDER)
+        reasons.append("LLM review flagged prompt injection")
+    if "HIDDEN_BEHAVIOR" in strong:
+        rec = _escalate(rec, "human_review", _REC_ORDER)
+        malice = _escalate(malice, "medium", _MALICE_ORDER)
+        reasons.append("LLM review flagged hidden or deceptive behaviour")
+    if "INTENT_MISMATCH" in strong:
+        rec = _escalate(rec, "human_review", _REC_ORDER)
+        mismatch = True
+        reasons.append("LLM review flagged a purpose/behaviour mismatch")
+
+    summary = re.sub(r"^\w+:", f"{rec}:", verdict.summary)
+    summary = re.sub(r"malice=\w+", f"malice={malice}", summary)
+
+    return verdict.model_copy(update={
+        "recommendation": rec,
+        "malice_indicators": malice,
+        "intent_mismatch": mismatch,
+        "reasons": reasons,
+        "summary": summary,
+    })
 
 MALICE_CATEGORIES = {
     "INJECTION", "SECRET", "EXFILTRATION", "PERSISTENCE", "HIJACKING", "OBFUSCATION",

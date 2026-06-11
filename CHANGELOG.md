@@ -4,6 +4,18 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project follows
 semantic versioning.
 
+## [0.10.1] - 2026-06-11
+
+### Added — LLM review feeds the verdict
+- The optional `--llm` semantic review was previously display-only. Its findings
+  now fold into the verdict: a high/critical `INJECTION`, `HIDDEN_BEHAVIOR`, or
+  `INTENT_MISMATCH` escalates the recommendation (`human_review`/`block`), raises
+  malice, and can set `intent_mismatch`. Each adds an explanatory reason.
+- Escalate-only: the semantic layer can add scrutiny but never downgrade the
+  verdict, and `QUALITY` findings never touch trust — a clean LLM pass is not
+  evidence of safety (same principle as never trusting provenance). Verified by
+  `tests/test_llm_verdict.py` and an end-to-end `--llm` run.
+
 ## [0.10.0] - 2026-06-11
 
 ### Added — nuance-aware trust (transparency axis, issue #2)
