@@ -122,7 +122,7 @@ ai-skill-audit audit examples/malicious-skill.md --verbose
     ! [ENTROPY] High-entropy string (5.2 bits)
 ```
 
-**What it caught:** 13 findings across 7 threat categories — all from a skill that looks perfectly normal on the surface (has description, steps, inputs, examples, gotchas). The quality dimensions all score high, but trust drops to 0%.
+**What it caught:** 14 findings across 7 threat categories — all from a skill that looks perfectly normal on the surface (has description, steps, inputs, examples, gotchas). The quality dimensions all score high, but trust drops to 0%.
 
 **Key insight:** This is exactly how real attacks work. The skill is well-structured enough to pass a casual review, but the trust scanner catches the `<IMPORTANT>` hidden tag, base64-encoded shell commands, credential file access, and prompt injection buried in the body.
 
