@@ -16,6 +16,11 @@ class Finding(BaseModel):
     source: str = "content"
     confidence: float = Field(default=0.8, ge=0.0, le=1.0)
     disposition: str = "active"
+    # "declared" = the operation is in the open (a documented, readable command);
+    # "hidden" = concealed (obfuscated/encoded, or a capability primitive used in a
+    # skill that is otherwise concealing behaviour). Transparency, not provenance,
+    # is what separates powerful-but-legitimate from malicious.
+    transparency: str = "declared"
 
 
 class ScoreDimension(BaseModel):

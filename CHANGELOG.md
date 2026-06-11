@@ -4,6 +4,26 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project follows
 semantic versioning.
 
+## [Unreleased]
+
+### Added — nuance-aware trust (transparency axis, issue #2)
+- Findings now carry a **`transparency`** signal (`declared` vs `hidden`). Trust is
+  derived from *behaviour*, never from provenance — a reputable name or high quality
+  score never lowers scrutiny.
+- **Capability ≠ malice.** Execution primitives (`subprocess`, `os.system`,
+  `exec.Command`, …) declared in the open are reclassified to a new **`CAPABILITY`**
+  category — surfaced for review, not counted as malice. The *same* primitive hidden
+  in a concealing skill (obfuscated/encoded evidence, or co-occurring with
+  obfuscation/injection) stays `EXFILTRATION` malice.
+- The verdict escalates **any hidden finding** to malice, and a hidden
+  exfil/secret/backdoor now **blocks regardless of profile** — concealment removes the
+  "expected capability in context" benefit of the doubt.
+- Net effect: a legitimate dev/deploy toolkit that openly uses powerful primitives
+  reads as `capability` / `human_review` instead of a malice-driven `F`; a polished,
+  reputable-looking skill that *hides* an exfil call still blocks. Verified by
+  `tests/test_transparency.py` (incl. the "reputable-but-compromised must still block"
+  case) and adversarial encode-then-exec / wrapped-payload probes.
+
 ## [0.9.0] - 2026-06-10
 
 ### Fixed

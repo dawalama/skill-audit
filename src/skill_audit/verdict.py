@@ -14,7 +14,18 @@ MALICE_CATEGORIES = {
 
 CAPABILITY_CATEGORIES = {
     "DESTRUCTIVE", "PRIVILEGE", "SUSPICIOUS_URL", "ENTROPY",
+    # Declared execution primitives (subprocess/os.system/…) — powerful capability,
+    # not malice on their own. They are routed here only when declared in the open;
+    # the same primitive hidden in a concealing skill stays EXFILTRATION (malice).
+    "CAPABILITY",
 }
+
+
+def _is_malice_finding(finding: Finding) -> bool:
+    """A finding signals malice if it is an intrinsically-malicious category, or
+    if its behaviour is HIDDEN. Concealment is the tell — a hidden capability is
+    no longer just capability. Provenance/quality never enter this decision."""
+    return finding.category in MALICE_CATEGORIES or finding.transparency == "hidden"
 
 
 def interpret_card(card: ScoreCard) -> AuditVerdict:
@@ -97,7 +108,7 @@ def _infer_profile(card: ScoreCard) -> str:
 
 
 def _malice_level(findings: list[Finding]) -> str:
-    malice_findings = [f for f in findings if f.category in MALICE_CATEGORIES]
+    malice_findings = [f for f in findings if _is_malice_finding(f)]
     if any(f.severity == "critical" for f in malice_findings):
         return "high"
     if any(f.severity == "high" for f in malice_findings):
@@ -130,10 +141,15 @@ def _recommendation(
     capability: str,
 ) -> str:
     categories = {f.category for f in findings}
+    hidden_malice = any(_is_malice_finding(f) and f.transparency == "hidden" for f in findings)
 
     if "INJECTION" in categories:
         return "block"
     if categories & {"SECRET", "EXFILTRATION", "PERSISTENCE", "HIJACKING"}:
+        # Concealment removes the benefit of the doubt: a HIDDEN exfil/secret/
+        # backdoor blocks regardless of how the skill profiles or who shipped it.
+        if hidden_malice:
+            return "block"
         if profile in {"developer-toolkit", "deployment", "browser-automation", "security-research", "documentation"}:
             return "human_review"
         return "block"

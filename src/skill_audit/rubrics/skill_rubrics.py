@@ -931,25 +931,39 @@ def _score_trust(
         "DESTRUCTIVE": 0.25,       # May be intentional but risky
         "ENTROPY": 0.20,           # High entropy = possible encoded payload
         "PRIVILEGE": 0.15,         # sudo is common but worth flagging
+        "CAPABILITY": 0.10,        # Declared capability — surfaced for review, not malice
     }
+
+    # A skill that conceals behaviour anywhere makes its capability primitives
+    # suspect: a declared subprocess is capability, the same call in a skill that
+    # also obfuscates/injects is part of the kill chain.
+    has_concealment = any(
+        f["category"].upper() in {"OBFUSCATION", "INJECTION"} for f in findings
+    )
 
     total_deduction = 0.0
     seen_categories: set[str] = set()
     suppressed_categories: set[str] = set()
 
     for idx, finding in enumerate(findings, 1):
-        category = finding["category"].upper()
+        raw_category = finding["category"].upper()
         desc = finding["description"]
-        if category in _ignored:
+        evidence = finding.get("evidence", "")
+        source = finding.get("source", "content")
+        category, transparency = _classify_transparency(
+            raw_category, desc, evidence, has_concealment=has_concealment
+        )
+        if category in _ignored or raw_category in _ignored:
             suppressed_categories.add(category)
             suggestions.append(f"[{category}] (ignored) {desc}")
             structured_findings.append(_build_finding(
                 index=idx,
                 category=category,
                 message=desc,
-                evidence=finding.get("evidence", ""),
-                source=finding.get("source", "content"),
+                evidence=evidence,
+                source=source,
                 disposition="suppressed",
+                transparency=transparency,
             ))
             continue
         suggestions.append(f"[{category}] {desc}")
@@ -957,9 +971,10 @@ def _score_trust(
             index=idx,
             category=category,
             message=desc,
-            evidence=finding.get("evidence", ""),
-            source=finding.get("source", "content"),
+            evidence=evidence,
+            source=source,
             disposition="active",
+            transparency=transparency,
         ))
         if category not in seen_categories:
             total_deduction += severity_weights.get(category, 0.2)
@@ -1006,7 +1021,59 @@ _CATEGORY_SEVERITY = {
     "DESTRUCTIVE": "medium",
     "ENTROPY": "medium",
     "PRIVILEGE": "low",
+    # Capability primitives that are declared in the open — powerful, but not a
+    # malice signal on their own (a dev/deploy/build skill legitimately runs them).
+    "CAPABILITY": "low",
 }
+
+# Execution primitives that are pure *capability*: legitimate in dev/build/deploy
+# skills when declared, malicious only when hidden. These live in the
+# EXFILTRATION pattern group (they are RCE-shaped) but are reclassified to the
+# CAPABILITY category when they appear transparently. Matched by exact pattern
+# description so the classification stays in lock-step with the pattern table.
+_CAPABILITY_EXEC_MESSAGES = {
+    "os.system call — potential RCE",
+    "os.popen call — potential RCE",
+    "Subprocess launching shell or downloader",
+    "Node child_process.exec — potential RCE",
+    "Go exec.Command — potential RCE",
+}
+
+# Markers that a snippet is concealing what it does (encoded/obfuscated payloads).
+_OBFUSCATED_EVIDENCE_RE = re.compile(
+    r"base64\s+-d|base64\s+--decode|\|\s*base64|b64decode|atob\s*\(|"
+    r"\beval\s*[\(\"']|__import__\s*\(|"
+    r"(?:\\x[0-9a-fA-F]{2}){3,}|(?:\\u[0-9a-fA-F]{4}){3,}|"
+    r"[​‌‍⁠﻿]",
+)
+
+
+def _looks_obfuscated(evidence: str) -> bool:
+    """True if the evidence itself hides what it does (encoding/eval/zero-width)."""
+    return bool(_OBFUSCATED_EVIDENCE_RE.search(evidence))
+
+
+def _classify_transparency(
+    raw_category: str, message: str, evidence: str, *, has_concealment: bool
+) -> tuple[str, str]:
+    """Return (effective_category, transparency) for a raw trust match.
+
+    - Concealment/manipulation categories (OBFUSCATION/INJECTION) are always hidden.
+    - Evidence that is itself encoded/obfuscated is hidden.
+    - A capability primitive (subprocess/os.system/…) is *declared* capability when
+      the skill shows no other concealment, and *hidden* malice when it does —
+      transparency, not the bare pattern, decides.
+    """
+    is_cap_exec = raw_category == "EXFILTRATION" and message in _CAPABILITY_EXEC_MESSAGES
+    hidden = (
+        raw_category in {"OBFUSCATION", "INJECTION"}
+        or _looks_obfuscated(evidence)
+        or (is_cap_exec and has_concealment)
+    )
+    transparency = "hidden" if hidden else "declared"
+    if is_cap_exec and not hidden:
+        return "CAPABILITY", transparency
+    return raw_category, transparency
 
 
 def _build_finding(
@@ -1017,6 +1084,7 @@ def _build_finding(
     evidence: str,
     source: str,
     disposition: str,
+    transparency: str = "declared",
 ) -> Finding:
     """Create a stable structured finding from a trust match."""
     category_slug = category.lower().replace("_", "-")
@@ -1033,6 +1101,7 @@ def _build_finding(
         source=source,
         confidence=confidence,
         disposition=disposition,
+        transparency=transparency,
     )
 
 
