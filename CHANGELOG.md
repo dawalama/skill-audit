@@ -4,6 +4,15 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project follows
 semantic versioning.
 
+## [0.10.2] - 2026-06-11
+
+### Changed — trust verdict reads independently of the quality grade
+- HTML report headers now show a prominent **trust badge** (`⛔ Block` / `⚠ Review`
+  / `Warn` / `✓ Allow`, coloured by recommendation) next to the quality grade. A
+  well-written malicious skill is a quality `C` *and* a trust `Block`; the badge
+  makes the safety decision impossible to miss, so the grade can't be misread as
+  "acceptable."
+
 ## [0.10.1] - 2026-06-11
 
 ### Added — LLM review feeds the verdict

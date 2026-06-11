@@ -475,6 +475,18 @@ def _trust_label(card: ScoreCard) -> str:
     return f"  ·  Trust: {card.verdict.recommendation}"
 
 
+def _trust_badge(card: ScoreCard) -> str:
+    """A prominent trust pill for the report header so the safety decision reads
+    independently of the quality grade."""
+    if not card.verdict:
+        return ""
+    rec = card.verdict.recommendation
+    return (
+        f'<span class="trust-badge" style="background:{_rec_color(rec)}" '
+        f'title="Trust verdict">{_rec_label(rec)}</span>'
+    )
+
+
 def format_html(cards: list[ScoreCard], llm_findings: dict[str, list] | None = None, audit_source: str = "", audit_command: str = "") -> str:
     """Generate a self-contained HTML report for scorecards.
 
@@ -520,7 +532,7 @@ def format_html(cards: list[ScoreCard], llm_findings: dict[str, list] | None = N
   <div class="card-header">
     <div class="card-title">
       <h2>{_esc(card.entity_name)}</h2>
-      <span class="badge" style="background:{gc}" title="Quality grade">{_esc(card.grade)}</span>
+      <span class="badge" style="background:{gc}" title="Quality grade">{_esc(card.grade)}</span>{_trust_badge(card)}
     </div>
     <div class="card-meta">
       <span class="tag">{_esc(card.entity_type)}</span>
@@ -688,6 +700,11 @@ def format_html(cards: list[ScoreCard], llm_findings: dict[str, list] | None = N
     color: #fff; font-weight: 700; font-size: 0.75rem;
     width: 1.5rem; height: 1.5rem; border-radius: 4px;
   }}
+  .trust-badge {{
+    display: inline-flex; align-items: center;
+    color: #fff; font-weight: 700; font-size: 0.72rem; letter-spacing: 0.02em;
+    padding: 0.3rem 0.7rem; border-radius: 999px; text-transform: uppercase;
+  }}
   .card-meta {{ display: flex; align-items: center; gap: 0.5rem; }}
   .tag {{
     background: #f1f5f9; color: #64748b; padding: 0.15rem 0.5rem;
@@ -826,6 +843,31 @@ def _grade_color(grade: str) -> str:
         "D": "red",
         "F": "red bold",
     }.get(grade, "white")
+
+
+# Trust verdict → colour + short label. The trust recommendation is the safety
+# decision and must read independently of the quality grade (a well-written
+# malicious skill is a quality C but a trust BLOCK).
+_REC_COLOR = {
+    "block": "#b62324",
+    "human_review": "#9e6a03",
+    "warn": "#9e6a03",
+    "allow": "#238636",
+}
+_REC_LABEL = {
+    "block": "⛔ Block",
+    "human_review": "⚠ Review",
+    "warn": "Warn",
+    "allow": "✓ Allow",
+}
+
+
+def _rec_color(recommendation: str) -> str:
+    return _REC_COLOR.get(recommendation, "#64748b")
+
+
+def _rec_label(recommendation: str) -> str:
+    return _REC_LABEL.get(recommendation, recommendation)
 
 
 def _score_bar(score: float, width: int = 10) -> str:
