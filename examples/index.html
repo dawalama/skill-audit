@@ -3,15 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ai-skill-audit — Why you need it</title>
+<title>ai-skill-audit — the linter for AI skills</title>
+<meta name="description" content="ai-skill-audit grades AI skill files for quality across 6 dimensions and scans them for prompt injection, credential theft, and data exfiltration. Score the skills you write; vet the ones you install. Runs offline, free, no telemetry.">
+<meta property="og:title" content="ai-skill-audit — the linter for AI skills">
+<meta property="og:description" content="Grade quality + catch malicious skills (prompt injection, credential theft, exfiltration) before they reach your agent. Offline, free, open source.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://dawalama.github.io/skill-audit/">
+<meta name="twitter:card" content="summary_large_image">
 <style>
   :root { --bg: #0d1117; --fg: #e6edf3; --muted: #8b949e; --accent: #58a6ff; --border: #30363d; --card: #161b22; --red: #f85149; --yellow: #d29922; --green: #3fb950; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--fg); line-height: 1.6; }
-  .container { max-width: 760px; margin: 0 auto; padding: 3rem 1.5rem; }
-  h1 { font-size: 1.8rem; margin-bottom: 0.3rem; }
+  .container { max-width: 820px; margin: 0 auto; padding: 3rem 1.5rem; }
+  h1 { font-size: 1.9rem; margin-bottom: 0.4rem; }
   h1 code { background: var(--card); padding: 0.1em 0.4em; border-radius: 6px; font-size: 0.9em; }
-  .tagline { color: var(--muted); margin-bottom: 2.5rem; font-size: 1.05rem; }
+  .tagline { color: var(--fg); margin-bottom: 0.4rem; font-size: 1.15rem; font-weight: 500; }
+  .subtagline { color: var(--muted); margin-bottom: 1.5rem; font-size: 1rem; }
   h2 { font-size: 1.2rem; margin: 2.5rem 0 0.8rem; color: var(--fg); }
   p { margin-bottom: 0.8rem; }
   a { color: var(--accent); text-decoration: none; }
@@ -19,6 +26,37 @@
   code { background: var(--card); padding: 0.15em 0.4em; border-radius: 4px; font-size: 0.9em; font-family: 'SF Mono', Monaco, Consolas, monospace; }
   pre { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; overflow-x: auto; margin: 1rem 0; font-size: 0.9rem; }
   pre code { background: none; padding: 0; }
+
+  /* Hero CTA */
+  .cta-row { display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center; margin: 1.2rem 0; }
+  .btn { display: inline-block; padding: 0.55rem 1.1rem; border-radius: 8px; font-weight: 600; font-size: 0.95rem; border: 1px solid var(--border); }
+  .btn-primary { background: var(--accent); color: #07101f; border-color: var(--accent); }
+  .btn-primary:hover { text-decoration: none; filter: brightness(1.1); }
+  .btn-ghost { color: var(--fg); }
+  .btn-ghost:hover { border-color: var(--accent); text-decoration: none; }
+
+  /* Trust badges */
+  .trust-bar { display: flex; gap: 1.2rem; flex-wrap: wrap; color: var(--muted); font-size: 0.85rem; margin: 0.6rem 0 0; }
+  .trust-bar span strong { color: var(--green); }
+
+  /* Contrast / killer demo */
+  .contrast { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.2rem 0 0.6rem; }
+  .skill-col { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem; }
+  .skill-col.bad { border-color: #3d1515; }
+  .skill-col .name { font-size: 0.9rem; color: var(--muted); margin-bottom: 0.2rem; }
+  .skill-col .verdict { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.8rem; }
+  .skill-col .verdict.allow { color: var(--green); }
+  .skill-col .verdict.block { color: var(--red); }
+  .dim { display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem; margin: 0.25rem 0; color: var(--muted); }
+  .dim .dlabel { width: 84px; flex-shrink: 0; }
+  .bar { flex: 1; height: 7px; background: #21262d; border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; }
+  .bar-fill.g { background: var(--green); }
+  .bar-fill.y { background: var(--yellow); }
+  .bar-fill.r { background: var(--red); }
+  .dim .dval { width: 30px; text-align: right; flex-shrink: 0; }
+  .punchline { text-align: center; color: var(--muted); font-size: 0.92rem; margin: 0.4rem 0 0; }
+  .punchline strong { color: var(--fg); }
 
   .problem { background: linear-gradient(135deg, #1a0a0a 0%, var(--card) 100%); border: 1px solid #3d1515; border-radius: 10px; padding: 1.5rem; margin: 1.5rem 0; }
   .problem h3 { color: var(--red); font-size: 1rem; margin-bottom: 0.5rem; }
@@ -32,20 +70,25 @@
   .stat .num.green { color: var(--green); }
   .stat .label { color: var(--muted); font-size: 0.8rem; }
 
+  /* Use cases */
+  .usecases { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin: 1rem 0; }
+  .usecase { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
+  .usecase h4 { font-size: 0.92rem; margin-bottom: 0.3rem; }
+  .usecase p { font-size: 0.82rem; color: var(--muted); margin: 0 0 0.5rem; }
+  .usecase code { font-size: 0.78rem; }
+
   .report-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; margin-bottom: 1rem; display: block; text-decoration: none; transition: border-color 0.2s; }
   .report-card:hover { border-color: var(--accent); text-decoration: none; }
+  .report-card.featured { border-color: #3d2a15; }
   .report-card h3 { font-size: 1rem; margin-bottom: 0.3rem; color: var(--fg); }
   .report-card p { color: var(--muted); font-size: 0.9rem; margin: 0; }
   .grade { display: inline-block; width: 24px; height: 24px; line-height: 24px; text-align: center; border-radius: 5px; font-weight: 700; font-size: 0.8rem; color: #fff; }
+  .grade-a { background: #238636; }
   .grade-b { background: #1f6feb; }
   .grade-c { background: #9e6a03; }
   .grade-d { background: #d29922; }
   .grade-f { background: #b62324; }
   .finding { color: var(--red); font-size: 0.85rem; margin-top: 0.3rem; }
-
-  .install { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.2rem; margin: 1.5rem 0; display: flex; align-items: center; gap: 0.5rem; }
-  .install code { font-size: 1rem; }
-  .install .prefix { color: var(--muted); }
 
   .features { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin: 1rem 0; }
   .feature { font-size: 0.9rem; color: var(--muted); padding: 0.3rem 0; }
@@ -54,8 +97,8 @@
   .links { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; }
   .links a { margin-right: 1.5rem; }
 
-  @media (max-width: 600px) {
-    .features { grid-template-columns: 1fr; }
+  @media (max-width: 640px) {
+    .features, .usecases, .contrast { grid-template-columns: 1fr; }
     .stat-row { flex-direction: column; }
   }
 </style>
@@ -64,7 +107,41 @@
 <div class="container">
 
 <h1><code>ai-skill-audit</code></h1>
-<p class="tagline">The linter for AI skills. Quality scoring + research-backed security scanning in one tool.</p>
+<p class="tagline">The linter for AI skills.</p>
+<p class="subtagline">Grade quality across 6 dimensions and scan for security threats &mdash; one tool to <strong>harden the skills you write</strong> and <strong>vet the ones you install</strong>.</p>
+
+<div class="cta-row">
+  <a href="https://pypi.org/project/ai-skill-audit/" class="btn btn-primary">pip install ai-skill-audit</a>
+  <a href="https://github.com/dawalama/skill-audit" class="btn btn-ghost">View on GitHub</a>
+</div>
+
+<div class="trust-bar">
+  <span><strong>Offline</strong> by default &mdash; your skills never leave your machine</span>
+  <span><strong>Free</strong> &amp; open source (MIT)</span>
+  <span><strong>No telemetry</strong></span>
+</div>
+
+<h2>Same quality. One ships a backdoor.</h2>
+<p style="color: var(--muted); font-size: 0.92rem;">Quality scoring alone can't tell these apart &mdash; both are well-written. The trust scan is what separates them.</p>
+<div class="contrast">
+  <div class="skill-col">
+    <div class="name">examples/clean-skill.md &mdash; "Code Review"</div>
+    <div class="verdict allow">Grade A (97%) &middot; &rarr; allow</div>
+    <div class="dim"><span class="dlabel">completeness</span><span class="bar"><span class="bar-fill g" style="width:100%"></span></span><span class="dval">100%</span></div>
+    <div class="dim"><span class="dlabel">clarity</span><span class="bar"><span class="bar-fill g" style="width:100%"></span></span><span class="dval">100%</span></div>
+    <div class="dim"><span class="dlabel">safety</span><span class="bar"><span class="bar-fill g" style="width:100%"></span></span><span class="dval">100%</span></div>
+    <div class="dim"><span class="dlabel">trust</span><span class="bar"><span class="bar-fill g" style="width:100%"></span></span><span class="dval">100%</span></div>
+  </div>
+  <div class="skill-col bad">
+    <div class="name">examples/malicious-skill.md &mdash; "Deploy Helper"</div>
+    <div class="verdict block">Grade C (74%) &middot; &rarr; block</div>
+    <div class="dim"><span class="dlabel">completeness</span><span class="bar"><span class="bar-fill g" style="width:100%"></span></span><span class="dval">100%</span></div>
+    <div class="dim"><span class="dlabel">clarity</span><span class="bar"><span class="bar-fill y" style="width:80%"></span></span><span class="dval">80%</span></div>
+    <div class="dim"><span class="dlabel">safety</span><span class="bar"><span class="bar-fill g" style="width:100%"></span></span><span class="dval">100%</span></div>
+    <div class="dim"><span class="dlabel">trust</span><span class="bar"><span class="bar-fill r" style="width:3%"></span></span><span class="dval">0%</span></div>
+  </div>
+</div>
+<p class="punchline"><strong>14 hidden findings</strong> across 7 categories &mdash; prompt injection, credential theft, obfuscated shell execution &mdash; behind a perfect-looking skill.</p>
 
 <h2>The problem</h2>
 <p>80,000+ community skills are circulating across Claude Code, Cursor, and MCP platforms. You copy-paste a config, install a skill, or browse a marketplace &mdash; and trust that it's safe.</p>
@@ -78,6 +155,25 @@
   <div class="stat"><span class="num red">37%</span><span class="label">of skills with critical issues</span></div>
   <div class="stat"><span class="num yellow">6</span><span class="label">leaked API keys in one popular MCP config</span></div>
   <div class="stat"><span class="num green">110+</span><span class="label">threat patterns across 9 categories</span></div>
+</div>
+
+<h2>Who it's for</h2>
+<div class="usecases">
+  <div class="usecase">
+    <h4>Writing skills?</h4>
+    <p>Score and harden your own skills before you ship them.</p>
+    <code>audit SKILL.md --verbose</code>
+  </div>
+  <div class="usecase">
+    <h4>Installing one?</h4>
+    <p>Vet a community skill or repo before it reaches your agent.</p>
+    <code>audit github.com/user/repo</code>
+  </div>
+  <div class="usecase">
+    <h4>Shipping at a team?</h4>
+    <p>Gate CI so quality and trust can't regress below a bar.</p>
+    <code>audit skills/ --min-grade B</code>
+  </div>
 </div>
 
 <h2>What it catches</h2>
@@ -94,36 +190,30 @@
 <p style="color: var(--muted); font-size: 0.85rem; margin-top: 0.5rem;">Patterns informed by <a href="https://arxiv.org/abs/2604.03070">arXiv:2604.03070</a>, <a href="https://www.spaceraccoon.dev/prompt-injection-ai-agents-mcp/">ClawHavoc</a>, OWASP LLM Top 10, and ongoing security research.</p>
 
 <h2>See it in action</h2>
-<p>Real scans of public GitHub repositories, with static analysis and agent-friendly structured outputs:</p>
+<p>Real scans with static analysis and agent-friendly structured outputs:</p>
+
+<a href="audit-malicious-skill.html" class="report-card featured">
+  <h3>Example Malicious Skill: looks normal, hides 14 attack vectors <span class="grade grade-c">C</span></h3>
+  <p>A crafted test skill with near-perfect quality scores &mdash; but trust at 0%. Hides prompt injection, credential theft, obfuscated shell execution, and destructive commands.</p>
+  <p class="finding">14 findings across 7 categories &mdash; exactly how real attacks work</p>
+</a>
 
 <a href="remote-audit-mcp.html" class="report-card">
   <h3>MCP Config: 30 servers, 6 leaked secrets <span class="grade grade-b">B</span></h3>
   <p>A popular "100-tool MCP config" with hardcoded GitHub, Slack, Discord, and API keys.</p>
-  <p class="finding">Overall risk: CRITICAL &mdash; secret_hygiene scored 0%</p>
+  <p class="finding">Overall risk: CRITICAL &mdash; secret hygiene scored 0%</p>
 </a>
 
-<a href="audit-mcp-llm.html" class="report-card">
-  <h3>MCP Config + LLM Review <span class="grade grade-b">B</span></h3>
-  <p>Optional semantic MCP review on top of static config checks.</p>
-  <p class="finding">Shows how --llm complements deterministic scanning</p>
-</a>
-
-<a href="audit-malicious-skill.html" class="report-card">
-  <h3>Example Malicious Skill: looks normal, hides 14 attack vectors <span class="grade grade-c">C</span></h3>
-  <p>A crafted test skill with perfect quality scores &mdash; but trust at 0%. Hides prompt injection, credential theft, obfuscated shell execution, and destructive commands.</p>
-  <p class="finding">14 findings across 7 categories &mdash; exactly how real attacks work</p>
+<a href="audit-evil-deploy.html" class="report-card">
+  <h3>Evil Deploy: all 10 arXiv:2604.03070 categories <span class="grade grade-f">F</span></h3>
+  <p>Test skill mapping to every vulnerability category from the "Credential Leakage in LLM Agent Skills" paper &mdash; reverse shells, persistence, crypto mining, credential logging.</p>
+  <p class="finding">16 findings across 6 categories &mdash; all 10 steps flagged</p>
 </a>
 
 <a href="audit-malicious-skill-llm.html" class="report-card">
   <h3>Malicious Skill + LLM Review <span class="grade grade-c">C</span></h3>
-  <p>Same static scan with optional LLM review added to show semantic findings such as intent mismatch and hidden behavior.</p>
+  <p>The same static scan with an optional LLM review layered on to surface semantic findings such as intent mismatch and hidden behavior.</p>
   <p class="finding">Use --llm for small, public inputs where semantic review is worth the extra cost</p>
-</a>
-
-<a href="audit-evil-deploy.html" class="report-card">
-  <h3>Evil Deploy: all 10 arXiv:2604.03070 categories <span class="grade" style="background:#b62324">F</span></h3>
-  <p>Test skill mapping to every vulnerability category from the "Credential Leakage in LLM Agent Skills" paper &mdash; reverse shells, persistence, crypto mining, credential logging.</p>
-  <p class="finding">16 findings across 6 categories &mdash; all 10 steps flagged</p>
 </a>
 
 <a href="remote-audit-gstack.html" class="report-card">
@@ -133,33 +223,29 @@
 </a>
 
 <a href="remote-audit-skills.html" class="report-card">
-  <h3>Skill Collection: 200+ Claude skills <span class="grade grade-c">C</span></h3>
+  <h3>Skill Collection: a directory of Claude skills <span class="grade grade-c">C</span></h3>
   <p>Engineering, marketing, product, and C-level advisor skills. Quality issues found, no security threats.</p>
-  <p class="finding">10 skills scanned, 12 doc files auto-skipped &mdash; avg score 65%</p>
+  <p class="finding">Quality scoring across a whole collection &mdash; doc files auto-skipped</p>
 </a>
 
 <h2>Get started</h2>
 
-<div class="install">
-  <span class="prefix">$</span> <code>pip install ai-skill-audit</code>
-</div>
-
-<pre><code># Audit a skill file
+<pre><code># Score a skill you're writing
 ai-skill-audit audit SKILL.md --verbose
 
-# Audit a GitHub repo
+# Vet a GitHub repo before installing
 ai-skill-audit audit https://github.com/user/repo --summary
 
-# MCP config scan
+# Scan an MCP config
 ai-skill-audit audit mcp.json
 
-# Full audit with LLM review
+# Optional semantic review (only this sends data out)
 ai-skill-audit audit skills/ --llm --verbose
 
-# HTML report
-ai-skill-audit audit skills/ --output html --llm > report.html
+# Generate a shareable HTML report
+ai-skill-audit audit skills/ --output html &gt; report.html
 
-# CI gating
+# Gate CI on quality + trust
 ai-skill-audit audit skills/ --min-grade B</code></pre>
 
 <div class="links">
