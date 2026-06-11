@@ -4,7 +4,7 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project follows
 semantic versioning.
 
-## [Unreleased]
+## [0.10.0] - 2026-06-11
 
 ### Added — nuance-aware trust (transparency axis, issue #2)
 - Findings now carry a **`transparency`** signal (`declared` vs `hidden`). Trust is
