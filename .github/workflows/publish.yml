@@ -5,18 +5,45 @@ on:
     tags:
       - "v*"
 
-permissions:
-  id-token: write
-
 jobs:
-  publish:
+  # Gate: never publish a tag that doesn't pass lint, type-check, and tests.
+  test:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8
+
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      - name: Ruff (lint)
+        run: uv run ruff check src/ tests/
+
+      - name: Mypy (type check)
+        run: uv run mypy
+
+      - name: Run tests
+        run: uv run pytest tests/ -v
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    # Least privilege: only the publish job needs the OIDC token.
+    permissions:
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
