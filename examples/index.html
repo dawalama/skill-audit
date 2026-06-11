@@ -216,16 +216,10 @@
   <p class="finding">Use --llm for small, public inputs where semantic review is worth the extra cost</p>
 </a>
 
-<a href="remote-audit-gstack.html" class="report-card">
-  <h3>gstack: a powerful real-world toolkit &mdash; capability, not malice <span style="display:inline-block; padding:0.1em 0.55em; border-radius:5px; font-weight:700; font-size:0.72rem; color:#fff; background:#9e6a03; vertical-align:middle;">REVIEW</span></h3>
-  <p>A legitimate full-stack dev toolkit scanned as an agent instruction surface. It needs broad shell and filesystem access to do its job &mdash; and uses it in the open, with no obfuscation, injection, or hidden exfiltration. The audit surfaces that capability for you to review; it does not call the toolkit malicious.</p>
-  <p class="finding" style="color: var(--muted)">capability: medium &middot; no hidden-malice signals &middot; provenance never lowers scrutiny &mdash; trusted sources get compromised too</p>
-</a>
-
-<a href="remote-audit-skills.html" class="report-card">
-  <h3>Skill Collection: a directory of Claude skills <span class="grade grade-c">C</span></h3>
-  <p>Engineering, marketing, product, and C-level advisor skills. Quality issues found, no security threats.</p>
-  <p class="finding">Quality scoring across a whole collection &mdash; doc files auto-skipped</p>
+<a href="remote-audit-webgpu.html" class="report-card">
+  <h3>A real public skill repo: the quality half at work <span class="grade grade-a">A</span><span class="grade grade-d" style="margin-left:0.2rem;">D</span></h3>
+  <p>A legitimate WebGPU/Three.js skill collection scanned straight from GitHub &mdash; <strong>16 files, zero security threats</strong>. The tool grades them on quality: 7 score A, 9 land C&ndash;D for missing examples, gotchas, or structure. This is the "harden the skills you write" half, on real-world code.</p>
+  <p class="finding" style="color: var(--muted)">trust: clean across all 16 files &middot; quality is where the work is &mdash; actionable, not accusatory</p>
 </a>
 
 <h2>Get started</h2>

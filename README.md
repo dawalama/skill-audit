@@ -556,10 +556,9 @@ ai-skill-audit audit examples/malicious-skill.md --verbose
 See [examples/remote-audits.md](examples/remote-audits.md) for annotated scans of real public repos, including:
 
 - **MCP config with 30 servers** — catches 6 hardcoded API keys ([HTML report](https://dawalama.github.io/skill-audit/remote-audit-mcp.html))
-- **Malicious skill** — looks normal, hides 13 attack vectors across 7 categories ([HTML report](https://dawalama.github.io/skill-audit/audit-malicious-skill.html))
+- **Malicious skill** — looks normal, hides 14 attack vectors across 7 categories ([HTML report](https://dawalama.github.io/skill-audit/audit-malicious-skill.html))
 - **LLM review examples** — optional semantic review for malicious skills and MCP configs (`audit-malicious-skill-llm.html`, `audit-mcp-llm.html`)
-- **gstack dev toolkit** — 59 remote files scanned, including docs as attack surface ([HTML report](https://dawalama.github.io/skill-audit/remote-audit-gstack.html))
-- **200+ skill collection** — grades 10 skills, auto-skips 12 doc files ([HTML report](https://dawalama.github.io/skill-audit/remote-audit-skills.html))
+- **Real skill repo (quality)** — scans dgreenheck/webgpu-claude-skill: 16 files, trust clean, graded A–D on quality ([HTML report](https://dawalama.github.io/skill-audit/remote-audit-webgpu.html))
 
 ```bash
 # Audit any public GitHub repo

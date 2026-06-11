@@ -46,43 +46,41 @@ ai-skill-audit audit https://github.com/angrysky56/100-tool-mcp-server-json-exam
 
 **What's safe:** Command patterns, filesystem scope, and network configuration all scored 100%.
 
-## 2. Large Skills Collection
+## 2. Real Skill Repo — Quality Scoring
 
-A collection of 200+ domain-specific Claude skills (engineering, marketing, product, C-level advisor, etc.). Scanned with `--min-grade B` to flag skills that need improvement.
+A real public WebGPU/Three.js skill collection (`dgreenheck/webgpu-claude-skill`), scanned straight from GitHub. No security threats — this is the *quality* half of the tool at work on legitimate, well-intentioned code.
 
 ```bash
-ai-skill-audit audit https://github.com/alirezarezvani/claude-skills --summary --min-grade B
+ai-skill-audit audit https://github.com/dgreenheck/webgpu-claude-skill --summary
 ```
 
 ```
                               Skill Audit Summary
-┏━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━┳━━━━━━━━┓
-┃ File                 ┃ Type  ┃ Name                 ┃ Grade ┃ Score ┃ Issues ┃
-┡━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━╇━━━━━━━━┩
-│ SKILL.md             │ skill │ "engineering-skills" │   C   │   72% │      5 │
-│ SKILL.md             │ skill │ "c-level-advisor"    │   C   │   70% │      6 │
-│ SKILL.md             │ skill │ "finance-skills"     │   C   │   66% │      6 │
-│ SKILL.md             │ skill │ "pm-skills"          │   C   │   65% │      7 │
-│ SKILL.md             │ skill │ "ra-qm-skills"       │   C   │   65% │      7 │
-│ SKILL.md             │ skill │ "business-growth-sk… │   D   │   63% │      7 │
-│ SKILL.md             │ skill │ "engineering-advanc… │   D   │   63% │      7 │
-│ SKILL.md             │ skill │ "product-skills"     │   D   │   63% │      7 │
-│ SKILL.md             │ skill │ "marketing-skills"   │   D   │   63% │      7 │
-│ SKILL-AUTHORING-STA… │ skill │ Skill Authoring      │   D   │   60% │      8 │
-│                      │       │ Standard             │       │       │        │
-└──────────────────────┴───────┴──────────────────────┴───────┴───────┴────────┘
+┏━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━┳━━━━━━━━┓
+┃ File                 ┃ Type   ┃ Name                ┃ Grade ┃ Score ┃ Issues ┃
+┡━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━╇━━━━━━━━┩
+│ basic-setup.js       │ script │ basic-setup.js      │   A   │  100% │      - │
+│ custom-material.js   │ script │ custom-material.js  │   A   │  100% │      - │
+│ earth-shader.js      │ script │ earth-shader.js     │   A   │  100% │      - │
+│ particle-system.js   │ script │ particle-system.js  │   A   │  100% │      - │
+│ post-processing.js   │ script │ post-processing.js  │   A   │  100% │      - │
+│ compute-shader.js    │ script │ compute-shader.js   │   A   │  100% │      - │
+│ webgpu-project.js    │ script │ webgpu-project.js   │   A   │  100% │      - │
+│ device-loss.md       │ skill  │ Device Loss         │   C   │   66% │      6 │
+│ limits-and-features… │ skill  │ Limits And Features │   D   │   65% │      6 │
+│ SKILL.md             │ skill  │ webgpu-threejs-tsl  │   D   │   63% │      7 │
+│ compute-shaders.md   │ skill  │ Compute Shaders     │   D   │   58% │      7 │
+│ REFERENCE.md         │ skill  │ Reference           │   D   │   57% │      8 │
+│ wgsl-integration.md  │ skill  │ Wgsl Integration    │   D   │   56% │      8 │
+│ core-concepts.md     │ skill  │ Core Concepts       │   D   │   54% │      8 │
+│ materials.md         │ skill  │ Materials           │   D   │   54% │      8 │
+│ post-processing.md   │ skill  │ Post Processing     │   D   │   54% │      8 │
+└──────────────────────┴────────┴─────────────────────┴───────┴───────┴────────┘
 
-  10 files analyzed, average score: 65%
-
-  Skipped 12 documentation file(s) (README, CONTRIBUTING, etc.).
-  Use --include-docs to scan them.
-
-10 file(s) below minimum grade B
+  16 files analyzed, average score: 77%
 ```
 
-**What it shows:** All 10 skill files scored below B (65% average). Common issues: missing examples, missing gotchas/caveats, and limited testability. No security threats detected — these are quality issues, not safety issues.
-
-**Doc filtering in action:** 12 documentation files (README, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, INSTALLATION, etc.) were automatically skipped. In the previous version without filtering, these inflated the results to 20 files with many false low grades.
+**What it shows:** Trust is clean across all 16 files — no security findings on a legitimate repo. The 7 JavaScript helper scripts score A; the 9 skill markdown files land C–D for quality gaps (missing examples, gotchas, and structure). That's actionable feedback for the author — the "harden the skills you write" half — not a safety verdict.
 
 ## 3. Malicious Skill (Multi-Vector Attack)
 
@@ -194,20 +192,6 @@ ai-skill-audit audit https://github.com/user/repo --verbose
 
 **Why this matters:** A malicious skill author could previously embed `<!-- skill-audit: ignore INJECTION -->` or ship a `.skill-audit-ignore` file to hide their own findings. Now, remote content has zero influence on its audit score.
 
-## 6. Garry Tan's gstack (59 Remote Files)
-
-A full-stack development toolkit with deploy, review, QA, canary, benchmark, and more.
-
-```bash
-ai-skill-audit audit https://github.com/garrytan/gstack --summary
-```
-
-Key findings:
-- **59 files scanned** under remote-audit defaults, including docs such as AGENTS.md, README.md, and architecture notes because they are part of the agent instruction surface.
-- Average score 50% — mostly quality/profile mismatch issues plus trust findings from broad bootstrap and shell patterns.
-- The scan highlights an important next product need: trusted-provider and skill-profile interpretation should downgrade expected capability risks only after preserving the raw finding evidence.
-- A TOON report is also generated for agent context: `examples/remote-audit-gstack.toon`.
-
 ## Reports
 
 Generated reports:
@@ -216,9 +200,8 @@ Generated reports:
 - [Malicious skill + LLM review](https://dawalama.github.io/skill-audit/audit-malicious-skill-llm.html) — static scan plus semantic review
 - [MCP config scan](https://dawalama.github.io/skill-audit/remote-audit-mcp.html) — angrysky56/100-tool-mcp-server
 - [MCP config + LLM review](https://dawalama.github.io/skill-audit/audit-mcp-llm.html) — optional semantic MCP security review
-- [gstack dev toolkit](https://dawalama.github.io/skill-audit/remote-audit-gstack.html) — garrytan/gstack (59 remote files)
-- [Skills collection scan](https://dawalama.github.io/skill-audit/remote-audit-skills.html) — alirezarezvani/claude-skills
-- Agent-facing TOON examples: `audit-clean-skill.toon`, `audit-malicious-skill.toon`, and `remote-audit-gstack.toon`
+- [Real skill repo — quality scoring](https://dawalama.github.io/skill-audit/remote-audit-webgpu.html) — dgreenheck/webgpu-claude-skill (16 files, trust clean)
+- Agent-facing TOON examples: `audit-clean-skill.toon`, `audit-malicious-skill.toon`
 
 Generate your own:
 
