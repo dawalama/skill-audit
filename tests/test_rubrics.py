@@ -1,10 +1,9 @@
 """Tests for skill-lint rubrics."""
 
-import pytest
 
 from skill_audit.parser import ParsedArtifact
-from skill_audit.rubrics.skill_rubrics import score_skill
 from skill_audit.rubrics.role_rubrics import score_role
+from skill_audit.rubrics.skill_rubrics import score_skill
 
 
 class TestSkillRubrics:

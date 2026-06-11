@@ -1,13 +1,12 @@
 """Tests for MCP config scanner."""
 
 import json
+
 import pytest
-from pathlib import Path
 
-from skill_audit.mcp_scanner import scan_mcp_config, McpScanResult, McpServerFinding
-from skill_audit.analyzer import analyze_file, analyze_mcp_config
+from skill_audit.analyzer import analyze_file
+from skill_audit.mcp_scanner import scan_mcp_config
 from skill_audit.parser import detect_format
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

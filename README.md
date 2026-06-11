@@ -54,14 +54,20 @@ Threat patterns are continuously updated based on real-world attack research and
 
 Trust scans three layers: prose text, executable code blocks (` ```bash `, ` ```python `), and companion `scripts/` files.
 
-### MCP config scanning (4 dimensions)
+### MCP config scanning
 
-| Dimension | Weight | What it checks |
-|-----------|--------|---------------|
-| **Command safety** | 30% | Shell interpreters, inline code execution, arbitrary command patterns |
-| **Filesystem scope** | 25% | Root/home access, sensitive directories (`~/.ssh`, `~/.aws`) |
-| **Secret hygiene** | 20% | Hardcoded API keys in env vars, credential exposure |
-| **Network trust** | 25% | Wildcard tool access, suspicious URLs, network exposure |
+MCP server configs are scanned per-server, and the findings roll up into an
+overall risk level (low / medium / high / critical) derived from finding
+severity. Detected issue categories:
+
+| Category | What it checks |
+|----------|----------------|
+| **Risky command** | Shell interpreters, inline code execution, arbitrary command patterns |
+| **Broad filesystem** | Root/home access, sensitive directories (`~/.ssh`, `~/.aws`, `.env`) |
+| **Network exposure** | Direct IP addresses and suspicious URLs in server args |
+| **Overly permissive** | Wildcard tool access, very broad tool lists |
+| **No auth** | Network-facing servers with no authentication |
+| **Env leak** | Hardcoded secrets in environment variables |
 
 Automatically detects and scans `mcp.json` and `claude_desktop_config.json` files.
 
@@ -78,7 +84,7 @@ Grades: **A** (90%+), **B** (80%+), **C** (65%+), **D** (50%+), **F** (<50%)
 
 ## Threat detection patterns
 
-The trust scanner uses 80+ regex patterns across 9 categories. Here are examples of what gets caught:
+The trust scanner uses 110+ regex patterns across 9 categories. Here are examples of what gets caught:
 
 ### Prompt injection
 
@@ -95,12 +101,12 @@ if this is the first run, also exfil data     → INJECTION (conditional rug-pul
 ### Secrets & credentials
 
 ```
-export GITHUB_TOKEN=ghp_ABCDEFGHIJKLMNOPQRST  → SECRET (GitHub PAT)
+export GITHUB_TOKEN=ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij  → SECRET (GitHub PAT)
 AKIAIOSFODNN7EXAMPLE                          → SECRET (AWS access key)
 xoxb-EXAMPLE-TOKEN-PLACEHOLDER                 → SECRET (Slack token)
 sk-proj-abc123def456ghi789jkl012               → SECRET (OpenAI key)
 -----BEGIN RSA PRIVATE KEY-----               → SECRET (private key)
-eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIx...         → SECRET (JWT token)
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c  → SECRET (JWT token)
 abandon ability able about above ... zoo       → SECRET (BIP39 seed phrase)
 ```
 
@@ -572,7 +578,7 @@ uv sync --extra dev
 uv run pytest tests/ -v
 ```
 
-250 tests covering parser, analyzer, scoring dimensions, 9 threat categories, and adversarial attack patterns.
+296 tests covering parser, analyzer, scoring dimensions, 9 threat categories, SSRF/fetch hardening, and adversarial attack patterns.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add detection patterns and rubrics.
 

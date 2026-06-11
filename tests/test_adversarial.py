@@ -5,7 +5,6 @@ ClawHavoc campaigns, Unicode smuggling, conditional payloads,
 multi-layer obfuscation, and social engineering patterns.
 """
 
-import pytest
 
 from skill_audit.parser import ParsedArtifact
 from skill_audit.rubrics.skill_rubrics import score_skill

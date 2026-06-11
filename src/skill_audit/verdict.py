@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from .models import AuditVerdict, Finding, ScoreCard
 
-
 MALICE_CATEGORIES = {
     "INJECTION", "SECRET", "EXFILTRATION", "PERSISTENCE", "HIJACKING", "OBFUSCATION",
 }

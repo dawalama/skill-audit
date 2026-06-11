@@ -1,11 +1,10 @@
 """Tests for LLM reviewer — tests parsing logic without making real LLM calls."""
 
-import pytest
 
 from skill_audit.llm_reviewer import (
-    _parse_response,
-    LLMReview,
     LLMFinding,
+    LLMReview,
+    _parse_response,
 )
 
 

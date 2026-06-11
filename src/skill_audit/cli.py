@@ -1,15 +1,13 @@
 """CLI for skill-audit."""
 
 import os
-import sys
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.console import Console
 
 from . import __version__
-from .config import load_config, format_config
+from .config import format_config, load_config
 
 _HELP = """\
 Audit AI skill and role files for quality and trust.
@@ -32,7 +30,7 @@ How to use:
   Check LLM providers:   ai-skill-audit providers
 
 Skills are graded A-F across 6 dimensions: completeness, clarity,
-actionability, safety, testability, and trust. Trust scans for 7 threat
+actionability, safety, testability, and trust. Trust scans for 9 threat
 categories including prompt injection, secrets, and exfiltration.
 
 Static analysis by default (fast, free, offline). Add --llm for deeper
@@ -134,17 +132,17 @@ def _build_llm_content(artifact) -> str:
 @app.command()
 def audit(
     path: str = typer.Argument(..., help="File, directory, or URL to audit"),
-    format: Optional[str] = typer.Option(None, "--format", "-f", help="Force format: dotai-skill, dotai-role, claude-native"),
+    format: str | None = typer.Option(None, "--format", "-f", help="Force format: dotai-skill, dotai-role, claude-native"),
     output: str = typer.Option("table", "--output", "-o", help="Output format: table, json, toon, markdown, html"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show per-dimension details and suggestions"),
-    min_grade: Optional[str] = typer.Option(None, "--min-grade", help="Exit 1 if below grade (A/B/C/D) — useful for CI"),
+    min_grade: str | None = typer.Option(None, "--min-grade", help="Exit 1 if below grade (A/B/C/D) — useful for CI"),
     summary: bool = typer.Option(False, "--summary", help="Summary table only (for directories)"),
     security_only: bool = typer.Option(False, "--security-only", help="Run only trust/security checks; skip quality scoring"),
     llm: bool = typer.Option(False, "--llm", help="Enable LLM review for deeper analysis (uses claude CLI, OpenRouter, or Ollama)"),
-    llm_provider: Optional[str] = typer.Option(None, "--llm-provider", help="Force LLM provider: claude, openrouter, ollama"),
-    llm_model: Optional[str] = typer.Option(None, "--llm-model", help="Override LLM model (e.g. anthropic/claude-sonnet-4-5)"),
+    llm_provider: str | None = typer.Option(None, "--llm-provider", help="Force LLM provider: claude, openrouter, ollama"),
+    llm_model: str | None = typer.Option(None, "--llm-model", help="Override LLM model (e.g. anthropic/claude-sonnet-4-5)"),
     no_cache: bool = typer.Option(False, "--no-cache", help="Skip LLM cache and force fresh review"),
-    include_docs: Optional[bool] = typer.Option(None, "--include-docs", help="Include documentation files (README, CONTRIBUTING, etc.) in directory scans"),
+    include_docs: bool | None = typer.Option(None, "--include-docs", help="Include documentation files (README, CONTRIBUTING, etc.) in directory scans"),
     trust_target_ignore: bool = typer.Option(False, "--trust-target-ignore", help="Honor .skill-audit-ignore files inside remote repos (off by default for safety)"),
 ):
     """Audit a skill or role file for quality and trust.
@@ -172,9 +170,9 @@ def audit(
       ai-skill-audit audit https://github.com/user/skills     GitHub repo
       ai-skill-audit audit https://github.com/user/repo/blob/main/SKILL.md
     """
-    from .analyzer import analyze_file, analyze_directory
-    from .fetcher import is_remote, fetch_remote, cleanup_temp
-    from .formatters import format_table, format_json, format_toon, format_markdown, format_html, format_summary_table
+    from .analyzer import analyze_directory, analyze_file
+    from .fetcher import cleanup_temp, fetch_remote, is_remote
+    from .formatters import format_html, format_json, format_markdown, format_summary_table, format_table, format_toon
     from .ignore import load_ignore_config
 
     # Load config and apply defaults (CLI flags override config values)
@@ -201,7 +199,7 @@ def audit(
                 temp_path = target
         except ValueError as e:
             _stderr.print(f"[red]{e}[/red]")
-            raise typer.Exit(1)
+            raise typer.Exit(1) from e
     else:
         target = Path(path).expanduser().resolve()
         if not target.exists():
@@ -233,7 +231,7 @@ def audit(
     # LLM review (runs before output so HTML can include findings)
     llm_results: dict[str, list] = {}
     if llm:
-        from .llm_reviewer import review_skill, detect_provider
+        from .llm_reviewer import detect_provider, review_skill
         from .parser import parse_file as parse_for_llm
 
         provider = llm_provider or detect_provider()
@@ -332,7 +330,7 @@ def info(
     format, entity type, parsed name, description, and what sections were
     found.
     """
-    from .parser import parse_file, detect_format
+    from .parser import detect_format, parse_file
 
     target = Path(path).expanduser().resolve()
     if not target.exists():
@@ -345,8 +343,8 @@ def info(
         from .mcp_scanner import scan_mcp_config
         result = scan_mcp_config(target)
         console.print(f"\n  [bold]File:[/bold]        {target.name}")
-        console.print(f"  [bold]Format:[/bold]      mcp-config")
-        console.print(f"  [bold]Type:[/bold]        mcp-config")
+        console.print("  [bold]Format:[/bold]      mcp-config")
+        console.print("  [bold]Type:[/bold]        mcp-config")
         console.print(f"  [bold]Servers:[/bold]     {result.server_count}")
         console.print(f"  [bold]Risk:[/bold]        {result.overall_risk}")
         console.print(f"  [bold]Findings:[/bold]    {len(result.servers)}")
@@ -435,8 +433,9 @@ def cache(
     Cache auto-invalidates when skill content changes.
     Stored at ~/.cache/skill-audit/llm/
     """
-    from .llm_reviewer import _CACHE_DIR
     import shutil
+
+    from .llm_reviewer import _CACHE_DIR
 
     if not _CACHE_DIR.exists():
         console.print("  No cache found.")
@@ -454,11 +453,11 @@ def cache(
         return
 
     total_size = sum(f.stat().st_size for f in entries)
-    console.print(f"\n  [bold]LLM Review Cache[/bold]")
+    console.print("\n  [bold]LLM Review Cache[/bold]")
     console.print(f"  Location: {_CACHE_DIR}")
     console.print(f"  Entries:  {len(entries)}")
     console.print(f"  Size:     {total_size / 1024:.1f} KB")
-    console.print(f"\n  Run [bold]ai-skill-audit cache --clear[/bold] to delete.\n")
+    console.print("\n  Run [bold]ai-skill-audit cache --clear[/bold] to delete.\n")
 
 
 @app.command()

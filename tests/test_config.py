@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from skill_audit.config import load_config, AuditConfig, LLMConfig, format_config
+from skill_audit.config import AuditConfig, LLMConfig, format_config, load_config
 
 
 @pytest.fixture

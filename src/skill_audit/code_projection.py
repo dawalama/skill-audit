@@ -12,7 +12,6 @@ import re
 from dataclasses import dataclass
 from typing import Literal
 
-
 ChunkKind = Literal["code", "string", "comment", "doc"]
 
 
@@ -73,7 +72,7 @@ def _project_python(text: str) -> list[CodeChunk]:
     for node in ast.walk(tree):
         if isinstance(node, (ast.Module, ast.Load, ast.Store, ast.Del, ast.Constant)):
             continue
-        if isinstance(node, ast.Expr) and isinstance(getattr(node, "value", None), ast.Constant):
+        if isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant):
             value = node.value.value
             if isinstance(value, str):
                 chunks.append(_chunk_from_node("doc", node, text=value, executable=False))

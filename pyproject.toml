@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ai-skill-audit"
-version = "0.8.1"
+version = "0.9.0"
 description = "Audit AI skill and role files for quality and trust. Catches bad prompts before they reach your agent."
 readme = "README.md"
 license = "MIT"
@@ -35,7 +35,7 @@ Issues = "https://github.com/dawalama/skill-audit/issues"
 Changelog = "https://github.com/dawalama/skill-audit/releases"
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0"]
+dev = ["pytest>=8.0", "ruff>=0.6", "mypy>=1.11"]
 
 [project.scripts]
 ai-skill-audit = "skill_audit.cli:app"
@@ -46,3 +46,22 @@ packages = ["src/skill_audit"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+
+[tool.ruff.lint]
+# E/W: pycodestyle, F: pyflakes, I: isort, B: bugbear, UP: pyupgrade
+select = ["E", "F", "W", "I", "B", "UP"]
+# Long regex pattern lines in the rubrics are intentional and more readable unsplit.
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+files = ["src/skill_audit"]
+ignore_missing_imports = true
+# Pragmatic baseline — tighten over time. No implicit Optional, but not full strict.
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true

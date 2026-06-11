@@ -1,14 +1,14 @@
 """Output formatters for skill-audit results."""
 
-import json
 import html as html_mod
+import json
 
 from rich.console import Console
-from rich.table import Table
 from rich.panel import Panel
+from rich.table import Table
 
-from .models import ScoreCard
 from . import __version__
+from .models import ScoreCard
 
 
 def format_table(card: ScoreCard, verbose: bool = False) -> None:
@@ -146,7 +146,7 @@ def format_llm_findings(findings: list, entity_name: str, model: str,
     # Top Risks summary — show critical+high as a quick glance box
     top_risks = [f for f in ordered if f.severity in ("critical", "high")]
     if top_risks:
-        console.print(f"    [bold]Top Risks[/bold]")
+        console.print("    [bold]Top Risks[/bold]")
         for f in top_risks:
             label = severity_labels[f.severity]
             console.print(f"      {label}  {f.message}")

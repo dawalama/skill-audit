@@ -8,9 +8,9 @@ from pathlib import Path
 from .config import WeightsConfig
 from .ignore import IgnoreConfig
 from .models import ScoreCard, ScoreDimension
-from .parser import ParsedArtifact, parse_file, parse_text, detect_format
-from .rubrics.skill_rubrics import score_skill
+from .parser import ParsedArtifact, detect_format, parse_file, parse_text
 from .rubrics.role_rubrics import score_role
+from .rubrics.skill_rubrics import score_skill
 from .verdict import interpret_card
 
 
@@ -144,7 +144,7 @@ _DOC_FILES = {
     "audit_report.md", "skill_pipeline.md", "store.md",
     # Project structure / meta docs
     "agents.md", "ethos.md", "todos.md", "browser.md",
-    "todos.md", "vision.md", "philosophy.md",
+    "vision.md", "philosophy.md",
 }
 
 _MCP_FILES = {"mcp.json", "claude_desktop_config.json"}

@@ -1,10 +1,9 @@
 """Tests for skill-lint analyzer."""
 
-import pytest
-from pathlib import Path
 
-from skill_audit.analyzer import analyze_file, analyze_artifact, analyze_directory, analyze_text
-from skill_audit.parser import parse_file
+import pytest
+
+from skill_audit.analyzer import analyze_directory, analyze_file, analyze_text
 
 
 @pytest.fixture

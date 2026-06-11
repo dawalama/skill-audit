@@ -630,7 +630,7 @@ def _extract_code_blocks_ast(text: str) -> list[tuple[str, str]]:
     more reliably than regex.
     """
     import mistletoe
-    from mistletoe.block_token import CodeFence, BlockCode
+    from mistletoe.block_token import BlockCode, CodeFence
 
     doc = mistletoe.Document(text)
     blocks: list[tuple[str, str]] = []
@@ -769,14 +769,9 @@ def _score_trust(
     else:
         all_text = f"{' '.join(a.steps)} {clean_body} {' '.join(a.gotchas)} {' '.join(a.examples)}"
 
-    # Documentation-only text: description + gotchas (used for context-aware filtering)
-    # Patterns found ONLY here and nowhere else are likely documenting dangers, not executing them
-    doc_only_text = "" if a.format == "script" else f"{a.description} {' '.join(a.gotchas)}"
-
     # Layer 2: Extract executable code blocks
     code_blocks = _extract_code_blocks(all_text)
     exec_blocks = [(lang, code) for lang, code in code_blocks if lang in _EXEC_LANGUAGES]
-    non_exec_blocks = [(lang, code) for lang, code in code_blocks if lang and lang not in _EXEC_LANGUAGES]
 
     if exec_blocks:
         langs = sorted(set(lang for lang, _ in exec_blocks))
@@ -825,7 +820,6 @@ def _score_trust(
         scan_texts.append(cmd)
 
     full_scan = "\n".join(scan_texts)
-    full_scan_lower = full_scan.lower()
 
     # Build "actionable" text — everything except description field
     # Description often documents what the skill *warns about* (e.g., "warns before rm -rf")
@@ -838,7 +832,6 @@ def _score_trust(
     for cmd in inline_cmds:
         actionable_texts.append(cmd)
     actionable_scan = "\n".join(actionable_texts)
-    actionable_lower = actionable_scan.lower()
 
     # Categories where documentation context matters — patterns in description/gotchas
     # that warn about dangers should not flag if the pattern isn't in executable code
@@ -860,9 +853,13 @@ def _score_trust(
     ]
 
     for patterns, category, case_insensitive in _ALL_PATTERN_GROUPS:
-        text_to_scan = full_scan_lower if case_insensitive else full_scan
+        # Match against the ORIGINAL (non-lowercased) text, using re.IGNORECASE
+        # for case-insensitive groups. Pre-lowercasing the text silently killed
+        # any pattern containing an uppercase literal (e.g. `(POST|PUT)`, `DAN`,
+        # `exec.Command`) because the literal could never match lowercased input.
+        flags = re.IGNORECASE if case_insensitive else 0
         for pattern, desc in patterns:
-            match = re.search(pattern, text_to_scan)
+            match = re.search(pattern, full_scan, flags)
             if match:
                 # Context-aware filtering: for DESTRUCTIVE patterns, check if the
                 # match is ONLY in documentation (description/gotchas) and not in
@@ -870,8 +867,7 @@ def _score_trust(
                 # A skill that warns "don't run rm -rf" shouldn't be flagged the
                 # same as one that instructs "run rm -rf".
                 if category in _DOC_AWARE_CATEGORIES:
-                    action_text = actionable_lower if case_insensitive else actionable_scan
-                    if not re.search(pattern, action_text):
+                    if not re.search(pattern, actionable_scan, flags):
                         # Pattern only in docs/description — skip it
                         continue
                 evidence = _evidence_window(full_scan, match.start(), match.end())

@@ -1,9 +1,9 @@
 """Tests for skill-lint parser."""
 
-import pytest
-from pathlib import Path
 
-from skill_audit.parser import parse_file, parse_text, detect_format, detect_format_from_text, ParsedArtifact
+import pytest
+
+from skill_audit.parser import detect_format, detect_format_from_text, parse_file, parse_text
 
 
 @pytest.fixture

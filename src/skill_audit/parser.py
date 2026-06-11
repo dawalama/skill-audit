@@ -280,8 +280,8 @@ def _split_sections_ast(body: str) -> dict[str, str]:
     lines = body.split("\n")
 
     # Collect heading positions from the AST
-    heading_positions: list[tuple[str, int]] = []
-    for token in doc.children:
+    heading_positions: list[tuple[str, int | None]] = []
+    for token in (doc.children or []):
         if isinstance(token, Heading) and token.level == 2:
             # Extract the raw text from the heading's children
             heading_text = _render_span_tokens(token.children).strip().lower()
@@ -358,88 +358,25 @@ def _render_span_tokens(children) -> str:
     return "".join(parts)
 
 
-def _parse_body_ast(body: str) -> dict:
-    """Parse markdown body into structured components using mistletoe AST.
-
-    Returns a dict with:
-      - headings: list of (level, text) tuples
-      - code_blocks: list of (language, content) tuples
-      - lists: list of dicts with 'ordered' bool and 'items' list (supports nesting)
-      - paragraphs: list of raw text strings
-    """
-    import mistletoe
-    from mistletoe.block_token import (
-        Heading,
-        CodeFence,
-        BlockCode,
-        List as MdList,
-        Paragraph,
-    )
-
-    doc = mistletoe.Document(body)
-    result: dict = {
-        "headings": [],
-        "code_blocks": [],
-        "lists": [],
-        "paragraphs": [],
-    }
-
-    def _extract_list_items(list_token) -> list[dict]:
-        """Recursively extract list items, including nested lists."""
-        items = []
-        for item in list_token.children:
-            text_parts: list[str] = []
-            sub_items: list[dict] = []
-            for child in (item.children or []):
-                if isinstance(child, Paragraph):
-                    text_parts.append(_render_span_tokens(child.children))
-                elif isinstance(child, MdList):
-                    sub_items.extend(_extract_list_items(child))
-                elif hasattr(child, 'children') and child.children:
-                    text_parts.append(_render_span_tokens(child.children))
-            text = " ".join(text_parts).strip()
-            items.append({"text": text, "children": sub_items})
-        return items
-
-    for token in doc.children:
-        if isinstance(token, Heading):
-            text = _render_span_tokens(token.children).strip()
-            result["headings"].append((token.level, text))
-        elif isinstance(token, (CodeFence, BlockCode)):
-            lang = getattr(token, 'language', '') or ''
-            content = (getattr(token, 'content', '') or
-                       (token.children[0].content if token.children else ''))
-            result["code_blocks"].append((lang.lower().strip(), content.strip()))
-        elif isinstance(token, MdList):
-            ordered = hasattr(token, 'start_at') or getattr(token, 'start', None) is not None
-            items = _extract_list_items(token)
-            result["lists"].append({"ordered": ordered, "items": items})
-        elif isinstance(token, Paragraph):
-            text = _render_span_tokens(token.children).strip()
-            if text:
-                result["paragraphs"].append(text)
-
-    return result
-
-
 def _extract_steps_ast(steps_body: str) -> list[str]:
     """Extract numbered list steps from a section body using mistletoe AST."""
     import mistletoe
-    from mistletoe.block_token import List as MdList, Paragraph
+    from mistletoe.block_token import List as MdList
+    from mistletoe.block_token import Paragraph
 
     doc = mistletoe.Document(steps_body)
     steps: list[str] = []
 
-    for token in doc.children:
+    for token in (doc.children or []):
         if isinstance(token, MdList):
-            for item in token.children:
+            for item in (token.children or []):
                 text_parts: list[str] = []
                 for child in (item.children or []):
                     if isinstance(child, Paragraph):
                         text_parts.append(_render_span_tokens(child.children))
                     elif isinstance(child, MdList):
                         # Include sub-list text as part of the step
-                        for sub_item in child.children:
+                        for sub_item in (child.children or []):
                             for sub_child in (sub_item.children or []):
                                 if isinstance(sub_child, Paragraph):
                                     text_parts.append(

@@ -3,14 +3,10 @@
 import textwrap
 from pathlib import Path
 
-import pytest
-
 from skill_audit.ignore import (
     IgnoreConfig,
-    VALID_CATEGORIES,
-    UNSUPPRESSIBLE_INLINE,
-    load_ignore_config,
     _parse_ignore_file,
+    load_ignore_config,
 )
 
 

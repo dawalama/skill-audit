@@ -8,8 +8,13 @@ Thanks for your interest in making AI skills safer. Here's how to contribute.
 git clone https://github.com/dawalama/skill-audit.git
 cd skill-audit
 uv sync --extra dev
-uv run pytest tests/ -v
+uv run pytest tests/ -v      # tests
+uv run ruff check src/ tests/ # lint
+uv run mypy                   # type check
 ```
+
+`ruff` and `mypy` run as a `lint` job in CI, so a PR must be lint- and
+type-clean to merge. Run them locally before submitting.
 
 ## Adding detection patterns
 
@@ -40,7 +45,7 @@ Pattern coverage is informed by [arXiv:2604.03070](https://arxiv.org/abs/2604.03
 
 - Patterns should have **low false positive rates** — flag real threats, not common usage
 - Include a clear description explaining *why* the pattern is suspicious
-- Case sensitivity: injection/destructive/exfiltration patterns are case-insensitive; secrets/obfuscation are case-sensitive (to match actual key formats)
+- Case sensitivity: the case-insensitive groups (injection, destructive, exfiltration, privilege, suspicious URLs, persistence, hijacking) are matched against the original text with `re.IGNORECASE`, so uppercase literals like `POST` or `exec.Command` in those patterns are fine. Secrets and obfuscation are matched case-sensitively to preserve real key/encoding formats
 - Test with both true positives (malicious) and true negatives (legitimate usage)
 
 ## Adding scoring rubrics
@@ -63,7 +68,7 @@ Format detection lives in `src/skill_audit/parser.py`. To support a new format:
 
 - Keep PRs focused — one feature or fix per PR
 - Include tests for new functionality
-- Run the full test suite before submitting
+- Run the full test suite, `ruff`, and `mypy` before submitting
 - Update README.md if adding user-facing features
 
 ## Reporting false positives
