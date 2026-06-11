@@ -512,7 +512,7 @@ Threat patterns are informed by published security research on LLM agent ecosyst
 | Source | What it informed |
 |--------|-----------------|
 | [arXiv:2604.03070](https://arxiv.org/abs/2604.03070) — "Credential Leakage in LLM Agent Skills" (2026) | 10 vulnerability categories across 17,022 skills: reverse shells, persistence mechanisms, resource hijacking, credential logging, insecure storage |
-| [ClawHavoc](https://www.spaceraccoon.dev/prompt-injection-ai-agents-mcp/) — MCP prompt injection research | `<IMPORTANT>` hidden instruction tags, conditional rug-pull patterns |
+| [ClawHavoc](https://www.koi.ai/blog/clawhavoc-341-malicious-clawedbot-skills-found-by-the-bot-they-were-targeting) — 335-skill marketplace poisoning campaign (Koi Security, 2026) | `<IMPORTANT>` hidden instruction tags, conditional rug-pull patterns, credential/env exfiltration |
 | OWASP LLM Top 10 | Prompt injection, insecure output handling, supply chain vulnerabilities |
 
 If you've found a novel attack pattern in the wild or in published research, [open an issue](https://github.com/dawalama/skill-audit/issues) or see [CONTRIBUTING.md](CONTRIBUTING.md) for how to add detection patterns.
