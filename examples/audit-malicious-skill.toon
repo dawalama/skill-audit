@@ -11,6 +11,7 @@ audits[1]:
       recommendation: block
       capability_risk: high
       malice_indicators: high
+      intent_mismatch: false
       quality: C
       summary: "block: profile=security-research, malice=high, capability=high, categories=DESTRUCTIVE, ENTROPY, EXFILTRATION, INJECTION, OBFUSCATION, PRIVILEGE, SUSPICIOUS_URL"
       reasons[6]:

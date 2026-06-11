@@ -11,6 +11,7 @@ audits[1]:
       recommendation: allow
       capability_risk: low
       malice_indicators: low
+      intent_mismatch: false
       quality: A
       summary: "allow: no active security findings; profile=developer-toolkit"
       reasons[1]:
