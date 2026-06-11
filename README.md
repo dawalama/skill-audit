@@ -577,7 +577,7 @@ uv sync --extra dev
 uv run pytest tests/ -v
 ```
 
-296 tests covering parser, analyzer, scoring dimensions, 9 threat categories, SSRF/fetch hardening, and adversarial attack patterns.
+307 tests covering parser, analyzer, scoring dimensions, 9 threat categories, transparency-aware trust, SSRF/fetch hardening, and adversarial attack patterns.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add detection patterns and rubrics.
 

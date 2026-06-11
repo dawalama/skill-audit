@@ -119,6 +119,7 @@ def analyze_artifact(
         entity_type=artifact.entity_type,
         entity_name=artifact.name,
         format=artifact.format,
+        description=artifact.description,
         dimensions=dimensions,
         file_path=artifact.file_path,
     )
