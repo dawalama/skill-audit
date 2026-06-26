@@ -457,8 +457,13 @@ def _score_testability(a: ParsedArtifact, weight: float = 0.10) -> ScoreDimensio
 # description/gotchas prose (documenting dangers, not executing them) are
 # excluded via _is_documentation_context().
 _DESTRUCTIVE_PATTERNS = [
-    (r"\brm\s+-rf\s+[/~]", "Destructive rm -rf on root or home directory"),
-    (r"\brm\s+-rf\s+/", "Destructive rm -rf on absolute path"),
+    # rm -rf of root, home, or a glob of them — the catastrophic cases. A scoped path
+    # like /tmp/foo or ./build must NOT match (it did before: `[/~]` matched any
+    # absolute path, mislabeling `rm -rf /tmp/x` as "root or home directory").
+    (r"\brm\s+-rf\s+(/|~|\$HOME)(\*)?(\s|$|[;&|'\"])", "Destructive rm -rf on root or home directory"),
+    # rm -rf of a critical system directory (excludes /tmp and /var/tmp).
+    (r"\brm\s+-rf\s+/(etc|usr|bin|sbin|lib|lib64|boot|dev|sys|proc|root|home|opt|var)(?!/tmp)(/|\s|$|[;&|'\"])",
+     "Destructive rm -rf on a system directory"),
     (r"\bgit\s+push\s+--force\b", "Force push can destroy remote history"),
     (r"\bgit\s+reset\s+--hard\b", "Hard reset destroys uncommitted work"),
     (r"\bdrop\s+(table|database)\b", "DROP TABLE/DATABASE is destructive"),
