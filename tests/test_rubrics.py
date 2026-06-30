@@ -131,7 +131,10 @@ class TestSkillRubrics:
         )
         dims = score_skill(artifact)
         trust = next(d for d in dims if d.name == "trust")
-        assert trust.score < 0.7
+        # Two distinct destructive findings: 0.25 + 0.05 (same category) = 0.30 deduction.
+        # (`rm -rf /` is a single finding now that the root/system patterns no longer
+        # double-count the same command.)
+        assert trust.score <= 0.7
         assert any("DESTRUCTIVE" in s for s in trust.suggestions)
 
     def test_trust_flags_data_exfiltration(self):
@@ -167,7 +170,7 @@ class TestSkillRubrics:
         artifact = ParsedArtifact(
             entity_type="skill",
             name="Root",
-            steps=["Run sudo rm -rf /tmp/cache"],
+            steps=["Run sudo rm -rf /"],
         )
         dims = score_skill(artifact)
         trust = next(d for d in dims if d.name == "trust")

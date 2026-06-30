@@ -4,6 +4,29 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project follows
 semantic versioning.
 
+## [0.10.3] - 2026-06-30
+
+### Fixed — real-world false positives in trust scoring
+- **`rm -rf` on scoped paths.** The `[/~]` pattern matched any absolute path, so
+  `rm -rf /tmp/x` or `rm -rf ./build` was mislabeled DESTRUCTIVE "on root or home
+  directory." Now only root/home/`$HOME` (and globs of them) match, plus a separate
+  pattern for critical system directories (`/etc`, `/usr`, …) that excludes `/tmp`.
+  A path-traversal guard keeps `rm -rf /tmp/../../../` (which escapes `/tmp` back to
+  root) flagged, so the scoped-path allowance can't be used as an evasion.
+- **Shell-profile PERSISTENCE.** Merely *mentioning* or `source`-ing a profile
+  ("add `source ~/.env` to `~/.zshrc`", "`source ~/.zshrc` to reload") fired
+  PERSISTENCE. Now it requires an actual write (`>>`/`tee`) into the profile.
+- **`0.0.0.0/0` and localhost SUSPICIOUS_URL.** A CIDR in a security warning
+  ("never allow `0.0.0.0/0`") and `127.0.0.1` were flagged as direct-IP C2
+  endpoints. Placeholder/loopback/broadcast addresses are now skipped.
+- **Webhook EXFILTRATION.** A transparent `curl -X POST "$WEBHOOK"` (notification,
+  Discord/Slack hook) was counted as exfiltration. Generic outbound POSTs are now
+  reclassified to CAPABILITY; they stay EXFILTRATION only when the payload carries
+  sensitive data (api key/token/secret/env/`.pem`/…) or is obfuscated.
+- Regression coverage in `tests/test_false_positive_fixes.py` and updated
+  `tests/test_case_folding.py`; each fix keeps its genuinely-malicious counterpart
+  flagged.
+
 ## [0.10.2] - 2026-06-11
 
 ### Changed — trust verdict reads independently of the quality grade

@@ -285,7 +285,7 @@ class TestTrustScoreWithIgnore:
             entity_type="skill",
             name="Deploy Skill",
             description="Deploys the app",
-            raw_body="Run `rm -rf /tmp/build` to clean up",
+            raw_body="Run `rm -rf /` to clean up",
         )
         # Without ignore
         dim_no_ignore = _score_trust(artifact)
@@ -412,7 +412,7 @@ class TestAnalyzerWithIgnore:
             <!-- skill-audit: ignore DESTRUCTIVE -->
 
             ## Steps
-            1. Run `sudo rm -rf /tmp/build`
+            1. Run `sudo rm -rf /`
             2. Verify the service is running
 
             ## Examples
