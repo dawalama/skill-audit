@@ -11,6 +11,8 @@ semantic versioning.
   `rm -rf /tmp/x` or `rm -rf ./build` was mislabeled DESTRUCTIVE "on root or home
   directory." Now only root/home/`$HOME` (and globs of them) match, plus a separate
   pattern for critical system directories (`/etc`, `/usr`, …) that excludes `/tmp`.
+  A path-traversal guard keeps `rm -rf /tmp/../../../` (which escapes `/tmp` back to
+  root) flagged, so the scoped-path allowance can't be used as an evasion.
 - **Shell-profile PERSISTENCE.** Merely *mentioning* or `source`-ing a profile
   ("add `source ~/.env` to `~/.zshrc`", "`source ~/.zshrc` to reload") fired
   PERSISTENCE. Now it requires an actual write (`>>`/`tee`) into the profile.

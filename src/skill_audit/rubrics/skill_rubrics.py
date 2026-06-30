@@ -464,6 +464,10 @@ _DESTRUCTIVE_PATTERNS = [
     # rm -rf of a critical system directory (excludes /tmp and /var/tmp).
     (r"\brm\s+-rf\s+/(etc|usr|bin|sbin|lib|lib64|boot|dev|sys|proc|root|home|opt|var)(?!/tmp)(/|\s|$|[;&|'\"])",
      "Destructive rm -rf on a system directory"),
+    # rm -rf with a `..` path-traversal segment — a "scoped" path that escapes its
+    # directory (e.g. `rm -rf /tmp/../../../`) resolves back to root, so the /tmp
+    # exclusion above must not give it a free pass.
+    (r"\brm\s+-rf\s+(\S*/)?\.\.(/|\s|$|[;&|'\"])", "Destructive rm -rf with .. path traversal"),
     (r"\bgit\s+push\s+--force\b", "Force push can destroy remote history"),
     (r"\bgit\s+reset\s+--hard\b", "Hard reset destroys uncommitted work"),
     (r"\bdrop\s+(table|database)\b", "DROP TABLE/DATABASE is destructive"),
