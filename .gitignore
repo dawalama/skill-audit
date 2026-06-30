@@ -24,6 +24,4 @@ build/
 /RFI-implemented.md
 /UPSTREAM_FIX_INSTRUCTIONS.md
 /rdc.yaml
-/t.html
-/test.html
-/claude-skills-report.html
+/*.html
