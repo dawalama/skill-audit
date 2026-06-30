@@ -596,7 +596,10 @@ _SUSPICIOUS_URL_PATTERNS = [
     (r"\bgist\.github\.com/", "Gist URL (unreviewed code source)"),
     (r"\bpastebin\.com/", "Pastebin URL (common malware hosting)"),
     (r"\bngrok\.io\b", "Ngrok tunnel (potential C2 or exfil endpoint)"),
-    (r"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}[:/]", "Direct IP address (no DNS = suspicious)"),
+    # Skip placeholder/loopback/broadcast addresses — they're configuration examples,
+    # not C2 endpoints. `0.0.0.0/0` in particular shows up in security *warnings*
+    # ("never allow 0.0.0.0/0"), and 127.0.0.1 is localhost.
+    (r"\b(?!127\.)(?!0\.0\.0\.0\b)(?!255\.255\.255\.255\b)\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}[:/]", "Direct IP address (no DNS = suspicious)"),
 ]
 
 # --- Persistence mechanisms (arXiv:2604.03070 Pattern B6) ---
@@ -606,7 +609,10 @@ _PERSISTENCE_PATTERNS: list[tuple[str, str]] = [
     (r"\bsystemctl\s+enable\b", "Enabling systemd service — persistence mechanism"),
     (r"\blaunchctl\s+load\b.*-w", "Loading persistent launchd agent"),
     (r"\bchkconfig\b.*\bon\b", "Enabling init.d service — persistence"),
-    (r"~?/?\.bashrc|~?/?\.bash_profile|~?/?\.zshrc|~?/?\.profile", "Modifying shell profile — persistence via shell init"),
+    # Require an actual WRITE (redirect/tee) into the profile — a backdoor edits shell
+    # init, but setup docs merely *mention* or `source` it ("add `source ~/.env` to
+    # ~/.zshrc", "source ~/.zshrc to reload"), which is benign and must not match.
+    (r"(?:>>?|\btee\b)\s*[^\n|;&]*?\.(?:bashrc|bash_profile|zshrc|zprofile|profile)\b", "Writing to shell profile — persistence via shell init"),
     (r"/etc/rc\.local", "Modifying rc.local — boot persistence"),
 ]
 
@@ -1044,6 +1050,17 @@ _CAPABILITY_EXEC_MESSAGES = {
     "Go exec.Command — potential RCE",
 }
 
+# Generic outbound-network primitives. Posting to a URL is a declared *capability*
+# (notifications, webhooks, API calls) — it's exfiltration only when it carries
+# sensitive data (the credential/env/file patterns stay EXFILTRATION) or is concealed.
+# A transparent `curl -X POST "$WEBHOOK"` is reclassified to CAPABILITY; an obfuscated
+# one (base64/eval evidence) stays hidden EXFILTRATION.
+_CAPABILITY_NET_MESSAGES = {
+    "Sends data to external URL via curl",
+    "Posts data to external URL",
+    "Posts data via wget",
+}
+
 # Markers that a snippet is concealing what it does (encoded/obfuscated payloads).
 _OBFUSCATED_EVIDENCE_RE = re.compile(
     r"base64\s+-d|base64\s+--decode|\|\s*base64|b64decode|atob\s*\(|"
@@ -1058,6 +1075,19 @@ def _looks_obfuscated(evidence: str) -> bool:
     return bool(_OBFUSCATED_EVIDENCE_RE.search(evidence))
 
 
+# Sensitive-data markers in an outbound-POST payload. When present, a curl/wget POST is
+# real exfiltration (not just a notification) and must NOT be downgraded to CAPABILITY.
+_SENSITIVE_PAYLOAD_RE = re.compile(
+    r"\bapi[_-]?key\b|\bsecret\b|\btoken\b|\bpassword\b|\bcredential\b|\bpasswd\b|"
+    r"\benv\b|\benviron\b|-u\s+\S+:|\.pem\b|\.env\b|\bssh\b|\baws\b|\bprivate[_-]?key\b",
+    re.IGNORECASE,
+)
+
+
+def _carries_sensitive_data(evidence: str) -> bool:
+    return bool(_SENSITIVE_PAYLOAD_RE.search(evidence))
+
+
 def _classify_transparency(
     raw_category: str, message: str, evidence: str, *, has_concealment: bool
 ) -> tuple[str, str]:
@@ -1069,7 +1099,12 @@ def _classify_transparency(
       the skill shows no other concealment, and *hidden* malice when it does —
       transparency, not the bare pattern, decides.
     """
-    is_cap_exec = raw_category == "EXFILTRATION" and message in _CAPABILITY_EXEC_MESSAGES
+    # A generic outbound POST is declared capability — UNLESS its payload carries
+    # sensitive data, in which case it stays EXFILTRATION.
+    is_cap_net = (raw_category == "EXFILTRATION" and message in _CAPABILITY_NET_MESSAGES
+                  and not _carries_sensitive_data(evidence))
+    is_cap_exec = raw_category == "EXFILTRATION" and (
+        message in _CAPABILITY_EXEC_MESSAGES or is_cap_net)
     hidden = (
         raw_category in {"OBFUSCATION", "INJECTION"}
         or _looks_obfuscated(evidence)
