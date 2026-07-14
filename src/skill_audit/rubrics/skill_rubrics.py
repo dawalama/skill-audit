@@ -529,6 +529,41 @@ _EXFILTRATION_PATTERNS = [
     (r"\?(?:api_key|token|secret|password|auth)=", "Credentials in URL query string (logged by proxies)"),
 ]
 
+_DEFENSIVE_EXFIL_HEURISTICS = {
+    "May leak secrets",
+    "May leak secrets (credential in output)",
+    "May expose crypto wallet/keys",
+}
+
+
+def _is_defensive_exfil_context(text: str, start: int, end: int, description: str) -> bool:
+    """Suppress broad secret-word proximity matches in explicit audit guidance.
+
+    Concrete sinks such as curl POST, uploads, reverse shells, or credential-bearing
+    commands use other pattern descriptions and are never suppressed here.  This is
+    intentionally limited to the three fuzzy proximity heuristics above.
+    """
+    if description not in _DEFENSIVE_EXFIL_HEURISTICS:
+        return False
+    window = text[max(0, start - 240):min(len(text), end + 240)].lower()
+    explicitly_forbidden = re.search(
+        r"\b(?:do not|don't|never|must not|without)\b[\s\S]{0,100}"
+        r"\b(?:print|log|send|upload|export|expose|leak|read|copy)\b",
+        window,
+    )
+    defensive_workflow = (
+        re.search(r"\b(?:audit|scan|search|check|detect|find|flag|redact)\w*\b", window)
+        and re.search(r"\b(?:secret|credential|private\s+key|wallet|seed\s+phrase|mnemonic)\w*\b", window)
+    )
+    # Secret-audit skills commonly put several `rg`/`grep` signatures in one
+    # code block.  A fuzzy proximity rule must not join `console.log` from one
+    # search expression to `PRIVATE KEY` from the next and call it exfiltration.
+    search_command = (
+        re.search(r"(?:\brg\b|\bgrep\b|--glob\b)", window)
+        and not re.search(r"\b(?:curl|wget|upload|send)\b", window)
+    )
+    return bool(explicitly_forbidden or defensive_workflow or search_command)
+
 # --- Code obfuscation ---
 _OBFUSCATION_PATTERNS = [
     (r"\beval\b.*\$\(.*\b(curl|wget|nc|base64)\b", "eval with network/encoded command (obfuscated execution)"),
@@ -876,6 +911,10 @@ def _score_trust(
         for pattern, desc in patterns:
             match = re.search(pattern, full_scan, flags)
             if match:
+                if category == "EXFILTRATION" and _is_defensive_exfil_context(
+                    full_scan, match.start(), match.end(), desc
+                ):
+                    continue
                 # Context-aware filtering: for DESTRUCTIVE patterns, check if the
                 # match is ONLY in documentation (description/gotchas) and not in
                 # any actionable context (code blocks, scripts, steps, commands).

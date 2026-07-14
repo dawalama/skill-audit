@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project follows
 semantic versioning.
 
+## [Unreleased]
+
+### Fixed — defensive secret-audit false positives
+- Explicit guidance to scan for and redact credentials no longer triggers the
+  broad EXFILTRATION proximity heuristics merely because it mentions printing,
+  logging, or private-key signatures.
+- Separate `rg`/`grep` audit expressions in one code block are no longer joined
+  into an invented credential-exposure relationship. Concrete outbound sinks,
+  credential logging, uploads, and malicious counterparts remain flagged.
+
 ## [0.10.3] - 2026-06-30
 
 ### Fixed — real-world false positives in trust scoring
