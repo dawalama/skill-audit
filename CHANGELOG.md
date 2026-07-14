@@ -6,6 +6,8 @@ semantic versioning.
 
 ## [Unreleased]
 
+## [0.10.4] - 2026-07-14
+
 ### Fixed — defensive secret-audit false positives
 - Explicit guidance to scan for and redact credentials no longer triggers the
   broad EXFILTRATION proximity heuristics merely because it mentions printing,
