@@ -6,8 +6,9 @@ import os
 from pathlib import Path
 
 from .config import WeightsConfig
+from .hook_scanner import analyze_hook_config, is_hook_config_file
 from .ignore import IgnoreConfig
-from .models import ScoreCard, ScoreDimension
+from .models import Finding, ScoreCard, ScoreDimension
 from .parser import ParsedArtifact, detect_format, parse_file, parse_text
 from .rubrics.role_rubrics import score_role
 from .rubrics.skill_rubrics import score_skill
@@ -29,6 +30,8 @@ def analyze_file(
     fmt = force_format or detect_format(path)
     if fmt == "mcp-config":
         return analyze_mcp_config(path)
+    if fmt == "agent-hooks":
+        return analyze_hook_config(path)
     artifact = parse_file(path, force_format)
     return analyze_artifact(artifact, ignore_config=ignore_config, custom_patterns=custom_patterns, weights=weights, trust_inline=trust_inline, security_only=security_only)
 
@@ -148,7 +151,11 @@ _DOC_FILES = {
     "vision.md", "philosophy.md",
 }
 
-_MCP_FILES = {"mcp.json", "claude_desktop_config.json"}
+_MCP_FILES = {"mcp.json", ".mcp.json", "claude_desktop_config.json"}
+
+_AGENT_DOT_DIRS = {".claude", ".cursor", ".vscode", ".claude-plugin"}
+
+_REPO_INSTRUCTION_FILES = {"agents.md", "claude.md", "gemini.md", ".cursorrules"}
 
 _SCRIPT_EXTENSIONS = {
     ".bash", ".cjs", ".fish", ".js", ".jsx", ".mjs", ".ps1", ".py",
@@ -181,18 +188,24 @@ def analyze_directory(
     include_docs: bool = False,
     trust_inline: bool = True,
     security_only: bool = False,
+    include_repo_instructions: bool = False,
 ) -> tuple[list[ScoreCard], int]:
     """Analyze all skill/role files in a directory.
 
-    Recursively scans markdown skills/roles, MCP configs, and scripts attached
-    to discovered skill surfaces. Documentation files such as README.md are
-    skipped by default without stopping recursion into deeper skill directories.
+    Recursively scans markdown skills/roles, MCP configs, agent hooks, and
+    scripts attached to discovered skill surfaces. Documentation files such as
+    README.md are skipped by default without stopping recursion into deeper
+    skill directories.
 
     Returns (cards, skipped_count) where skipped_count is the number of
     documentation files that were skipped.
     """
     results: list[ScoreCard] = []
-    candidates, skipped = _collect_audit_candidates(dir_path, include_docs=include_docs)
+    candidates, skipped = _collect_audit_candidates(
+        dir_path,
+        include_docs=include_docs,
+        include_repo_instructions=include_repo_instructions,
+    )
 
     for candidate in candidates:
         card = analyze_file(
@@ -212,22 +225,34 @@ def analyze_directory(
 def _collect_audit_candidates(
     dir_path: Path,
     include_docs: bool = False,
+    include_repo_instructions: bool = False,
 ) -> tuple[list[Path], int]:
     """Return auditable files under a directory in stable order."""
     markdown_candidates: list[Path] = []
     mcp_candidates: list[Path] = []
+    hook_candidates: list[Path] = []
     skipped = 0
 
     if not dir_path.exists():
         return [], skipped
 
     for root, dirs, files in os.walk(dir_path):
-        dirs[:] = sorted(d for d in dirs if d not in _SKIP_DIRS and not d.startswith("."))
+        dirs[:] = sorted(
+            d for d in dirs
+            if d not in _SKIP_DIRS and (not d.startswith(".") or d in _AGENT_DOT_DIRS)
+        )
         root_path = Path(root)
         for filename in sorted(files):
             path = root_path / filename
+            lower_name = path.name.lower()
             if path.name in _MCP_FILES:
                 mcp_candidates.append(path)
+            elif is_hook_config_file(path):
+                hook_candidates.append(path)
+            elif include_repo_instructions and (
+                lower_name in _REPO_INSTRUCTION_FILES or path.suffix.lower() == ".mdc"
+            ):
+                markdown_candidates.append(path)
             elif path.suffix.lower() == ".md":
                 if not include_docs and not _is_audit_markdown(path, dir_path):
                     skipped += 1
@@ -235,7 +260,7 @@ def _collect_audit_candidates(
                 markdown_candidates.append(path)
 
     script_candidates = _collect_attached_script_candidates(dir_path, markdown_candidates)
-    candidates = sorted({*mcp_candidates, *markdown_candidates, *script_candidates})
+    candidates = sorted({*mcp_candidates, *hook_candidates, *markdown_candidates, *script_candidates})
     return candidates, skipped
 
 
@@ -366,6 +391,26 @@ def analyze_mcp_config(path: Path) -> ScoreCard:
 
     dimensions: list[ScoreDimension] = []
 
+    def _to_finding(f, category_override: str | None = None) -> Finding:
+        cat_map = {
+            "risky-command": "CAPABILITY",
+            "broad-filesystem": "PRIVILEGE",
+            "env-leak": "SECRET",
+            "suspicious-url": "SUSPICIOUS_URL",
+            "network-exposure": "CAPABILITY",
+            "no-auth": "CAPABILITY",
+            "overly-permissive": "CAPABILITY",
+        }
+        cat = category_override or cat_map.get(f.category, "CAPABILITY")
+        return Finding(
+            id=f"MCP_{f.category.upper().replace('-', '_')}",
+            category=cat,
+            severity=f.severity,
+            message=f"[{f.server_name}] {f.message}",
+            evidence=f.detail,
+            source="mcp-config",
+        )
+
     # --- Command safety dimension ---
     cmd_findings = [f for f in result.servers if f.category == "risky-command"]
     cmd_score = 1.0
@@ -384,6 +429,7 @@ def analyze_mcp_config(path: Path) -> ScoreCard:
         weight=0.30,
         details=cmd_details,
         suggestions=cmd_suggestions,
+        findings=[_to_finding(f) for f in cmd_findings],
     ))
 
     # --- Filesystem scope dimension ---
@@ -403,6 +449,7 @@ def analyze_mcp_config(path: Path) -> ScoreCard:
         weight=0.25,
         details=fs_details,
         suggestions=fs_suggestions,
+        findings=[_to_finding(f) for f in fs_findings],
     ))
 
     # --- Secrets / env leaks dimension ---
@@ -423,6 +470,7 @@ def analyze_mcp_config(path: Path) -> ScoreCard:
         weight=0.20,
         details=env_details,
         suggestions=env_suggestions,
+        findings=[_to_finding(f) for f in env_findings],
     ))
 
     # --- Network / auth / URL dimension ---
@@ -444,6 +492,7 @@ def analyze_mcp_config(path: Path) -> ScoreCard:
         weight=0.25,
         details=net_details,
         suggestions=net_suggestions,
+        findings=[_to_finding(f) for f in net_findings],
     ))
 
     card = ScoreCard(

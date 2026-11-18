@@ -38,6 +38,7 @@ class WeightsConfig:
 @dataclass
 class AuditConfig:
     min_grade: str = ""
+    fail_on: str = ""
     output: str = "table"
     llm: LLMConfig = field(default_factory=LLMConfig)
     ignore_paths: list[str] = field(
@@ -111,6 +112,7 @@ def _dict_to_config(data: dict) -> AuditConfig:
 
     return AuditConfig(
         min_grade=data.get("min-grade", ""),
+        fail_on=data.get("fail-on", ""),
         output=data.get("output", "table"),
         llm=llm,
         ignore_paths=ignore_paths,
@@ -140,6 +142,7 @@ def format_config(cfg: AuditConfig) -> str:
     """Format an AuditConfig as a human-readable string."""
     lines = [
         f"min-grade = {cfg.min_grade!r}" if cfg.min_grade else "min-grade = (not set)",
+        f"fail-on = {cfg.fail_on!r}" if cfg.fail_on else "fail-on = (not set)",
         f"output = {cfg.output!r}",
         "",
         "[llm]",

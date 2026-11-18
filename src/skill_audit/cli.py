@@ -133,9 +133,10 @@ def _build_llm_content(artifact) -> str:
 def audit(
     path: str = typer.Argument(..., help="File, directory, or URL to audit"),
     format: str | None = typer.Option(None, "--format", "-f", help="Force format: dotai-skill, dotai-role, claude-native"),
-    output: str = typer.Option("table", "--output", "-o", help="Output format: table, json, toon, markdown, html"),
+    output: str = typer.Option("table", "--output", "-o", help="Output format: table, json, sarif, toon, markdown, html"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show per-dimension details and suggestions"),
     min_grade: str | None = typer.Option(None, "--min-grade", help="Exit 1 if below grade (A/B/C/D) — useful for CI"),
+    fail_on: str | None = typer.Option(None, "--fail-on", help="Exit 1 if trust verdict meets or exceeds threshold (warn, human_review, block)"),
     summary: bool = typer.Option(False, "--summary", help="Summary table only (for directories)"),
     security_only: bool = typer.Option(False, "--security-only", help="Run only trust/security checks; skip quality scoring"),
     llm: bool = typer.Option(False, "--llm", help="Enable LLM review for deeper analysis (uses claude CLI, OpenRouter, or Ollama)"),
@@ -143,6 +144,7 @@ def audit(
     llm_model: str | None = typer.Option(None, "--llm-model", help="Override LLM model (e.g. anthropic/claude-sonnet-4-5)"),
     no_cache: bool = typer.Option(False, "--no-cache", help="Skip LLM cache and force fresh review"),
     include_docs: bool | None = typer.Option(None, "--include-docs", help="Include documentation files (README, CONTRIBUTING, etc.) in directory scans"),
+    include_repo_instructions: bool = typer.Option(False, "--include-repo-instructions", help="Include repo AI instruction files (AGENTS.md, CLAUDE.md, GEMINI.md, .cursorrules, .cursor/rules/*.mdc) in directory scans"),
     trust_target_ignore: bool = typer.Option(False, "--trust-target-ignore", help="Honor .skill-audit-ignore files inside remote repos (off by default for safety)"),
 ):
     """Audit a skill or role file for quality and trust.
@@ -172,7 +174,7 @@ def audit(
     """
     from .analyzer import analyze_directory, analyze_file
     from .fetcher import cleanup_temp, fetch_remote, is_remote
-    from .formatters import format_html, format_json, format_markdown, format_summary_table, format_table, format_toon
+    from .formatters import format_html, format_json, format_markdown, format_sarif, format_summary_table, format_table, format_toon
     from .ignore import load_ignore_config
 
     # Load config and apply defaults (CLI flags override config values)
@@ -181,6 +183,16 @@ def audit(
         output = cfg.output
     if min_grade is None and cfg.min_grade:
         min_grade = cfg.min_grade
+    if fail_on is None and cfg.fail_on:
+        fail_on = cfg.fail_on
+
+    _verdict_order = {"allow": 0, "warn": 1, "human_review": 2, "block": 3}
+    if fail_on is not None:
+        fail_on_norm = fail_on.strip().lower()
+        if fail_on_norm not in ("warn", "human_review", "block"):
+            _stderr.print(f"[red]Invalid --fail-on value: {fail_on!r} (expected warn, human_review, or block)[/red]")
+            raise typer.Exit(2)
+        fail_on = fail_on_norm
     if not llm and cfg.llm.enabled:
         llm = True
     if llm_provider is None and cfg.llm.provider:
@@ -221,7 +233,7 @@ def audit(
 
     skipped = 0
     if target.is_dir():
-        cards, skipped = analyze_directory(target, format, ignore_config=ignore_config, custom_patterns=cfg.custom_patterns or None, weights=cfg.weights, include_docs=include_docs, trust_inline=_trust_inline, security_only=security_only)
+        cards, skipped = analyze_directory(target, format, ignore_config=ignore_config, custom_patterns=cfg.custom_patterns or None, weights=cfg.weights, include_docs=include_docs, trust_inline=_trust_inline, security_only=security_only, include_repo_instructions=include_repo_instructions)
         if not cards:
             _stderr.print(f"[yellow]No skill/role files found in {target}[/yellow]")
             raise typer.Exit(0)
@@ -267,6 +279,8 @@ def audit(
     # Output
     if output == "json":
         print(format_json(cards, audit_payload=security_only))
+    elif output == "sarif":
+        print(format_sarif(cards, llm_findings=llm_results or None))
     elif output == "toon":
         print(format_toon(cards))
     elif output == "html":
@@ -298,7 +312,7 @@ def audit(
         _stderr.print(f"  [dim]Skipped {skipped} documentation file(s) (README, CONTRIBUTING, etc.). Use --include-docs to scan them.[/dim]\n")
 
     # Print LLM findings to terminal (for non-HTML output)
-    if llm_results and output not in ("html", "json"):
+    if llm_results and output not in ("html", "json", "sarif"):
         from .formatters import format_llm_findings
         label = f"{len(llm_results)} file(s)" if len(llm_results) > 1 else list(llm_results.keys())[0]
         has_mcp = any(c.entity_type == "mcp-config" for c in cards)
@@ -311,6 +325,21 @@ def audit(
             if len(llm_results) > 1:
                 console.print()
         console.print()
+
+    # Check verdict threshold (--fail-on)
+    if fail_on:
+        fail_val = _verdict_order[fail_on]
+        verdict_failures = [
+            c for c in cards
+            if c.verdict and _verdict_order.get(c.verdict.recommendation, 0) >= fail_val
+        ]
+        if verdict_failures:
+            _stderr.print(
+                f"[red]{len(verdict_failures)} file(s) met or exceeded trust threshold '{fail_on}'[/red]"
+            )
+            if temp_path:
+                cleanup_temp(temp_path)
+            raise typer.Exit(1)
 
     # Check minimum grade
     if min_grade:

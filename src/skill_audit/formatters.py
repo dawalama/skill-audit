@@ -208,6 +208,123 @@ def format_json(cards: list[ScoreCard], *, audit_payload: bool = False) -> str:
     return json.dumps([c.to_dict() for c in cards], indent=2)
 
 
+_SARIF_LEVEL = {
+    "critical": "error",
+    "high": "error",
+    "medium": "warning",
+    "low": "note",
+}
+
+
+def format_sarif(
+    cards: list[ScoreCard],
+    llm_findings: dict[str, list] | None = None,
+) -> str:
+    """Format scorecards as SARIF v2.1.0 for CI / GitHub Code Scanning."""
+    rules_by_id: dict[str, dict] = {}
+    results: list[dict] = []
+
+    def _register_rule(rule_id: str, category: str, severity: str, description: str) -> None:
+        if rule_id in rules_by_id:
+            return
+        rules_by_id[rule_id] = {
+            "id": rule_id,
+            "name": category,
+            "shortDescription": {"text": description},
+            "defaultConfiguration": {"level": _SARIF_LEVEL.get(severity, "warning")},
+            "properties": {"category": category, "severity": severity},
+        }
+
+    for card in cards:
+        artifact_uri = str(card.file_path) if card.file_path else card.entity_name
+        rec = card.verdict.recommendation if card.verdict else None
+
+        for dim in card.dimensions:
+            for finding in dim.findings:
+                if finding.disposition != "active":
+                    continue
+                _register_rule(
+                    finding.id,
+                    finding.category,
+                    finding.severity,
+                    f"{finding.category}: {finding.message}",
+                )
+                msg = finding.message
+                if finding.evidence:
+                    msg = f"{msg} (evidence: {finding.evidence})"
+                props: dict = {
+                    "category": finding.category,
+                    "severity": finding.severity,
+                    "transparency": finding.transparency,
+                    "confidence": finding.confidence,
+                    "source": finding.source,
+                    "entity_name": card.entity_name,
+                }
+                if rec:
+                    props["recommendation"] = rec
+                results.append({
+                    "ruleId": finding.id,
+                    "level": _SARIF_LEVEL.get(finding.severity, "warning"),
+                    "message": {"text": msg},
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {"uri": artifact_uri},
+                            }
+                        }
+                    ],
+                    "properties": props,
+                })
+
+        if llm_findings and card.entity_name in llm_findings:
+            for lf in llm_findings[card.entity_name]:
+                sev = getattr(lf, "severity", "medium")
+                cat = getattr(lf, "category", "LLM_REVIEW")
+                rule_id = f"LLM_{cat}"
+                _register_rule(rule_id, cat, sev, f"LLM {cat} review finding")
+                msg = getattr(lf, "message", "")
+                evidence = getattr(lf, "evidence", "")
+                if evidence:
+                    msg = f"{msg} (evidence: {evidence})"
+                results.append({
+                    "ruleId": rule_id,
+                    "level": _SARIF_LEVEL.get(sev, "warning"),
+                    "message": {"text": msg},
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {"uri": artifact_uri},
+                            }
+                        }
+                    ],
+                    "properties": {
+                        "category": cat,
+                        "severity": sev,
+                        "source": "llm",
+                        "entity_name": card.entity_name,
+                    },
+                })
+
+    sarif = {
+        "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+        "version": "2.1.0",
+        "runs": [
+            {
+                "tool": {
+                    "driver": {
+                        "name": "skill-audit",
+                        "version": __version__,
+                        "informationUri": "https://github.com/dawalama/skill-audit",
+                        "rules": list(rules_by_id.values()),
+                    }
+                },
+                "results": results,
+            }
+        ],
+    }
+    return json.dumps(sarif, indent=2)
+
+
 def format_toon(cards: list[ScoreCard]) -> str:
     """Format scorecards as compact TOON for agent context."""
     payload = {

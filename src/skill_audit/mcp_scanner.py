@@ -88,7 +88,15 @@ _NETWORK_PATTERNS = [
     (r"\b0\.0\.0\.0\b", "Listening on all interfaces (0.0.0.0)"),
     (r"--host\s+0\.0\.0\.0", "Explicitly binding to all interfaces"),
     (r"\bINADDR_ANY\b", "Binding to all interfaces"),
+    (r"\b169\.254\.169\.254\b", "Cloud metadata endpoint (SSRF risk)"),
+    (r"\bmetadata\.google\.internal\b", "GCP metadata endpoint (SSRF risk)"),
 ]
+
+# Ephemeral package runners executing remote/git URLs
+_REMOTE_RUNNER_RE = re.compile(
+    r"\b(?:npx|uvx|bunx|pnpx)\b[^\n]*(?:https?://|git\+|github:|\.tgz\b|\.tar\.gz\b)",
+    re.IGNORECASE,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -170,6 +178,16 @@ def _scan_server(name: str, config: dict, result: McpScanResult) -> None:
                 detail=f"args: {args_str[:100]}",
             ))
 
+    # --- Ephemeral runner with remote/git URL ---
+    if _REMOTE_RUNNER_RE.search(full_cmd):
+        result.servers.append(McpServerFinding(
+            server_name=name,
+            category="risky-command",
+            severity="high",
+            message="Ephemeral package runner executes remote or unpinned git/URL target",
+            detail=f"command: {full_cmd[:100]}",
+        ))
+
     # --- Broad filesystem access ---
     for arg in args:
         arg_s = str(arg)
@@ -227,6 +245,16 @@ def _scan_server(name: str, config: dict, result: McpScanResult) -> None:
                 detail=f"allowedTools count: {len(allowed_tools)}",
             ))
 
+    # --- Unencrypted remote HTTP ---
+    if url and re.match(r"^http://(?!localhost\b|127\.0\.0\.1\b|\[::1\])", url, re.IGNORECASE):
+        result.servers.append(McpServerFinding(
+            server_name=name,
+            category="network-exposure",
+            severity="medium",
+            message="Unencrypted HTTP transport for remote MCP server",
+            detail=f"url: {url[:100]}",
+        ))
+
     # --- No authentication ---
     if url and not _has_auth(config, env):
         result.servers.append(McpServerFinding(
@@ -236,6 +264,25 @@ def _scan_server(name: str, config: dict, result: McpScanResult) -> None:
             message="Server exposes API via URL without apparent authentication",
             detail=f"url: {url[:100]}",
         ))
+
+    # --- Hardcoded secrets in headers ---
+    headers = config.get("headers", {})
+    if isinstance(headers, dict):
+        for h_name, h_val in headers.items():
+            h_val_str = str(h_val)
+            if (
+                any(k in h_name.lower() for k in ("authorization", "api-key", "apikey", "token", "secret"))
+                and h_val_str
+                and not h_val_str.startswith("$")
+                and "${" not in h_val_str
+            ):
+                result.servers.append(McpServerFinding(
+                    server_name=name,
+                    category="env-leak",
+                    severity="high",
+                    message=f"Hardcoded credential in HTTP header {h_name}",
+                    detail=f"{h_name}={h_val_str[:4]}{'*' * max(0, len(h_val_str) - 4)}",
+                ))
 
     # --- Environment variable leaks ---
     for env_name, env_val in env.items():
@@ -258,11 +305,12 @@ def _scan_server(name: str, config: dict, result: McpScanResult) -> None:
 
 def _has_auth(config: dict, env: dict) -> bool:
     """Heuristically check if a server config includes authentication."""
-    # Check for auth-related keys in config
-    auth_keys = {"auth", "authentication", "authorization", "apiKey", "api_key",
-                 "token", "bearer", "headers"}
-    if any(k.lower() in (ck.lower() for ck in config.keys()) for k in auth_keys):
-        return True
+    # Check for non-empty auth-related keys in config
+    auth_keys = {"auth", "authentication", "authorization", "apikey", "api_key",
+                 "token", "bearer", "headers", "oauth"}
+    for ck, cv in config.items():
+        if ck.lower() in auth_keys and cv:
+            return True
     # Check for auth-related env vars
     auth_env = {"API_KEY", "TOKEN", "SECRET", "AUTH", "BEARER", "PASSWORD"}
     for env_name in env:

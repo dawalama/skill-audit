@@ -64,8 +64,13 @@ def detect_format(path: Path) -> str:
         return "unknown"
 
     # MCP config files
-    if path.name in ("mcp.json", "claude_desktop_config.json"):
+    if path.name in ("mcp.json", ".mcp.json", "claude_desktop_config.json"):
         return "mcp-config"
+
+    # Agent hook config files
+    from .hook_scanner import is_hook_config_file
+    if is_hook_config_file(path):
+        return "agent-hooks"
 
     content = path.read_text()
     return detect_format_from_text(content, filename=path.name)
@@ -74,8 +79,14 @@ def detect_format(path: Path) -> str:
 def detect_format_from_text(content: str, filename: str = "inline.md") -> str:
     """Detect artifact format from raw text and an optional filename."""
     # MCP config files require filename context; raw JSON can otherwise be many things.
-    if filename in ("mcp.json", "claude_desktop_config.json"):
+    if filename in ("mcp.json", ".mcp.json", "claude_desktop_config.json"):
         return "mcp-config"
+
+    if filename == "hooks.json":
+        return "agent-hooks"
+
+    if filename.endswith(".mdc") or filename == ".cursorrules":
+        return "claude-native"
 
     fm = _extract_frontmatter(content)
     body = _extract_body(content)
