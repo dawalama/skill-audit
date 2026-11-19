@@ -1,7 +1,6 @@
 """Tests for P0 (--fail-on, SARIF) and P1 (hardened MCP, agent hooks, repo instructions)."""
 
 import json
-from pathlib import Path
 
 from typer.testing import CliRunner
 

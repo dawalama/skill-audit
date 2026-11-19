@@ -174,7 +174,15 @@ def audit(
     """
     from .analyzer import analyze_directory, analyze_file
     from .fetcher import cleanup_temp, fetch_remote, is_remote
-    from .formatters import format_html, format_json, format_markdown, format_sarif, format_summary_table, format_table, format_toon
+    from .formatters import (
+        format_html,
+        format_json,
+        format_markdown,
+        format_sarif,
+        format_summary_table,
+        format_table,
+        format_toon,
+    )
     from .ignore import load_ignore_config
 
     # Load config and apply defaults (CLI flags override config values)

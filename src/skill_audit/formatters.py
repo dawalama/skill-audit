@@ -470,7 +470,7 @@ def _is_tabular(value: list) -> bool:
     for item in value:
         if list(item.keys()) != keys:
             return False
-        if any(isinstance(v, (dict, list)) for v in item.values()):
+        if any(isinstance(v, dict | list) for v in item.values()):
             return False
     return True
 
@@ -488,7 +488,7 @@ def _toon_scalar(value, delimiter: str = ",") -> str:
         return "null"
     if isinstance(value, bool):
         return "true" if value else "false"
-    if isinstance(value, (int, float)):
+    if isinstance(value, int | float):
         return str(value)
     text = str(value)
     needs_quotes = (

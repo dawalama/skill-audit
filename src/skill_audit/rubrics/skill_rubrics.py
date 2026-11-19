@@ -686,7 +686,7 @@ def _extract_code_blocks_ast(text: str) -> list[tuple[str, str]]:
     blocks: list[tuple[str, str]] = []
 
     def _walk(token):
-        if isinstance(token, (CodeFence, BlockCode)):
+        if isinstance(token, CodeFence | BlockCode):
             lang = getattr(token, 'language', '') or ''
             content = (getattr(token, 'content', '') or
                        (token.children[0].content if token.children else ''))

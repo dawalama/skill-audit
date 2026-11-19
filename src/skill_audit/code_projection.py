@@ -70,7 +70,7 @@ def _project_python(text: str) -> list[CodeChunk]:
         return _project_line_language(text, comment_markers=("#",))
 
     for node in ast.walk(tree):
-        if isinstance(node, (ast.Module, ast.Load, ast.Store, ast.Del, ast.Constant)):
+        if isinstance(node, ast.Module | ast.Load | ast.Store | ast.Del | ast.Constant):
             continue
         if isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant):
             value = node.value.value
@@ -102,19 +102,17 @@ def _python_comment_chunks(text: str) -> list[CodeChunk]:
 def _is_compound_statement(node: ast.AST) -> bool:
     return isinstance(
         node,
-        (
-            ast.FunctionDef,
-            ast.AsyncFunctionDef,
-            ast.ClassDef,
-            ast.If,
-            ast.For,
-            ast.AsyncFor,
-            ast.While,
-            ast.With,
-            ast.AsyncWith,
-            ast.Try,
-            ast.Match,
-        ),
+        ast.FunctionDef
+        | ast.AsyncFunctionDef
+        | ast.ClassDef
+        | ast.If
+        | ast.For
+        | ast.AsyncFor
+        | ast.While
+        | ast.With
+        | ast.AsyncWith
+        | ast.Try
+        | ast.Match,
     )
 
 

@@ -280,13 +280,13 @@ def _clone_repo(url: str, branch: str | None = None) -> Path:
     parsed = urlparse(url)
     if parsed.scheme not in _ALLOWED_SCHEMES:
         raise ValueError(f"Refusing to clone non-http(s) repo: {url}")
+    if branch is not None and (branch.startswith("-") or branch != branch.strip() or not branch):
+        raise ValueError(f"Refusing suspicious branch name: {branch!r}")
     # Defense-in-depth: validates the host resolves public *now*. Note git
     # re-resolves the host itself at clone time, so unlike the file-fetch path
     # this cannot fully pin against DNS rebinding — the transport allowlist and
     # this check are the mitigations available without reimplementing git's I/O.
     _validate_url_safe(url)
-    if branch is not None and (branch.startswith("-") or branch != branch.strip() or not branch):
-        raise ValueError(f"Refusing suspicious branch name: {branch!r}")
 
     tmp = Path(tempfile.mkdtemp(prefix="skill-audit-"))
 

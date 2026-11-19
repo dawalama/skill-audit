@@ -90,7 +90,7 @@ def _dict_to_config(data: dict) -> AuditConfig:
     custom_raw = patterns_data.get("custom", [])
     custom_patterns = []
     for entry in custom_raw:
-        if isinstance(entry, (list, tuple)) and len(entry) == 3:
+        if isinstance(entry, list | tuple) and len(entry) == 3:
             custom_patterns.append((str(entry[0]), str(entry[1]), str(entry[2])))
 
     # Weights
