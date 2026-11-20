@@ -6,13 +6,15 @@ semantic versioning.
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-11-20
+
 ### Added
 - **Trust verdict CI gate (`--fail-on`).** Added `--fail-on warn|human_review|block` CLI flag and `fail-on` config option to exit `1` when any audited file's trust verdict meets or exceeds the threshold (exit `2` on invalid values).
 - **SARIF v2.1.0 output (`--output sarif`).** Added SARIF formatter (`format_sarif`) for GitHub Code Scanning and CI integrations, including optional LLM findings.
 - **Agent hook config scanning (`agent-hooks`).** Added `hook_scanner.py` to detect and scan `hooks.json`, `.claude/hooks.json`, and `.claude/settings.json` / `.claude/settings.local.json` (when a `"hooks"` key is present) across lifecycle events (`PreToolUse`, `PostToolUse`, `SessionStart`, etc.).
 - **Repo AI instruction opt-in (`--include-repo-instructions`).** Added `--include-repo-instructions` flag to include `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.cursorrules`, and `.cursor/rules/*.mdc` in directory scans; `detect_format_from_text` now recognizes `.cursorrules` and `.mdc` as `claude-native`.
 - **Agent dot-directory traversal.** Directory scans now descend into `.claude`, `.cursor`, `.vscode`, and `.claude-plugin` to surface hidden MCP and hook configs.
-- **2025–2026 agentic attack vector patterns.** Added detection for Unicode Tag block ASCII smuggling (`\U000e0000–\U000e007f`), bidirectional override characters (`\u202a–\u202e`, `\u2066–\u2069`), hidden `<system>`/`<tool_instruction>`/`<hidden_instruction>` XML tags, agent permission-bypass flags (`--dangerously-skip-permissions`, `--trust-all-tools`), non-PyPI/non-npm package-index hijacking, writes to agent context/config files (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `.cursorrules`, `.mcp.json`, `.claude/settings*.json`), `git config core.hooksPath`/`core.fsmonitor`, and MCP `autoApprove`/`alwaysAllow` wildcards.
+- **2025–2026 agentic attack vector patterns.** Added detection for Unicode Tag block ASCII smuggling (`\U000e0000–\U000e007f`), bidirectional override characters (`\u202a–\u202e`, `\u2066–\u2069`), hidden `<system>`/`<tool_instruction>`/`<hidden_instruction>` XML tags, MCP tool-shadowing & cross-tool parameter smuggling (`MCP03:2025`), agent permission-bypass flags (`--dangerously-skip-permissions`, `--trust-all-tools`), non-PyPI/non-npm package-index hijacking, writes to agent context/config files (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `.cursorrules`, `.mcp.json`, `.claude/settings*.json`), `git config core.hooksPath`/`core.fsmonitor`, and MCP `autoApprove`/`alwaysAllow` wildcards. Also updated `--llm` review prompts and added `examples/hooks.json`.
 
 ### Changed
 - **Hardened MCP config scanning.** Added `.mcp.json` detection, ephemeral remote runner checks (`npx`/`uvx`/`bunx`/`pnpx` targeting `https://`, `git+`, `github:`, `.tgz`, `.tar.gz`), cloud metadata SSRF endpoint detection (`169.254.169.254`, `metadata.google.internal`), unencrypted `http://` transport warnings, hardcoded credentials in HTTP `headers`, and stricter `_has_auth` checks. MCP findings also map into structured `Finding` objects on `ScoreDimension` for SARIF/verdict consistency.
