@@ -611,6 +611,9 @@ _INJECTION_PATTERNS = [
     (r"[\u202a-\u202e\u2066-\u2069]", "Unicode bidirectional override characters (may conceal instructions)"),
     # Conditional malice
     (r"if\s+.*?(first\s+run|first\s+time|hasn't\s+been\s+run)", "Conditional logic based on first run (rug-pull pattern)"),
+    # MCP tool shadowing & cross-tool hijacking (MCP03:2025)
+    (r"\b(?:always\s+use|prefer|use\s+this\s+tool\s+instead\s+of|override|shadow)\b[^\n]{0,60}\b(?:read_file|write_file|edit_file|bash|run_command|execute|shell)\b", "Tool shadowing / override directive (MCP03:2025)"),
+    (r"\bbefore\s+(?:calling|running|using|executing)\b[^\n]{0,60}\b(?:pass|include|append|send|read)\b[^\n]{0,60}\b(?:contents?|token|secret|key|env|~/\.ssh|~/\.aws|\.env)\b", "Cross-tool parameter smuggling directive (MCP03:2025)"),
 ]
 
 # --- Hardcoded secrets ---

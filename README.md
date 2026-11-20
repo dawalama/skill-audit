@@ -569,6 +569,7 @@ The `examples/` directory contains sample files for testing:
 | `malicious-skill.md` | C | Fake malicious skill — looks normal, hides 14 attack vectors |
 | `evil-deploy.md` | F | All 10 vulnerability categories from [arXiv:2604.03070](https://arxiv.org/abs/2604.03070) — reverse shell, persistence, crypto mining, credential logging |
 | `mcp.json` | C | MCP config with risky server configurations |
+| `hooks.json` | — | Sample agent hook config demonstrating `PreToolUse` exfiltration detection |
 
 ```bash
 # Try it yourself
