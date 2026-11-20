@@ -587,6 +587,7 @@ _PRIVILEGE_PATTERNS = [
     (r"\bsystemctl\s+(start|stop|enable|disable|restart)\b", "Modifies system services"),
     (r"\blaunchctl\s+(load|unload|bootstrap)\b", "Modifies macOS system services"),
     (r"\bcrontab\b", "Modifies scheduled tasks"),
+    (r"(?:--dangerously-skip-permissions|--trust-all-tools)\b", "Agent permission-bypass flag"),
 ]
 
 # --- Prompt injection (unique to AI skill files) ---
@@ -601,10 +602,13 @@ _INJECTION_PATTERNS = [
     (r"act\s+as\s+(if\s+)?you\s+(have\s+)?no\s+(restrictions|limits|rules)", "Prompt injection: restriction bypass"),
     # Hidden instructions in markdown (patterns must work on lowercased text)
     (r"<\s*important\s*>", "Hidden instruction tag (known injection pattern from ClawHavoc)"),
+    (r"<\s*(?:system|tool_instruction|hidden_instruction)\s*>", "Hidden instruction XML tag (potential prompt injection)"),
     (r"<!--.*?(ignore|override|bypass|execute|system\s*prompt).*?-->", "Suspicious HTML comment with directive keywords"),
-    # Zero-width / invisible characters used to hide instructions
+    # Zero-width / invisible / bidi characters used to hide instructions (Rules File Backdoor)
     (r"[\u200b\u200c\u200d\u2060\ufeff]", "Zero-width characters (may hide instructions)"),
     (r"[\u2062\u2063\u2064]", "Invisible math/separator characters"),
+    (r"[\U000e0000-\U000e007f]", "Unicode Tag characters (invisible ASCII smuggling)"),
+    (r"[\u202a-\u202e\u2066-\u2069]", "Unicode bidirectional override characters (may conceal instructions)"),
     # Conditional malice
     (r"if\s+.*?(first\s+run|first\s+time|hasn't\s+been\s+run)", "Conditional logic based on first run (rug-pull pattern)"),
 ]
@@ -639,6 +643,9 @@ _SUSPICIOUS_URL_PATTERNS = [
     # not C2 endpoints. `0.0.0.0/0` in particular shows up in security *warnings*
     # ("never allow 0.0.0.0/0"), and 127.0.0.1 is localhost.
     (r"\b(?!127\.)(?!0\.0\.0\.0\b)(?!255\.255\.255\.255\b)\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}[:/]", "Direct IP address (no DNS = suspicious)"),
+    # Package-index hijacking (DDIPE / PoisonedSkills)
+    (r"\b(?:pip|pip3|uv\s+pip)\s+install\b[^\n]*(?:--index-url|--extra-index-url)\s+https?://(?!pypi\.org\b|test\.pypi\.org\b)", "Package install from non-PyPI index URL (dependency hijacking risk)"),
+    (r"\bnpm\s+config\s+set\s+registry\s+https?://(?!registry\.npmjs\.org\b)", "Overriding npm registry to non-default URL"),
 ]
 
 # --- Persistence mechanisms (arXiv:2604.03070 Pattern B6) ---
@@ -653,6 +660,10 @@ _PERSISTENCE_PATTERNS: list[tuple[str, str]] = [
     # ~/.zshrc", "source ~/.zshrc to reload"), which is benign and must not match.
     (r"(?:>>?|\btee\b)\s*[^\n|;&]*?\.(?:bashrc|bash_profile|zshrc|zprofile|profile)\b", "Writing to shell profile — persistence via shell init"),
     (r"/etc/rc\.local", "Modifying rc.local — boot persistence"),
+    # Persistent agent context / config poisoning (CSA Agent Context Poisoning / OWASP ASI06)
+    (r"(?:>>?|\btee\b)\s*[^\n|;&]*?(?:CLAUDE\.md|AGENTS\.md|GEMINI\.md|\.cursorrules|\.mcp\.json|\.claude/settings(?:\.local)?\.json)\b", "Writing to agent instruction or config file — persistent context poisoning"),
+    # Repo-controlled git hook/fsmonitor execution
+    (r"\bgit\s+config\b[^\n]*\bcore\.(?:hooksPath|fsmonitor)\b", "Modifying git hooksPath or fsmonitor — repo-triggered code execution"),
 ]
 
 # --- Resource hijacking (arXiv:2604.03070 Pattern B5) ---

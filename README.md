@@ -20,8 +20,8 @@ The AI skill ecosystem is growing fast — 80k+ community skills across Claude C
 - **Vet before installing** — is this community skill safe and well-written?
 - **Catch threats** — prompt injection, hardcoded secrets, reverse shells, persistence backdoors, crypto miners, credential logging, data exfiltration
 - **Improve what you write** — get specific, actionable feedback on your own skills
-- **Gate quality in CI** — fail pipelines if skill quality drops below a threshold
-- **Scan MCP configs** — audit MCP server configurations for risky permissions and exposed secrets
+- **Gate quality and trust in CI** — fail pipelines on quality grade (`--min-grade`) or trust verdict (`--fail-on`), and emit SARIF for code scanning
+- **Scan MCP configs & agent hooks** — audit MCP server configurations (`.mcp.json`, `mcp.json`, `claude_desktop_config.json`) and agent lifecycle hooks (`hooks.json`, `.claude/settings.json`) for risky commands, SSRF targets, and exposed secrets
 
 Threat patterns are continuously updated based on real-world attack research and security publications. See [Research](#research) for the papers and sources that inform our detection rules.
 
@@ -62,14 +62,20 @@ severity. Detected issue categories:
 
 | Category | What it checks |
 |----------|----------------|
-| **Risky command** | Shell interpreters, inline code execution, arbitrary command patterns |
+| **Risky command** | Shell interpreters, inline code execution, arbitrary command patterns, ephemeral runners (`npx`/`uvx`/`bunx`/`pnpx`) executing remote/git URLs |
 | **Broad filesystem** | Root/home access, sensitive directories (`~/.ssh`, `~/.aws`, `.env`) |
-| **Network exposure** | Direct IP addresses and suspicious URLs in server args |
+| **Network exposure** | Direct IP addresses, cloud metadata SSRF endpoints (`169.254.169.254`, `metadata.google.internal`), unencrypted `http://` transport, suspicious URLs |
 | **Overly permissive** | Wildcard tool access, very broad tool lists |
 | **No auth** | Network-facing servers with no authentication |
-| **Env leak** | Hardcoded secrets in environment variables |
+| **Env & header leaks** | Hardcoded secrets in environment variables or HTTP `headers` |
 
-Automatically detects and scans `mcp.json` and `claude_desktop_config.json` files.
+Automatically detects and scans `mcp.json`, `.mcp.json`, and `claude_desktop_config.json` files.
+
+### Agent hook config scanning
+
+Automatically detects and scans agent lifecycle hook configurations (`hooks.json`, `.claude/hooks.json`, and `.claude/settings.json` / `.claude/settings.local.json` when a `"hooks"` key is present). Extracts commands from lifecycle events (`PreToolUse`, `PostToolUse`, `SessionStart`, `UserPromptSubmit`, `Stop`, etc.) and runs the trust scanner against them.
+
+Directory scans also descend into `.claude`, `.cursor`, `.vscode`, and `.claude-plugin` to surface hidden hook and MCP configs. Pass `--include-repo-instructions` to also scan repository AI instruction files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.cursorrules`, `.cursor/rules/*.mdc`).
 
 ### Roles (4 dimensions)
 
@@ -268,18 +274,22 @@ ai-skill-audit audit ~/.ai/skills/ --summary
   5 files analyzed, average score: 94%
 ```
 
-### Audit MCP configs
+### Audit MCP configs and agent hooks
 
 ```bash
-# Automatically detected in directories
+# Automatically detected in directories (including .claude/, .cursor/, .vscode/)
 ai-skill-audit audit . --summary
 
+# Include repo AI instruction files (AGENTS.md, CLAUDE.md, GEMINI.md, .cursorrules, *.mdc)
+ai-skill-audit audit . --include-repo-instructions --summary
+
 # Or directly
-ai-skill-audit audit mcp.json
+ai-skill-audit audit .mcp.json
 ai-skill-audit audit claude_desktop_config.json
+ai-skill-audit audit .claude/settings.json
 ```
 
-Scans MCP server configs for risky commands (`bash -c`), exposed secrets in env vars, overly broad filesystem access, and wildcard tool permissions.
+Scans MCP server configs for risky commands (`bash -c`, remote `npx`/`uvx` targets), exposed secrets in env vars or HTTP headers, cloud metadata SSRF endpoints, unencrypted HTTP transport, overly broad filesystem access, and wildcard tool permissions. Scans hook configs for dangerous shell commands across lifecycle events.
 
 ### Audit remote skills
 
@@ -339,6 +349,12 @@ ai-skill-audit audit review.md
 # JSON (for programmatic use)
 ai-skill-audit audit review.md --output json
 
+# SARIF v2.1.0 (for GitHub Code Scanning / CI)
+ai-skill-audit audit skills/ --output sarif > results.sarif
+
+# TOON (token-efficient output for agent prompts)
+ai-skill-audit audit review.md --output toon
+
 # Stable install-safety payload
 ai-skill-audit audit review.md --security-only --output json
 
@@ -352,11 +368,14 @@ ai-skill-audit audit review.md --output html > report.html
 ### Use in CI
 
 ```bash
+# Fail if any file's trust verdict meets or exceeds threshold (warn, human_review, block)
+ai-skill-audit audit ~/.ai/skills/ --fail-on block
+
 # Fail if any skill scores below B
 ai-skill-audit audit ~/.ai/skills/ --min-grade B
 ```
 
-Exit code 1 if any file is below the threshold.
+Exit code 1 if any file violates `--fail-on` or `--min-grade` (exit code 2 on an invalid `--fail-on` value).
 
 #### GitHub Actions example
 
@@ -422,7 +441,10 @@ Create `skill-audit.toml` in your project directory (or `~/.config/skill-audit/c
 # Default minimum grade for CI
 min-grade = "B"
 
-# Default output format: table, json, markdown, html
+# Default trust verdict threshold for CI: warn, human_review, block
+# fail-on = "block"
+
+# Default output format: table, json, sarif, toon, markdown, html
 output = "table"
 
 # LLM settings
@@ -472,8 +494,9 @@ ai-skill-audit config
 |--------|-------------|-----------------|
 | `dotai-skill` | [dotai](https://github.com/dawalama/dotai) structured skills | `trigger`, `category`, `## Steps` in frontmatter/body |
 | `dotai-role` | dotai role files | `## Principles` + `## Anti-patterns` sections |
-| `claude-native` | Claude Code SKILL.md files | `argument-hint`, `compatibility`/`license` in frontmatter, `SKILL.md` filename |
-| `mcp-config` | MCP server configurations | `mcp.json` or `claude_desktop_config.json` filename |
+| `claude-native` | Claude Code `SKILL.md` and repo AI instruction files | `argument-hint`, `compatibility`/`license` in frontmatter, `SKILL.md`, `.cursorrules`, `*.mdc` |
+| `mcp-config` | MCP server configurations | `mcp.json`, `.mcp.json`, or `claude_desktop_config.json` filename |
+| `agent-hooks` | Agent lifecycle hook configurations | `hooks.json`, or `settings.json` / `settings.local.json` with a `"hooks"` key |
 | `unknown` | Plain markdown | Fallback — still scored as a skill |
 
 ## Python API
@@ -513,7 +536,9 @@ Threat patterns are informed by published security research on LLM agent ecosyst
 |--------|-----------------|
 | [arXiv:2604.03070](https://arxiv.org/abs/2604.03070) — "Credential Leakage in LLM Agent Skills" (2026) | 10 vulnerability categories across 17,022 skills: reverse shells, persistence mechanisms, resource hijacking, credential logging, insecure storage |
 | [ClawHavoc](https://www.koi.ai/blog/clawhavoc-341-malicious-clawedbot-skills-found-by-the-bot-they-were-targeting) — 335-skill marketplace poisoning campaign (Koi Security, 2026) | `<IMPORTANT>` hidden instruction tags, conditional rug-pull patterns, credential/env exfiltration |
-| OWASP LLM Top 10 | Prompt injection, insecure output handling, supply chain vulnerabilities |
+| OWASP LLM Top 10 & OWASP Agentic Top 10 (ASI01–ASI10) | Prompt injection, agent goal hijack, tool misuse, agentic supply-chain vulnerabilities, unexpected code execution, context poisoning |
+| OWASP MCP Top 10 (`MCP03:2025` Tool Poisoning) & MCP Threat Modeling | Risky MCP commands, ephemeral remote package runners, SSRF metadata endpoints, unauthenticated transports, hardcoded header credentials |
+| Cloud Security Alliance (CSA) — *Agent Context Poisoning* (2026) & *PoisonedSkills* (2026) | Repo AI instruction file risks (`SKILL.md`, `CLAUDE.md`, `AGENTS.md`, `.cursorrules`), Document-Driven Implicit Payload Execution (DDIPE), and repo-controlled hook execution |
 
 If you've found a novel attack pattern in the wild or in published research, [open an issue](https://github.com/dawalama/skill-audit/issues) or see [CONTRIBUTING.md](CONTRIBUTING.md) for how to add detection patterns.
 
@@ -577,7 +602,7 @@ uv sync --extra dev
 uv run pytest tests/ -v
 ```
 
-307 tests covering parser, analyzer, scoring dimensions, 9 threat categories, transparency-aware trust, SSRF/fetch hardening, and adversarial attack patterns.
+Comprehensive test suite covering parser, analyzer, scoring dimensions, 9 threat categories, transparency-aware trust, MCP & hook scanning, SARIF output, SSRF/fetch hardening, and adversarial attack patterns.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add detection patterns and rubrics.
 

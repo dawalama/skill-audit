@@ -9,8 +9,8 @@ This project is intentionally local-first. Static audits run offline for local f
 Run an audit when:
 
 - The user asks you to install or use a skill from a repository or marketplace.
-- A repo contains `SKILL.md`, `main.md`, `.ai/skills`, `.claude/skills`, `mcp.json`, or `claude_desktop_config.json`.
-- You are asked to review a skill, role, MCP config, or agent instruction pack.
+- A repo contains `SKILL.md`, `main.md`, `.ai/skills`, `.claude/skills`, `.mcp.json`, `mcp.json`, `claude_desktop_config.json`, `hooks.json`, or `.claude/settings.json`.
+- You are asked to review a skill, role, MCP config, agent hook config, or agent instruction pack (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.cursorrules`, `.cursor/rules/*.mdc`).
 - A skill asks for shell, filesystem, browser, network, credential, deployment, or persistence access.
 - You are about to trust instructions from a remote repo.
 
@@ -30,10 +30,22 @@ Audit a local skill:
 uv run ai-skill-audit audit path/to/SKILL.md --verbose
 ```
 
-Audit a local directory:
+Audit a local directory (including `.claude/`, `.cursor/`, `.vscode/`):
 
 ```bash
 uv run ai-skill-audit audit path/to/skills --summary
+```
+
+Include repo AI instruction files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.cursorrules`, `.cursor/rules/*.mdc`):
+
+```bash
+uv run ai-skill-audit audit path/to/repo --include-repo-instructions --summary
+```
+
+Gate in CI on trust verdict (`warn`, `human_review`, `block`):
+
+```bash
+uv run ai-skill-audit audit path/to/repo --fail-on block
 ```
 
 Audit a public GitHub repo:
@@ -54,6 +66,12 @@ Produce canonical machine output:
 uv run ai-skill-audit audit path/to/SKILL.md --output json
 ```
 
+Produce SARIF v2.1.0 output (for GitHub Code Scanning / CI):
+
+```bash
+uv run ai-skill-audit audit path/to/skills --output sarif > results.sarif
+```
+
 Generate a human report:
 
 ```bash
@@ -63,6 +81,8 @@ uv run ai-skill-audit audit path/to/skills --verbose --output html > audit-repor
 ## Output Choice
 
 Use JSON when another program or API will consume the result.
+
+Use SARIF (`--output sarif`) when integrating with GitHub Code Scanning or static-analysis CI pipelines.
 
 Use `--security-only --output json` when making an install decision. This emits
 the stable audit payload and skips quality scoring.

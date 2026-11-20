@@ -245,6 +245,21 @@ def _scan_server(name: str, config: dict, result: McpScanResult) -> None:
                 detail=f"allowedTools count: {len(allowed_tools)}",
             ))
 
+    # --- Auto-approval / always-allow bypass ---
+    for auto_key in ("autoApprove", "auto_approve", "alwaysAllow", "always_allow"):
+        auto_val = config.get(auto_key)
+        is_wildcard_list = isinstance(auto_val, list) and (
+            "*" in auto_val or "all" in [str(t).lower() for t in auto_val]
+        )
+        if auto_val is True or auto_val == "*" or is_wildcard_list:
+            result.servers.append(McpServerFinding(
+                server_name=name,
+                category="overly-permissive",
+                severity="high",
+                message=f"Unrestricted tool auto-approval ({auto_key}) bypasses user confirmation",
+                detail=f"{auto_key}: {auto_val}",
+            ))
+
     # --- Unencrypted remote HTTP ---
     if url and re.match(r"^http://(?!localhost\b|127\.0\.0\.1\b|\[::1\])", url, re.IGNORECASE):
         result.servers.append(McpServerFinding(
